@@ -16,17 +16,18 @@ import { createPinIcon } from "./createPinIcon";
 
 type MapLayer = "map" | "satellite";
 
-const TILES: Record<MapLayer, { url: string; attribution: string }> = {
+const TILES: Record<MapLayer, { url: string; attribution: string; maxZoom: number }> = {
   map: {
-    // Carto Voyager — more reliable than OSM on some hosts
-    url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     attribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 19,
   },
   satellite: {
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     attribution:
       "Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics",
+    maxZoom: 19,
   },
 };
 
@@ -46,13 +47,23 @@ function MapClickHandler({
   return null;
 }
 
-function InvalidateOnChange({ layer }: { layer: MapLayer }) {
+function FixMapSize() {
   const map = useMap();
   useEffect(() => {
-    const id = window.setTimeout(() => map.invalidateSize(), 80);
-    return () => window.clearTimeout(id);
-  }, [map, layer]);
+    const t1 = window.setTimeout(() => map.invalidateSize(), 50);
+    const t2 = window.setTimeout(() => map.invalidateSize(), 300);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+    };
+  }, [map]);
   return null;
+}
+
+function formatReportedAt(value: string) {
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return value;
+  return d.toLocaleString("pt-BR");
 }
 
 interface MapViewProps {
@@ -74,19 +85,19 @@ export function MapView({
 
   return (
     <MapContainer
+      key={layer}
       center={BRAZIL_CENTER}
       zoom={BRAZIL_DEFAULT_ZOOM}
       className="z-0 h-full w-full"
+      style={{ height: "100%", width: "100%" }}
       scrollWheelZoom
-      preferCanvas
     >
       <TileLayer
-        key={layer}
         attribution={tile.attribution}
         url={tile.url}
-        maxZoom={19}
+        maxZoom={tile.maxZoom}
       />
-      <InvalidateOnChange layer={layer} />
+      <FixMapSize />
       <MapClickHandler enabled={pickMode} onClick={onMapClick} />
 
       {alerts.map((alert) => (
@@ -113,7 +124,7 @@ export function MapView({
                 </p>
               ) : null}
               <p className="mt-2 text-xs text-ash/80">
-                {new Date(alert.reportedAt).toLocaleString("pt-BR")}
+                {formatReportedAt(alert.reportedAt)}
               </p>
               <p className="mt-1 text-[10px] uppercase tracking-wide text-ash/60">
                 {alert.source === "inpe"

@@ -21,19 +21,23 @@ export function Idea() {
           </p>
         </Reveal>
 
-        <Reveal delayMs={120} className="flex justify-center md:justify-end">
-          <div className="brand-mark flex aspect-square w-full max-w-[18rem] flex-col items-center justify-center rounded-[2rem] px-8 py-10 text-center">
-            <Image
-              src="/brand/logo-ecomind.png"
-              alt="Logo EcoMind"
-              width={220}
-              height={220}
-              className="h-36 w-36 object-contain md:h-40 md:w-40"
-              sizes="160px"
-            />
-            <p className="display mt-5 text-2xl text-forest">EcoMind</p>
-            <p className="mt-2 text-sm text-ash">natureza + consciência</p>
-          </div>
+        <Reveal
+          delayMs={120}
+          className="flex flex-col items-center justify-center text-center md:items-end md:text-right"
+        >
+          <Image
+            src="/brand/logo-ecomind.png"
+            alt="Logo EcoMind"
+            width={240}
+            height={240}
+            className="h-40 w-40 object-contain md:h-48 md:w-48"
+            sizes="192px"
+            priority={false}
+          />
+          <p className="display mt-5 text-2xl text-forest md:text-3xl">
+            EcoMind
+          </p>
+          <p className="mt-2 text-sm text-ash">natureza + consciência</p>
         </Reveal>
       </div>
     </section>
