@@ -73,6 +73,41 @@ body {
   }
 }
 
+.section-soft {
+  background:
+    radial-gradient(ellipse 70% 55% at 8% 0%, rgba(200, 239, 212, 0.45), transparent 55%),
+    radial-gradient(ellipse 55% 45% at 92% 20%, rgba(47, 122, 79, 0.08), transparent 50%),
+    linear-gradient(180deg, #f7fcf8 0%, #eef7f1 100%);
+}
+
+.section-botanical {
+  background-color: #eef7f1;
+  background-image:
+    radial-gradient(ellipse 60% 50% at 100% 0%, rgba(184, 236, 200, 0.5), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 0% 100%, rgba(22, 61, 42, 0.06), transparent 50%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cpath fill='%232f7a4f' fill-opacity='0.045' d='M70 10c14 20 32 32 32 54S86 106 70 130C54 106 38 86 38 64S56 30 70 10z'/%3E%3C/svg%3E");
+  background-size: auto, auto, 140px 140px;
+}
+
+.section-warm {
+  background:
+    radial-gradient(ellipse 55% 45% at 90% 10%, rgba(154, 98, 66, 0.1), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 5% 90%, rgba(200, 239, 212, 0.35), transparent 50%),
+    linear-gradient(180deg, #fbfdfb 0%, #f3f7f2 100%);
+}
+
+.panel-soft {
+  border: 1px solid rgba(22, 61, 42, 0.1);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(8px);
+  border-radius: 1.25rem;
+}
+
+.brand-panel {
+  border-radius: 1.75rem;
+  box-shadow: 0 24px 60px rgba(18, 40, 28, 0.18);
+}
+
 .eyebrow {
   font-size: 0.75rem;
   font-weight: 600;

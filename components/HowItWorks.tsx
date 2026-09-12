@@ -20,7 +20,7 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section id="como-funciona" className="section bg-paper">
+    <section id="como-funciona" className="section section-botanical">
       <div className="section-inner">
         <Reveal>
           <p className="eyebrow text-forest-mid">Como funciona</p>
@@ -29,16 +29,18 @@ export function HowItWorks() {
           </h2>
         </Reveal>
 
-        <ol className="mt-14 grid gap-10 md:grid-cols-3 md:gap-0">
+        <ol className="mt-16 grid gap-6 md:grid-cols-3">
           {steps.map((step, i) => (
             <Reveal key={step.n} delayMs={i * 100}>
-              <li
-                className={`${i > 0 ? "border-t border-[var(--line)] pt-10 md:border-l md:border-t-0 md:pt-0 md:pl-8" : ""} ${i < steps.length - 1 ? "md:pr-8" : ""}`}
-              >
-                <span className="display text-5xl text-sprout-deep/25">
+              <li className="panel-soft relative h-full overflow-hidden p-7">
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute -right-2 -top-4 display text-[7rem] leading-none text-forest/[0.06]"
+                >
                   {step.n}
                 </span>
-                <h3 className="mt-3 font-display text-2xl font-semibold text-forest">
+                <p className="eyebrow text-forest-mid">Passo {step.n}</p>
+                <h3 className="mt-4 font-display text-2xl font-semibold text-forest">
                   {step.title}
                 </h3>
                 <p className="mt-3 max-w-xs text-base leading-relaxed text-ash">

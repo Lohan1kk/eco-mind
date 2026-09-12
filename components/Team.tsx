@@ -26,7 +26,7 @@ const team = [
 
 export function Team() {
   return (
-    <section id="equipe" className="section bg-paper">
+    <section id="equipe" className="section section-soft">
       <div className="section-inner">
         <Reveal>
           <p className="eyebrow text-forest-mid">Equipe</p>
@@ -39,18 +39,18 @@ export function Team() {
           </p>
         </Reveal>
 
-        <ul className="mt-14 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {team.map((person, i) => (
             <Reveal key={person.name} delayMs={i * 80}>
-              <li className="text-center">
-                <div className="mx-auto h-32 w-32 overflow-hidden rounded-full">
+              <li className="panel-soft px-5 py-8 text-center">
+                <div className="mx-auto h-28 w-28 overflow-hidden rounded-full ring-2 ring-sprout/40">
                   <Image
                     src={person.image}
                     alt={person.name}
-                    width={128}
-                    height={128}
+                    width={112}
+                    height={112}
                     className="h-full w-full object-cover"
-                    sizes="128px"
+                    sizes="112px"
                   />
                 </div>
                 <h3 className="mt-5 font-display text-xl font-semibold text-ink">

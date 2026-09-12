@@ -16,19 +16,21 @@ export function Hero() {
 
       <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-6xl flex-col justify-end px-5 pb-16 pt-28 md:px-8 md:pb-24 md:pt-36">
         <div className="max-w-2xl">
-          <div className="animate-fade-up mb-8 flex items-center gap-4">
+          <div className="animate-fade-up mb-7">
             <Image
               src="/brand/logo-ecomind.png"
               alt="EcoMind"
-              width={96}
-              height={96}
-              className="h-16 w-16 rounded-full md:h-20 md:w-20"
+              width={120}
+              height={120}
+              className="h-14 w-14 object-contain drop-shadow-md md:h-16 md:w-16"
               priority
             />
-            <p className="display text-4xl text-mist md:text-6xl">EcoMind</p>
+            <p className="display mt-4 text-5xl text-mist md:text-7xl">
+              EcoMind
+            </p>
           </div>
 
-          <h1 className="animate-fade-up animate-delay-1 display max-w-xl text-3xl text-mist md:text-5xl">
+          <h1 className="animate-fade-up animate-delay-1 display max-w-xl text-2xl text-sprout md:text-4xl">
             Cada decisão é uma semente.
           </h1>
 

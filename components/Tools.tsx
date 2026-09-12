@@ -27,7 +27,7 @@ const tools = [
 
 export function Tools() {
   return (
-    <section id="ferramentas" className="section bg-mist-soft/50">
+    <section id="ferramentas" className="section section-soft">
       <div className="section-inner">
         <Reveal>
           <p className="eyebrow text-forest-mid">Ferramentas</p>
@@ -40,15 +40,15 @@ export function Tools() {
           </p>
         </Reveal>
 
-        <ul className="mt-14 divide-y divide-[var(--line)] border-y border-[var(--line)]">
+        <ul className="mt-14 space-y-4">
           {tools.map((tool, i) => (
             <Reveal key={tool.href} delayMs={i * 80}>
               <li>
                 <Link
                   href={tool.href}
-                  className="group grid gap-3 py-8 transition md:grid-cols-[5rem_1fr_auto] md:items-center md:gap-10 md:py-10"
+                  className="panel-soft group grid gap-3 p-6 transition hover:border-forest/25 md:grid-cols-[5rem_1fr_auto] md:items-center md:gap-10 md:p-8"
                 >
-                  <span className="display text-3xl text-sprout-deep/30 transition group-hover:text-sprout-deep/60">
+                  <span className="display text-3xl text-sprout-deep/35 transition group-hover:text-sprout-deep/70">
                     {tool.step}
                   </span>
                   <div>
