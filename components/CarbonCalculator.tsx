@@ -61,7 +61,7 @@ export function CarbonCalculator() {
                 key={opt.mode}
                 type="button"
                 onClick={() => setTransport(opt.mode)}
-                className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                className={`rounded-md px-4 py-2 text-sm font-medium transition ${
                   transport === opt.mode
                     ? "bg-sprout text-ink"
                     : "border border-mist/25 text-mist/90 hover:border-sprout/50"
@@ -109,7 +109,7 @@ export function CarbonCalculator() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-sprout/20 bg-ink/40 p-8 backdrop-blur-sm">
+      <div className="border border-sprout/20 bg-ink/45 p-8">
         <p className="text-sm font-semibold uppercase tracking-wide text-sprout/80">
           Estimativa anual
         </p>

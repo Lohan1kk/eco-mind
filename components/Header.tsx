@@ -6,11 +6,11 @@ import { useEffect, useState } from "react";
 
 const links = [
   { href: "/#problema", label: "O problema" },
+  { href: "/#como-funciona", label: "Como funciona" },
   { href: "/calculadora", label: "Calculadora" },
   { href: "/quiz", label: "Quiz" },
   { href: "/alerta-queimadas", label: "Mapa" },
   { href: "/#equipe", label: "Equipe" },
-  { href: "/baixar", label: "Baixar app" },
 ];
 
 interface HeaderProps {
@@ -44,8 +44,8 @@ export function Header({ solid = false }: HeaderProps) {
           <Image
             src="/brand/icon-ecomind.png"
             alt=""
-            width={512}
-            height={512}
+            width={40}
+            height={40}
             className="h-10 w-10 rounded-full"
             priority
           />
@@ -71,10 +71,10 @@ export function Header({ solid = false }: HeaderProps) {
             </Link>
           ))}
           <Link
-            href="/#juntar"
+            href="/#agir"
             className="rounded-md bg-sprout px-4 py-2 text-sm font-semibold text-forest transition hover:bg-white"
           >
-            Quero participar
+            Começar
           </Link>
         </nav>
 
@@ -107,11 +107,11 @@ export function Header({ solid = false }: HeaderProps) {
             ))}
             <li>
               <Link
-                href="/#juntar"
+                href="/#agir"
                 className="mt-1 inline-flex rounded-md bg-forest px-4 py-2.5 text-sm font-semibold text-mist"
                 onClick={() => setOpen(false)}
               >
-                Quero participar
+                Começar
               </Link>
             </li>
           </ul>

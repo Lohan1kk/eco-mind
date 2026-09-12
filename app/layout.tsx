@@ -6,12 +6,14 @@ import "./globals.css";
 const display = Fraunces({
   variable: "--font-display",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const body = Source_Sans_3({
   variable: "--font-body",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -40,10 +42,10 @@ export const metadata: Metadata = {
     siteName: "EcoMind",
     images: [
       {
-        url: "/brand/logo-ecomind.png",
-        width: 512,
-        height: 512,
-        alt: "EcoMind — logo",
+        url: "/brand/hero-forest.jpg",
+        width: 1600,
+        height: 900,
+        alt: "Floresta — EcoMind",
       },
     ],
   },
@@ -51,6 +53,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "EcoMind",
     description: "Calculadora, quiz e mapa de queimadas com dados do INPE.",
+    images: ["/brand/hero-forest.jpg"],
   },
 };
 
@@ -69,6 +72,7 @@ const jsonLd = {
     "App de conscientização ambiental com calculadora de pegada, quiz e mapa de queimadas.",
   applicationCategory: "EducationalApplication",
   operatingSystem: "Web",
+  url: "https://eco-mind-ashy.vercel.app",
   offers: { "@type": "Offer", price: "0", priceCurrency: "BRL" },
 };
 
@@ -80,6 +84,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${display.variable} ${body.variable} h-full`}>
       <head>
+        <link rel="preload" as="image" href="/brand/hero-forest.jpg" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

@@ -33,11 +33,11 @@ export function Team() {
             Nossa equipe
           </p>
           <h2 className="mt-3 font-display text-3xl font-semibold leading-tight text-ink md:text-5xl">
-            Um time pequeno, raízes profundas
+            Quatro alunos, uma causa
           </h2>
           <p className="mt-4 max-w-xl text-lg text-ash">
-            Cientistas de dados, biólogos e designers trabalhando juntos desde o
-            primeiro protótipo.
+            Design, programação e conteúdo — um time escolar transformando
+            preocupação em ferramenta.
           </p>
         </Reveal>
 
@@ -45,13 +45,14 @@ export function Team() {
           {team.map((person, i) => (
             <Reveal key={person.name} delayMs={i * 90}>
               <li className="text-center">
-                <div className="mx-auto h-28 w-28 overflow-hidden rounded-full border-2 border-sprout/50">
+                <div className="mx-auto h-28 w-28 overflow-hidden rounded-full border border-forest/15">
                   <Image
                     src={person.image}
                     alt={person.name}
                     width={112}
                     height={112}
                     className="h-full w-full object-cover"
+                    sizes="112px"
                   />
                 </div>
                 <h3 className="mt-4 font-display text-xl font-semibold text-ink">

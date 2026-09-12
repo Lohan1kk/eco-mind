@@ -6,7 +6,7 @@ const links = [
   { href: "/quiz", label: "Quiz" },
   { href: "/alerta-queimadas", label: "Mapa de queimadas" },
   { href: "/baixar", label: "Baixar app" },
-  { href: "/#juntar", label: "Participar" },
+  { href: "/#agir", label: "Começar" },
 ];
 
 export function Footer() {
@@ -18,8 +18,8 @@ export function Footer() {
             <Image
               src="/brand/icon-ecomind.png"
               alt=""
-              width={512}
-              height={512}
+              width={36}
+              height={36}
               className="h-9 w-9 rounded-full"
             />
             <span className="font-display text-xl font-semibold text-mist">
@@ -61,7 +61,7 @@ export function Footer() {
           </a>
           {" · "}
           <a
-            href="https://github.com/hzy1kk/eco-mind"
+            href="https://github.com/Lohan1kk/eco-mind"
             className="underline hover:text-sprout"
             target="_blank"
             rel="noopener noreferrer"

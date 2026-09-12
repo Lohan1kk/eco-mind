@@ -65,17 +65,20 @@ body {
   background-size: auto, auto, auto, 120px 120px;
 }
 
-.hero-visual {
-  background-image:
-    linear-gradient(
-      105deg,
-      rgba(20, 38, 28, 0.82) 0%,
-      rgba(27, 94, 59, 0.55) 45%,
-      rgba(61, 52, 41, 0.45) 100%
-    ),
-    url("/brand/hero-forest.jpg");
-  background-size: cover;
-  background-position: center;
+.scroll-cue {
+  animation: scroll-cue 1.8s ease-in-out infinite;
+}
+
+@keyframes scroll-cue {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scaleY(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scaleY(0.7);
+  }
 }
 
 @keyframes fade-up {
@@ -146,7 +149,8 @@ body {
   }
 
   .animate-fade-up,
-  .animate-fade-in {
+  .animate-fade-in,
+  .scroll-cue {
     animation: none;
   }
 
