@@ -21,8 +21,9 @@ export default function AlertaQueimadasPage() {
             Alerta de queimadas
           </h1>
           <p className="mt-1 max-w-2xl text-sm text-ash">
-            Focos reais de satélite (INPE) no Brasil, atualizados a cada ~10
-            minutos. Toque no + para reportar um foco na sua região.
+            Focos de satélite (INPE; NASA quando disponível). A frequência
+            depende da fonte — 10 min ou consolidado do dia. Toque no + para
+            marcar um foco neste aparelho.
           </p>
         </div>
         <AlertaQueimadasClient />

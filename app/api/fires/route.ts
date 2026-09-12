@@ -5,7 +5,10 @@ import type { FireAlert } from "@/lib/alerts/types";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const fresh = searchParams.get("refresh") === "1";
+
   const firmsKey = process.env.FIRMS_MAP_KEY;
   let inpeAlerts: FireAlert[] = [];
   let inpeSource: string | null = null;
@@ -13,7 +16,7 @@ export async function GET() {
   const errors: string[] = [];
 
   try {
-    const inpe = await fetchInpeFires();
+    const inpe = await fetchInpeFires({ fresh });
     inpeAlerts = inpe.alerts;
     inpeSource = inpe.source;
   } catch {
@@ -22,7 +25,7 @@ export async function GET() {
 
   if (firmsKey) {
     try {
-      nasaAlerts = await fetchNasaFirmsFires(firmsKey, 1);
+      nasaAlerts = await fetchNasaFirmsFires(firmsKey, 1, { fresh });
     } catch {
       errors.push("NASA FIRMS indisponível.");
     }

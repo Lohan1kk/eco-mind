@@ -12,8 +12,8 @@ export function Idea() {
           </h2>
           <p className="lede mt-6 max-w-xl">
             A EcoMind nasceu na escola. Em vez de só reagir às notícias, criamos
-            um app que educa sobre desmatamento e queimadas, propõe missões de
-            conscientização e mostra caminhos práticos para agir.
+            um app que educa sobre desmatamento e queimadas, oferece ferramentas
+            práticas e mostra caminhos concretos para agir.
           </p>
           <p className="lede mt-4 max-w-xl">
             Pequenas ações plantadas hoje podem crescer em mudança real — na

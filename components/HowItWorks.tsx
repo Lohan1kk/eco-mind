@@ -8,8 +8,8 @@ const steps = [
   },
   {
     n: "02",
-    title: "Missões",
-    text: "Desafios de conscientização — o aluno participa, não só assiste.",
+    title: "Praticar",
+    text: "Calculadora, quiz e mapa — o aluno experimenta as ferramentas, não só assiste.",
   },
   {
     n: "03",

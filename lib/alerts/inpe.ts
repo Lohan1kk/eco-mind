@@ -10,6 +10,14 @@ function parseCsvLine(line: string): string[] {
   return line.split(",").map((cell) => cell.trim());
 }
 
+function safeIso(raw: string): string | null {
+  const normalized = raw.trim().replace(" ", "T");
+  const withZ = normalized.endsWith("Z") ? normalized : `${normalized}Z`;
+  const parsed = new Date(withZ);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed.toISOString();
+}
+
 function latestDailyFilename(): string {
   const now = new Date();
   const y = now.getUTCFullYear();
@@ -18,10 +26,14 @@ function latestDailyFilename(): string {
   return `focos_diario_br_${y}${m}${d}.csv`;
 }
 
-async function findLatest10MinFile(): Promise<string | null> {
-  const res = await fetch(INPE_10MIN_DIR, {
-    next: { revalidate: 300 },
-  });
+function fetchOpts(fresh: boolean, revalidate: number): RequestInit {
+  return fresh
+    ? { cache: "no-store" }
+    : { next: { revalidate } };
+}
+
+async function findLatest10MinFile(fresh: boolean): Promise<string | null> {
+  const res = await fetch(INPE_10MIN_DIR, fetchOpts(fresh, 300));
   if (!res.ok) return null;
 
   const html = await res.text();
@@ -35,33 +47,34 @@ function parse10MinCsv(text: string): FireAlert[] {
   const lines = text.trim().split("\n");
   if (lines.length < 2) return [];
 
-  return lines.slice(1).flatMap((line, index) => {
-    const parts = parseCsvLine(line);
-    if (parts.length < 4) return [];
+  return lines
+    .slice(1)
+    .flatMap((line, index) => {
+      const parts = parseCsvLine(line);
+      if (parts.length < 4) return [];
 
-    const lat = Number.parseFloat(parts[0]);
-    const lng = Number.parseFloat(parts[1]);
-    if (Number.isNaN(lat) || Number.isNaN(lng)) return [];
+      const lat = Number.parseFloat(parts[0]);
+      const lng = Number.parseFloat(parts[1]);
+      if (Number.isNaN(lat) || Number.isNaN(lng)) return [];
 
-    const satelite = parts[2];
-    const raw = parts[3].trim().replace(" ", "T");
-    const reportedAt = new Date(
-      raw.endsWith("Z") ? raw : `${raw}Z`,
-    ).toISOString();
+      const satelite = parts[2];
+      const reportedAt = safeIso(parts[3]);
+      if (!reportedAt) return [];
 
-    return [
-      {
-        id: `inpe-10m-${index}-${lat.toFixed(4)}-${lng.toFixed(4)}`,
-        lat,
-        lng,
-        level: "medio" as const,
-        description: satelite ? `Satélite ${satelite}` : undefined,
-        reportedAt,
-        source: "inpe" as const,
-        satelite,
-      },
-    ];
-  }).slice(0, 280);
+      return [
+        {
+          id: `inpe-10m-${index}-${lat.toFixed(4)}-${lng.toFixed(4)}`,
+          lat,
+          lng,
+          level: "medio" as const,
+          description: satelite ? `Satélite ${satelite}` : undefined,
+          reportedAt,
+          source: "inpe" as const,
+          satelite,
+        },
+      ];
+    })
+    .slice(0, 280);
 }
 
 function parseDailyCsv(text: string, limit: number): FireAlert[] {
@@ -77,12 +90,7 @@ function parseDailyCsv(text: string, limit: number): FireAlert[] {
     const lng = Number.parseFloat(parts[2]);
     if (Number.isNaN(lat) || Number.isNaN(lng)) return [];
 
-    const rawTime = parts[3].trim().replace(" ", "T");
-    const withZ = rawTime.endsWith("Z") ? rawTime : `${rawTime}Z`;
-    const parsed = new Date(withZ);
-    const reportedAt = Number.isNaN(parsed.getTime())
-      ? new Date().toISOString()
-      : parsed.toISOString();
+    const reportedAt = safeIso(parts[3]) ?? new Date().toISOString();
     const satelite = parts[4];
     const municipio = parts[5];
     const estado = parts[6];
@@ -115,15 +123,20 @@ function parseDailyCsv(text: string, limit: number): FireAlert[] {
     .slice(0, limit);
 }
 
-export async function fetchInpeFires(): Promise<{
+export async function fetchInpeFires(options?: {
+  fresh?: boolean;
+}): Promise<{
   alerts: FireAlert[];
   source: "inpe-10min" | "inpe-daily";
 }> {
-  const latest10 = await findLatest10MinFile();
+  const fresh = Boolean(options?.fresh);
+
+  const latest10 = await findLatest10MinFile(fresh);
   if (latest10) {
-    const res = await fetch(`${INPE_10MIN_DIR}${latest10}`, {
-      next: { revalidate: 600 },
-    });
+    const res = await fetch(
+      `${INPE_10MIN_DIR}${latest10}`,
+      fetchOpts(fresh, 600),
+    );
     if (res.ok) {
       const alerts = parse10MinCsv(await res.text());
       if (alerts.length > 0) {
@@ -133,7 +146,7 @@ export async function fetchInpeFires(): Promise<{
   }
 
   const dailyUrl = `${INPE_DAILY_BR}${latestDailyFilename()}`;
-  let res = await fetch(dailyUrl, { next: { revalidate: 3600 } });
+  let res = await fetch(dailyUrl, fetchOpts(fresh, 3600));
 
   if (!res.ok) {
     const yesterday = new Date();
@@ -141,9 +154,10 @@ export async function fetchInpeFires(): Promise<{
     const y = yesterday.getUTCFullYear();
     const m = String(yesterday.getUTCMonth() + 1).padStart(2, "0");
     const d = String(yesterday.getUTCDate()).padStart(2, "0");
-    res = await fetch(`${INPE_DAILY_BR}focos_diario_br_${y}${m}${d}.csv`, {
-      next: { revalidate: 3600 },
-    });
+    res = await fetch(
+      `${INPE_DAILY_BR}focos_diario_br_${y}${m}${d}.csv`,
+      fetchOpts(fresh, 3600),
+    );
   }
 
   if (!res.ok) {
