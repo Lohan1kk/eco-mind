@@ -1,14 +1,31 @@
+import { isAlertLevel } from "./levels";
 import type { AlertLevel, FireAlert } from "./types";
 
 const STORAGE_KEY = "ecomind-local-fire-reports";
+
+function isValidReport(value: unknown): value is FireAlert {
+  if (!value || typeof value !== "object") return false;
+  const a = value as FireAlert;
+  return (
+    typeof a.id === "string" &&
+    typeof a.lat === "number" &&
+    typeof a.lng === "number" &&
+    Number.isFinite(a.lat) &&
+    Number.isFinite(a.lng) &&
+    isAlertLevel(a.level) &&
+    typeof a.reportedAt === "string" &&
+    a.source === "user"
+  );
+}
 
 export function readLocalReports(): FireAlert[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
-    const parsed = JSON.parse(raw) as FireAlert[];
-    return Array.isArray(parsed) ? parsed : [];
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(isValidReport);
   } catch {
     return [];
   }

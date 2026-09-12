@@ -188,6 +188,47 @@ body {
   color: var(--mist);
 }
 
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(22, 61, 42, 0.2);
+  background: rgba(255, 255, 255, 0.92);
+  padding: 0.75rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--forest);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: var(--mist-soft);
+  border-color: rgba(22, 61, 42, 0.35);
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(22, 61, 42, 0.06) 0%,
+    rgba(22, 61, 42, 0.12) 50%,
+    rgba(22, 61, 42, 0.06) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
 .hero-overlay {
   background:
     linear-gradient(

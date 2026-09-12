@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { ALERT_LEVELS, LEVEL_META } from "@/lib/alerts/levels";
 import type { AlertLevel } from "@/lib/alerts/types";
 
@@ -15,6 +16,7 @@ interface ReportFireModalProps {
   coords: { lat: number; lng: number } | null;
   pickMode: boolean;
   onStartPickMode: () => void;
+  onCancelPickMode: () => void;
   onUseGeolocation: () => void;
   submitting: boolean;
   error: string | null;
@@ -27,11 +29,44 @@ export function ReportFireModal({
   coords,
   pickMode,
   onStartPickMode,
+  onCancelPickMode,
   onUseGeolocation,
   submitting,
   error,
 }: ReportFireModalProps) {
+  useEffect(() => {
+    if (!open) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        if (pickMode) onCancelPickMode();
+        else onClose();
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, pickMode, onCancelPickMode, onClose]);
+
   if (!open) return null;
+
+  // Compact banner while picking — full overlay would block the map.
+  if (pickMode) {
+    return (
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[1200] flex justify-center p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="pointer-events-auto flex w-full max-w-md items-center gap-3 rounded-xl border border-forest/15 bg-white/95 px-4 py-3 shadow-lg backdrop-blur-sm">
+          <p className="flex-1 text-sm font-medium text-forest">
+            Toque no mapa para marcar o foco
+          </p>
+          <button
+            type="button"
+            onClick={onCancelPickMode}
+            className="rounded-md bg-forest/10 px-3 py-1.5 text-sm font-semibold text-forest"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -70,7 +105,7 @@ export function ReportFireModal({
               Reportar queimada
             </h2>
             <p className="mt-1 text-sm text-ash">
-              Informe o local e o nível. O reporte fica salvo neste aparelho.
+              O reporte fica salvo neste aparelho (não sincroniza na nuvem).
             </p>
           </div>
           <button
@@ -92,20 +127,14 @@ export function ReportFireModal({
               </p>
             ) : (
               <p className="mt-1 text-sm text-burn">
-                {pickMode
-                  ? "Clique no mapa para marcar o local."
-                  : "Escolha uma forma de definir o local."}
+                Escolha uma forma de definir o local.
               </p>
             )}
             <div className="mt-2 flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={onStartPickMode}
-                className={`rounded-md px-3 py-1.5 text-sm font-medium ${
-                  pickMode
-                    ? "bg-forest text-mist"
-                    : "bg-forest/10 text-forest"
-                }`}
+                className="rounded-md bg-forest/10 px-3 py-1.5 text-sm font-medium text-forest"
               >
                 Marcar no mapa
               </button>
@@ -120,7 +149,10 @@ export function ReportFireModal({
           </div>
 
           <div>
-            <label htmlFor="level" className="block text-sm font-semibold text-ink">
+            <label
+              htmlFor="level"
+              className="block text-sm font-semibold text-ink"
+            >
               Nível de alerta
             </label>
             <select
@@ -165,7 +197,7 @@ export function ReportFireModal({
             disabled={!coords || submitting}
             className="w-full rounded-md bg-forest px-4 py-3 text-sm font-semibold text-mist transition hover:bg-forest-mid disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {submitting ? "Enviando..." : "Enviar alerta"}
+            {submitting ? "Salvando..." : "Salvar neste aparelho"}
           </button>
         </form>
       </div>
