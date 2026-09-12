@@ -214,8 +214,9 @@ export default function FireMap() {
         />
       )}
 
+      {/* z-[1100]: above Leaflet controls (z-index 1000) so tabs stay clickable */}
       {sourceLabel ? (
-        <div className="pointer-events-none absolute left-3 top-14 z-[500] flex items-center gap-2 sm:top-16">
+        <div className="pointer-events-none absolute left-3 top-14 z-[1100] flex items-center gap-2 sm:top-16">
           <div className="pointer-events-auto rounded-lg border border-forest/15 bg-white/95 px-3 py-1.5 text-xs font-medium text-forest shadow-md backdrop-blur-sm">
             {sourceLabel}
             {meta?.inpeSource === "inpe-10min" ? " · ~10 min" : null}
@@ -235,7 +236,7 @@ export default function FireMap() {
         </div>
       ) : null}
 
-      <div className="pointer-events-none absolute left-3 top-[4.5rem] z-[500] sm:top-[5.5rem]">
+      <div className="pointer-events-none absolute left-3 top-[4.5rem] z-[1100] sm:top-[5.5rem]">
         <div className="pointer-events-auto flex flex-wrap gap-1 rounded-lg border border-forest/15 bg-white/95 p-1 shadow-md backdrop-blur-sm">
           <button
             type="button"
@@ -270,7 +271,7 @@ export default function FireMap() {
         </div>
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 top-3 z-[500] flex justify-center px-3">
+      <div className="pointer-events-none absolute inset-x-0 top-3 z-[1100] flex justify-center px-3">
         <div
           className="pointer-events-auto inline-flex rounded-lg border border-forest/15 bg-white/95 p-1 shadow-md backdrop-blur-sm"
           role="tablist"
@@ -295,7 +296,7 @@ export default function FireMap() {
         </div>
       </div>
 
-      <div className="pointer-events-none absolute bottom-24 left-3 z-[500] sm:bottom-6">
+      <div className="pointer-events-none absolute bottom-24 left-3 z-[1100] sm:bottom-6">
         <div className="pointer-events-auto">
           <FireLegend />
         </div>
@@ -305,13 +306,13 @@ export default function FireMap() {
         type="button"
         onClick={openReport}
         aria-label="Reportar queimada"
-        className="absolute bottom-28 right-4 z-[500] flex h-14 w-14 items-center justify-center rounded-full bg-red-600 text-3xl font-light text-white shadow-lg transition hover:bg-red-700 md:bottom-6"
+        className="absolute bottom-28 right-4 z-[1100] flex h-14 w-14 items-center justify-center rounded-full bg-red-600 text-3xl font-light text-white shadow-lg transition hover:bg-red-700 md:bottom-6"
       >
         +
       </button>
 
       {error && !modalOpen ? (
-        <div className="absolute bottom-24 right-4 z-[500] max-w-xs rounded-lg bg-burn px-3 py-2 text-sm text-white shadow-md">
+        <div className="absolute bottom-24 right-4 z-[1100] max-w-xs rounded-lg bg-burn px-3 py-2 text-sm text-white shadow-md">
           {error}
         </div>
       ) : null}
