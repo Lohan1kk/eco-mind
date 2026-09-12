@@ -55,7 +55,7 @@ export function ReportFireModal({
 
   return (
     <div
-      className="fixed inset-0 z-[1000] flex items-end justify-center bg-ink/50 p-4 sm:items-center"
+      className="fixed inset-0 z-[1200] flex items-end justify-center bg-ink/50 p-4 sm:items-center"
       role="dialog"
       aria-modal="true"
       aria-labelledby="report-title"
@@ -70,7 +70,7 @@ export function ReportFireModal({
               Reportar queimada
             </h2>
             <p className="mt-1 text-sm text-ash">
-              Informe o local e o nível de alerta.
+              Informe o local e o nível. O reporte fica salvo neste aparelho.
             </p>
           </div>
           <button

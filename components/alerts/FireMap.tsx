@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { isInBrazil } from "@/lib/alerts/geo";
 import { ALERT_LEVELS, LEVEL_META } from "@/lib/alerts/levels";
+import { addLocalReport, readLocalReports } from "@/lib/alerts/localReports";
 import type { AlertLevel, FireAlert } from "@/lib/alerts/types";
 import { FireLegend } from "./FireLegend";
 import { MapView } from "./MapView";
@@ -11,6 +12,13 @@ import { ReportFireModal } from "./ReportFireModal";
 type MapLayer = "map" | "satellite";
 
 const MAX_VISIBLE_ALERTS = 280;
+
+const LEVEL_PRIORITY: Record<AlertLevel, number> = {
+  critico: 0,
+  alto: 1,
+  medio: 2,
+  baixo: 3,
+};
 
 interface FiresMeta {
   count: number;
@@ -36,58 +44,64 @@ export default function FireMap() {
   const [error, setError] = useState<string | null>(null);
   const [levelFilter, setLevelFilter] = useState<AlertLevel | "all">("all");
   const [refreshing, setRefreshing] = useState(false);
+  const [partialWarning, setPartialWarning] = useState<string | null>(null);
 
-  const loadAllAlerts = useCallback(async () => {
-    const [firesRes, userRes] = await Promise.all([
-      fetch("/api/fires"),
-      fetch("/api/alerts"),
-    ]);
+  const loadSatellite = useCallback(async (fresh = false) => {
+    const url = fresh ? "/api/fires?refresh=1" : "/api/fires";
+    const firesRes = await fetch(url, fresh ? { cache: "no-store" } : undefined);
 
-    let satellite: FireAlert[] = [];
-    let metaPayload: FiresMeta | null = null;
-
-    if (firesRes.ok) {
-      const firesData = (await firesRes.json()) as {
-        alerts: FireAlert[];
-        meta: FiresMeta;
-      };
-      satellite = firesData.alerts;
-      metaPayload = firesData.meta;
-    } else {
+    if (!firesRes.ok) {
       throw new Error("Falha ao buscar focos de satélite.");
     }
 
-    const user: FireAlert[] = userRes.ok
-      ? ((await userRes.json()) as FireAlert[])
-      : [];
-    const userOnly = user.filter((a) => a.source === "user");
+    const firesData = (await firesRes.json()) as {
+      alerts: FireAlert[];
+      meta: FiresMeta;
+    };
 
     return {
-      alerts: [...userOnly, ...satellite],
-      meta: metaPayload,
+      satellite: firesData.alerts,
+      meta: firesData.meta,
     };
   }, []);
 
+  const mergeAlerts = useCallback((satellite: FireAlert[]) => {
+    const local = readLocalReports();
+    return [...local, ...satellite];
+  }, []);
+
   useEffect(() => {
-    loadAllAlerts()
-      .then(({ alerts: data, meta: m }) => {
-        setAlerts(data);
+    loadSatellite()
+      .then(({ satellite, meta: m }) => {
+        setAlerts(mergeAlerts(satellite));
         setMeta(m);
-        if (m?.errors?.length && data.length === 0) {
-          setError(m.errors.join(" "));
+        if (m.errors?.length) {
+          if (satellite.length === 0) {
+            setError(m.errors.join(" "));
+          } else {
+            setPartialWarning(m.errors.join(" "));
+          }
         }
       })
       .catch(() => setError("Não foi possível carregar os focos de queimada."))
       .finally(() => setLoading(false));
-  }, [loadAllAlerts]);
+  }, [loadSatellite, mergeAlerts]);
 
   async function refreshData() {
     setRefreshing(true);
     setError(null);
+    setPartialWarning(null);
     try {
-      const { alerts: data, meta: m } = await loadAllAlerts();
-      setAlerts(data);
+      const { satellite, meta: m } = await loadSatellite(true);
+      setAlerts(mergeAlerts(satellite));
       setMeta(m);
+      if (m.errors?.length) {
+        if (satellite.length === 0) {
+          setError(m.errors.join(" "));
+        } else {
+          setPartialWarning(m.errors.join(" "));
+        }
+      }
     } catch {
       setError("Não foi possível atualizar os dados.");
     } finally {
@@ -149,22 +163,13 @@ export default function FireMap() {
     setSubmitting(true);
     setError(null);
     try {
-      const res = await fetch("/api/alerts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const payload = await res.json();
-      if (!res.ok) {
-        setError(payload.error ?? "Erro ao enviar alerta.");
-        return;
-      }
-      const { alerts: updated, meta: m } = await loadAllAlerts();
-      setAlerts(updated);
+      addLocalReport(data);
+      const { satellite, meta: m } = await loadSatellite();
+      setAlerts(mergeAlerts(satellite));
       setMeta(m);
       closeReport();
     } catch {
-      setError("Erro de rede ao enviar alerta.");
+      setError("Não foi possível salvar o reporte neste aparelho.");
     } finally {
       setSubmitting(false);
     }
@@ -176,9 +181,15 @@ export default function FireMap() {
         ? alerts
         : alerts.filter((a) => a.level === levelFilter);
 
-    // Keep user reports first, then cap for map performance.
     const users = byLevel.filter((a) => a.source === "user");
-    const sats = byLevel.filter((a) => a.source !== "user");
+    const sats = byLevel
+      .filter((a) => a.source !== "user")
+      .sort(
+        (a, b) =>
+          LEVEL_PRIORITY[a.level] - LEVEL_PRIORITY[b.level] ||
+          (b.frp ?? 0) - (a.frp ?? 0),
+      );
+
     return [...users, ...sats].slice(0, MAX_VISIBLE_ALERTS);
   }, [alerts, levelFilter]);
 
@@ -195,6 +206,13 @@ export default function FireMap() {
       ? `INPE · ${meta.inpe} focos${meta.nasa > 0 ? ` · NASA ${meta.nasa}` : ""}`
       : meta?.nasa
         ? `NASA FIRMS · ${meta.nasa} focos`
+        : null;
+
+  const freshnessLabel =
+    meta?.inpeSource === "inpe-10min"
+      ? " · ~10 min"
+      : meta?.inpeSource === "inpe-daily"
+        ? " · diário"
         : null;
 
   return (
@@ -214,12 +232,12 @@ export default function FireMap() {
         />
       )}
 
-      {/* z-[1100]: above Leaflet controls (z-index 1000) so tabs stay clickable */}
+      {/* z-[1100]: above Leaflet controls (z-index 1000) */}
       {sourceLabel ? (
         <div className="pointer-events-none absolute left-3 top-14 z-[1100] flex items-center gap-2 sm:top-16">
           <div className="pointer-events-auto rounded-lg border border-forest/15 bg-white/95 px-3 py-1.5 text-xs font-medium text-forest shadow-md backdrop-blur-sm">
             {sourceLabel}
-            {meta?.inpeSource === "inpe-10min" ? " · ~10 min" : null}
+            {freshnessLabel}
             <span className="ml-1 text-ash/70">
               · {filteredAlerts.length} visíveis
             </span>
@@ -233,6 +251,14 @@ export default function FireMap() {
           >
             <span className={refreshing ? "animate-spin" : ""}>↻</span>
           </button>
+        </div>
+      ) : null}
+
+      {partialWarning ? (
+        <div className="pointer-events-none absolute inset-x-0 top-[7.5rem] z-[1100] flex justify-center px-3 sm:top-[8.5rem]">
+          <p className="pointer-events-auto max-w-md rounded-lg border border-burn/20 bg-white/95 px-3 py-1.5 text-center text-[11px] text-burn shadow-md">
+            {partialWarning}
+          </p>
         </div>
       ) : null}
 

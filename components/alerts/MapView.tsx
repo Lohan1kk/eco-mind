@@ -16,7 +16,10 @@ import { createPinIcon } from "./createPinIcon";
 
 type MapLayer = "map" | "satellite";
 
-const TILES: Record<MapLayer, { url: string; attribution: string; maxZoom: number }> = {
+const TILES: Record<
+  MapLayer,
+  { url: string; attribution: string; maxZoom: number }
+> = {
   map: {
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     attribution:
@@ -47,7 +50,7 @@ function MapClickHandler({
   return null;
 }
 
-function FixMapSize() {
+function FixMapSize({ layer }: { layer: MapLayer }) {
   const map = useMap();
   useEffect(() => {
     const t1 = window.setTimeout(() => map.invalidateSize(), 50);
@@ -56,7 +59,7 @@ function FixMapSize() {
       window.clearTimeout(t1);
       window.clearTimeout(t2);
     };
-  }, [map]);
+  }, [map, layer]);
   return null;
 }
 
@@ -85,7 +88,6 @@ export function MapView({
 
   return (
     <MapContainer
-      key={layer}
       center={BRAZIL_CENTER}
       zoom={BRAZIL_DEFAULT_ZOOM}
       className="z-0 h-full w-full"
@@ -93,11 +95,12 @@ export function MapView({
       scrollWheelZoom
     >
       <TileLayer
+        key={layer}
         attribution={tile.attribution}
         url={tile.url}
         maxZoom={tile.maxZoom}
       />
-      <FixMapSize />
+      <FixMapSize layer={layer} />
       <MapClickHandler enabled={pickMode} onClick={onMapClick} />
 
       {alerts.map((alert) => (
@@ -132,7 +135,7 @@ export function MapView({
                   : alert.source === "nasa"
                     ? "NASA FIRMS"
                     : alert.source === "user"
-                      ? "Reporte comunitário"
+                      ? "Reporte neste aparelho"
                       : "EcoMind"}
               </p>
             </div>

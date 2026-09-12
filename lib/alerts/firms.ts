@@ -1,8 +1,6 @@
+import { BRAZIL_BBOX_FIRMS } from "./geo";
 import { frpToLevel } from "./frp";
 import type { FireAlert } from "./types";
-
-/** Brazil bounding box: south, west, north, east */
-const BRAZIL_BBOX = "-33.75,-74.0,-5.0,-34.0";
 
 const FIRMS_SOURCES = [
   "VIIRS_NOAA20_NRT",
@@ -30,8 +28,7 @@ function parseFirmsCsv(text: string): FireAlert[] {
     const lng = Number.parseFloat(parts[lngIdx]);
     if (Number.isNaN(lat) || Number.isNaN(lng)) return [];
 
-    const frp =
-      frpIdx >= 0 ? Number.parseFloat(parts[frpIdx]) : Number.NaN;
+    const frp = frpIdx >= 0 ? Number.parseFloat(parts[frpIdx]) : Number.NaN;
     const date = dateIdx >= 0 ? parts[dateIdx] : "";
     const time = timeIdx >= 0 ? parts[timeIdx]?.padStart(4, "0") : "0000";
     const satelite = satIdx >= 0 ? parts[satIdx] : "NASA FIRMS";
@@ -60,20 +57,27 @@ function parseFirmsCsv(text: string): FireAlert[] {
 export async function fetchNasaFirmsFires(
   mapKey: string,
   days = 1,
+  options?: { fresh?: boolean },
 ): Promise<FireAlert[]> {
-  const all: FireAlert[] = [];
+  const fresh = Boolean(options?.fresh);
+  const fetchInit: RequestInit = fresh
+    ? { cache: "no-store" }
+    : { next: { revalidate: 3600 } };
 
-  for (const source of FIRMS_SOURCES) {
-    const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${mapKey}/${source}/${BRAZIL_BBOX}/${days}`;
-    try {
-      const res = await fetch(url, { next: { revalidate: 3600 } });
-      if (!res.ok) continue;
-      all.push(...parseFirmsCsv(await res.text()));
-    } catch {
-      // Try next sensor source.
-    }
-  }
+  const batches = await Promise.all(
+    FIRMS_SOURCES.map(async (source) => {
+      const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${mapKey}/${source}/${BRAZIL_BBOX_FIRMS}/${days}`;
+      try {
+        const res = await fetch(url, fetchInit);
+        if (!res.ok) return [] as FireAlert[];
+        return parseFirmsCsv(await res.text());
+      } catch {
+        return [] as FireAlert[];
+      }
+    }),
+  );
 
+  const all = batches.flat();
   const seen = new Set<string>();
   return all.filter((alert) => {
     const key = `${alert.lat.toFixed(3)}:${alert.lng.toFixed(3)}`;
