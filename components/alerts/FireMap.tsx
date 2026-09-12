@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { isInBrazil } from "@/lib/alerts/geo";
 import { ALERT_LEVELS, LEVEL_META } from "@/lib/alerts/levels";
 import type { AlertLevel, FireAlert } from "@/lib/alerts/types";
@@ -9,6 +9,8 @@ import { MapView } from "./MapView";
 import { ReportFireModal } from "./ReportFireModal";
 
 type MapLayer = "map" | "satellite";
+
+const MAX_VISIBLE_ALERTS = 280;
 
 interface FiresMeta {
   count: number;
@@ -51,15 +53,17 @@ export default function FireMap() {
       };
       satellite = firesData.alerts;
       metaPayload = firesData.meta;
+    } else {
+      throw new Error("Falha ao buscar focos de satélite.");
     }
 
     const user: FireAlert[] = userRes.ok
       ? ((await userRes.json()) as FireAlert[])
       : [];
-
     const userOnly = user.filter((a) => a.source === "user");
+
     return {
-      alerts: [...satellite, ...userOnly],
+      alerts: [...userOnly, ...satellite],
       meta: metaPayload,
     };
   }, []);
@@ -166,17 +170,17 @@ export default function FireMap() {
     }
   }
 
-  const sourceLabel =
-    meta && meta.inpe > 0
-      ? `INPE · ${meta.inpe} focos${meta.nasa > 0 ? ` · NASA ${meta.nasa}` : ""}`
-      : meta?.nasa
-        ? `NASA FIRMS · ${meta.nasa} focos`
-        : null;
+  const filteredAlerts = useMemo(() => {
+    const byLevel =
+      levelFilter === "all"
+        ? alerts
+        : alerts.filter((a) => a.level === levelFilter);
 
-  const filteredAlerts =
-    levelFilter === "all"
-      ? alerts
-      : alerts.filter((a) => a.level === levelFilter);
+    // Keep user reports first, then cap for map performance.
+    const users = byLevel.filter((a) => a.source === "user");
+    const sats = byLevel.filter((a) => a.source !== "user");
+    return [...users, ...sats].slice(0, MAX_VISIBLE_ALERTS);
+  }, [alerts, levelFilter]);
 
   const levelCounts = ALERT_LEVELS.reduce(
     (acc, level) => {
@@ -185,6 +189,13 @@ export default function FireMap() {
     },
     {} as Record<AlertLevel, number>,
   );
+
+  const sourceLabel =
+    meta && meta.inpe > 0
+      ? `INPE · ${meta.inpe} focos${meta.nasa > 0 ? ` · NASA ${meta.nasa}` : ""}`
+      : meta?.nasa
+        ? `NASA FIRMS · ${meta.nasa} focos`
+        : null;
 
   return (
     <div className="relative h-[calc(100svh-8.5rem-env(safe-area-inset-bottom))] w-full md:h-[calc(100svh-4rem)]">

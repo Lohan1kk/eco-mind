@@ -4,7 +4,7 @@ import { Reveal } from "./Reveal";
 export function Idea() {
   return (
     <section id="ideia" className="section section-botanical">
-      <div className="section-inner grid items-center gap-12 md:grid-cols-[1.1fr_0.9fr] md:gap-16">
+      <div className="section-inner grid items-center gap-12 md:grid-cols-[1.15fr_0.85fr] md:gap-16">
         <Reveal>
           <p className="eyebrow text-forest-mid">Nossa ideia</p>
           <h2 className="display mt-4 text-3xl text-forest md:text-5xl">
@@ -21,32 +21,18 @@ export function Idea() {
           </p>
         </Reveal>
 
-        <Reveal delayMs={120}>
-          <div className="brand-panel relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden md:mx-0 md:ml-auto">
+        <Reveal delayMs={120} className="flex justify-center md:justify-end">
+          <div className="brand-mark flex aspect-square w-full max-w-[18rem] flex-col items-center justify-center rounded-[2rem] px-8 py-10 text-center">
             <Image
-              src="/brand/hero-forest.jpg"
-              alt=""
-              fill
-              sizes="(max-width: 768px) 90vw, 420px"
-              className="object-cover object-center"
+              src="/brand/logo-ecomind.png"
+              alt="Logo EcoMind"
+              width={220}
+              height={220}
+              className="h-36 w-36 object-contain md:h-40 md:w-40"
+              sizes="160px"
             />
-            <div
-              aria-hidden
-              className="absolute inset-0 bg-gradient-to-t from-[rgba(18,40,28,0.72)] via-[rgba(18,40,28,0.25)] to-transparent"
-            />
-            <div className="absolute inset-0 flex flex-col items-center justify-end px-6 pb-10 text-center">
-              <Image
-                src="/brand/logo-ecomind.png"
-                alt="Logo EcoMind"
-                width={160}
-                height={160}
-                className="h-24 w-24 object-contain drop-shadow-lg md:h-28 md:w-28"
-              />
-              <p className="display mt-4 text-2xl text-mist">EcoMind</p>
-              <p className="mt-2 text-sm text-mist/75">
-                natureza + consciência
-              </p>
-            </div>
+            <p className="display mt-5 text-2xl text-forest">EcoMind</p>
+            <p className="mt-2 text-sm text-ash">natureza + consciência</p>
           </div>
         </Reveal>
       </div>

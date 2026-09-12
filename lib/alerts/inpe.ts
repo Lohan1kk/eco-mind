@@ -60,7 +60,7 @@ function parse10MinCsv(text: string): FireAlert[] {
         satelite,
       },
     ];
-  });
+  }).slice(0, 280);
 }
 
 function parseDailyCsv(text: string, limit: number): FireAlert[] {
@@ -144,6 +144,6 @@ export async function fetchInpeFires(): Promise<{
     throw new Error("INPE indisponível.");
   }
 
-  const alerts = parseDailyCsv(await res.text(), 800);
+  const alerts = parseDailyCsv(await res.text(), 300);
   return { alerts, source: "inpe-daily" };
 }

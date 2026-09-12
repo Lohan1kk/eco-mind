@@ -18,9 +18,10 @@ type MapLayer = "map" | "satellite";
 
 const TILES: Record<MapLayer, { url: string; attribution: string }> = {
   map: {
-    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    // Carto Voyager — more reliable than OSM on some hosts
+    url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
     attribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
   },
   satellite: {
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
@@ -45,13 +46,12 @@ function MapClickHandler({
   return null;
 }
 
-function LayerSwitcher({ layer }: { layer: MapLayer }) {
+function InvalidateOnChange({ layer }: { layer: MapLayer }) {
   const map = useMap();
-
   useEffect(() => {
-    map.invalidateSize();
+    const id = window.setTimeout(() => map.invalidateSize(), 80);
+    return () => window.clearTimeout(id);
   }, [map, layer]);
-
   return null;
 }
 
@@ -76,11 +76,17 @@ export function MapView({
     <MapContainer
       center={BRAZIL_CENTER}
       zoom={BRAZIL_DEFAULT_ZOOM}
-      className="h-full w-full"
+      className="z-0 h-full w-full"
       scrollWheelZoom
+      preferCanvas
     >
-      <TileLayer attribution={tile.attribution} url={tile.url} />
-      <LayerSwitcher layer={layer} />
+      <TileLayer
+        key={layer}
+        attribution={tile.attribution}
+        url={tile.url}
+        maxZoom={19}
+      />
+      <InvalidateOnChange layer={layer} />
       <MapClickHandler enabled={pickMode} onClick={onMapClick} />
 
       {alerts.map((alert) => (
@@ -90,7 +96,7 @@ export function MapView({
           icon={createPinIcon(alert.level)}
         >
           <Popup>
-            <div className="min-w-[180px] text-sm">
+            <div className="min-w-[170px] text-sm">
               <p className="font-semibold text-ink">
                 {LEVEL_META[alert.level].label}
               </p>
@@ -101,16 +107,10 @@ export function MapView({
               ) : alert.description ? (
                 <p className="mt-1 text-ash">{alert.description}</p>
               ) : null}
-              {alert.bioma ? (
-                <p className="mt-1 text-xs text-ash/80">Bioma: {alert.bioma}</p>
-              ) : null}
               {alert.satelite ? (
                 <p className="mt-1 text-xs text-ash/80">
                   Satélite: {alert.satelite}
                 </p>
-              ) : null}
-              {alert.frp != null ? (
-                <p className="mt-1 text-xs text-ash/80">FRP: {alert.frp} MW</p>
               ) : null}
               <p className="mt-2 text-xs text-ash/80">
                 {new Date(alert.reportedAt).toLocaleString("pt-BR")}
