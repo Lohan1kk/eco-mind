@@ -15,7 +15,7 @@ const features = [
   "Calculadora de pegada de carbono",
   "Quiz ambiental com dados reais",
   "Mapa de queimadas (INPE)",
-  "Reporte comunitário de focos",
+  "Reporte de focos salvo neste aparelho",
 ];
 
 export default function BaixarPage() {

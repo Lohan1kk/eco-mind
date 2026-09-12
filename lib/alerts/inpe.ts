@@ -1,3 +1,4 @@
+import { isInBrazil } from "./geo";
 import { frpToLevel } from "./frp";
 import type { FireAlert } from "./types";
 
@@ -56,6 +57,7 @@ function parse10MinCsv(text: string): FireAlert[] {
       const lat = Number.parseFloat(parts[0]);
       const lng = Number.parseFloat(parts[1]);
       if (Number.isNaN(lat) || Number.isNaN(lng)) return [];
+      if (!isInBrazil(lat, lng)) return [];
 
       const satelite = parts[2];
       const reportedAt = safeIso(parts[3]);
