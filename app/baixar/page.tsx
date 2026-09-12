@@ -30,7 +30,7 @@ export default function BaixarPage() {
               alt=""
               width={64}
               height={64}
-              className="h-16 w-16 rounded-full"
+              className="h-16 w-16 object-contain"
               priority
             />
             <div>
