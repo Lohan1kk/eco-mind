@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local QA captures (do not commit)
+qa-screenshot-*.webp
+ecomind-demo.mp4
+qa-screenshot-*.webp

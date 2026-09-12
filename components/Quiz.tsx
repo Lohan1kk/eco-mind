@@ -38,34 +38,45 @@ export function Quiz() {
 
   if (finished) {
     const pct = Math.round((score / QUIZ_QUESTIONS.length) * 100);
-    const emoji = pct >= 80 ? "🌟" : pct >= 50 ? "🌿" : "📚";
     const title =
-      pct >= 80 ? "Excelente!" : pct >= 50 ? "Bom trabalho!" : "Continue aprendendo!";
+      pct >= 80
+        ? "Excelente!"
+        : pct >= 50
+          ? "Bom trabalho!"
+          : "Continue aprendendo!";
 
     return (
       <div className="mx-auto max-w-lg text-center">
-        <div className="card-premium p-8">
-          <p className="text-5xl">{emoji}</p>
-          <h2 className="mt-4 font-display text-2xl font-semibold text-forest">{title}</h2>
-          <p className="mt-2 text-ash">
+        <div className="border border-forest/12 bg-white/70 px-8 py-10">
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-forest-mid">
+            Resultado
+          </p>
+          <h2 className="mt-3 font-display text-3xl font-semibold text-forest">
+            {title}
+          </h2>
+          <p className="mt-3 text-ash">
             Você acertou{" "}
             <strong className="text-ink">
               {score} de {QUIZ_QUESTIONS.length}
             </strong>{" "}
             ({pct}%)
           </p>
-          <div className="mt-6 h-3 overflow-hidden rounded-full bg-mist-soft">
+          <div className="mx-auto mt-6 h-2 max-w-xs overflow-hidden rounded-full bg-mist-soft">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-forest-mid to-sprout-deep transition-all duration-700"
+              className="h-full rounded-full bg-forest-mid transition-all duration-700"
               style={{ width: `${pct}%` }}
             />
           </div>
           <p className="mt-6 text-sm leading-relaxed text-ash">
-            Compartilhe o EcoMind e ajude mais pessoas a entender o impacto das
+            Compartilhe a EcoMind e ajude mais pessoas a entender o impacto das
             escolhas do dia a dia.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <button type="button" onClick={reset} className="btn-primary rounded-md bg-forest px-5 py-3 text-sm font-semibold text-mist">
+            <button
+              type="button"
+              onClick={reset}
+              className="btn-primary rounded-md bg-forest px-5 py-3 text-sm font-semibold text-mist"
+            >
               Jogar novamente
             </button>
             <Link href="/calculadora" className="btn-secondary">
@@ -94,7 +105,7 @@ export function Quiz() {
         </div>
       </div>
 
-      <div className="card-premium p-6 sm:p-8">
+      <div className="border border-forest/12 bg-white/75 px-6 py-7 sm:px-8 sm:py-8">
         <h2 className="font-display text-lg font-semibold text-ink sm:text-xl">
           {question.q}
         </h2>
@@ -105,8 +116,9 @@ export function Quiz() {
             let cls =
               "border-forest/15 bg-white hover:border-forest-mid/40 hover:bg-mist-soft";
             if (selected !== null) {
-              if (isCorrect) cls = "border-sprout-deep bg-sprout/25 ring-2 ring-sprout/40";
-              else if (isSelected) cls = "border-red-300 bg-red-50";
+              if (isCorrect)
+                cls = "border-sprout-deep bg-sprout/25";
+              else if (isSelected) cls = "border-burn/40 bg-[#f8efe8]";
               else cls = "border-forest/5 bg-mist/50 opacity-55";
             }
 
@@ -116,9 +128,9 @@ export function Quiz() {
                 type="button"
                 onClick={() => handleAnswer(i)}
                 disabled={selected !== null}
-                className={`flex items-center gap-3 rounded-xl border-2 px-4 py-3.5 text-left text-sm font-medium text-ink transition sm:text-base ${cls}`}
+                className={`flex items-center gap-3 border px-4 py-3.5 text-left text-sm font-medium text-ink transition sm:text-base ${cls}`}
               >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-forest/10 text-xs font-bold text-forest-mid">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center bg-forest/10 text-xs font-bold text-forest-mid">
                   {String.fromCharCode(65 + i)}
                 </span>
                 {opt}
@@ -128,7 +140,7 @@ export function Quiz() {
         </div>
 
         {selected !== null ? (
-          <p className="mt-5 rounded-xl bg-mist-soft px-4 py-3 text-sm leading-relaxed text-ash animate-fade-in">
+          <p className="mt-5 bg-mist-soft px-4 py-3 text-sm leading-relaxed text-ash animate-fade-in">
             {question.feedback}
           </p>
         ) : null}

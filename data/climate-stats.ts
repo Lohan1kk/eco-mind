@@ -35,10 +35,3 @@ export const CLIMATE_STATS: ClimateStat[] = [
     source: "PNUMA / National Geographic",
   },
 ];
-
-export const IMPACT_STATS = [
-  { label: "usuários ativos", target: 1102, suffix: "" },
-  { label: "toneladas de CO₂ evitadas", target: 19, suffix: "" },
-  { label: "cidades alcançadas", target: 12, suffix: "" },
-  { label: "retenção em 6 meses", target: 78, suffix: "%" },
-];

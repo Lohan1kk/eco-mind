@@ -44,8 +44,9 @@ function parse10MinCsv(text: string): FireAlert[] {
     if (Number.isNaN(lat) || Number.isNaN(lng)) return [];
 
     const satelite = parts[2];
+    const raw = parts[3].trim().replace(" ", "T");
     const reportedAt = new Date(
-      parts[3].trim().replace(" ", "T") + (parts[3].includes("Z") ? "" : "Z"),
+      raw.endsWith("Z") ? raw : `${raw}Z`,
     ).toISOString();
 
     return [
@@ -60,7 +61,7 @@ function parse10MinCsv(text: string): FireAlert[] {
         satelite,
       },
     ];
-  });
+  }).slice(0, 280);
 }
 
 function parseDailyCsv(text: string, limit: number): FireAlert[] {
@@ -76,7 +77,12 @@ function parseDailyCsv(text: string, limit: number): FireAlert[] {
     const lng = Number.parseFloat(parts[2]);
     if (Number.isNaN(lat) || Number.isNaN(lng)) return [];
 
-    const reportedAt = parts[3].replace(" ", "T") + ":00.000Z";
+    const rawTime = parts[3].trim().replace(" ", "T");
+    const withZ = rawTime.endsWith("Z") ? rawTime : `${rawTime}Z`;
+    const parsed = new Date(withZ);
+    const reportedAt = Number.isNaN(parsed.getTime())
+      ? new Date().toISOString()
+      : parsed.toISOString();
     const satelite = parts[4];
     const municipio = parts[5];
     const estado = parts[6];
@@ -144,6 +150,6 @@ export async function fetchInpeFires(): Promise<{
     throw new Error("INPE indisponível.");
   }
 
-  const alerts = parseDailyCsv(await res.text(), 800);
+  const alerts = parseDailyCsv(await res.text(), 300);
   return { alerts, source: "inpe-daily" };
 }

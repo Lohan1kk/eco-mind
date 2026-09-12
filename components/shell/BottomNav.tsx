@@ -4,11 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV = [
-  { href: "/", label: "Início", icon: "⌂" },
-  { href: "/calculadora", label: "Pegada", icon: "◎" },
-  { href: "/alerta-queimadas", label: "Mapa", icon: "⊕" },
-  { href: "/quiz", label: "Quiz", icon: "?" },
-  { href: "/baixar", label: "Baixar", icon: "↓" },
+  { href: "/", label: "Início" },
+  { href: "/calculadora", label: "Pegada" },
+  { href: "/alerta-queimadas", label: "Mapa" },
+  { href: "/quiz", label: "Quiz" },
+  { href: "/baixar", label: "Baixar" },
 ];
 
 /** Full-screen map uses its own chrome; hide tab bar there. */
@@ -34,20 +34,18 @@ export function BottomNav() {
             <li key={item.href} className="flex-1">
               <Link
                 href={item.href}
-                className={`flex flex-col items-center gap-0.5 px-1 py-2.5 text-[10px] font-semibold uppercase tracking-wide transition ${
+                className={`flex flex-col items-center gap-1 px-1 py-2.5 text-[10px] font-semibold uppercase tracking-wide transition ${
                   active
                     ? "text-forest"
                     : "text-ash/70 hover:text-forest"
                 }`}
               >
                 <span
-                  className={`flex h-7 w-7 items-center justify-center rounded-full text-base ${
-                    active ? "bg-sprout/60 text-forest" : ""
+                  className={`h-1 w-5 rounded-full transition ${
+                    active ? "bg-forest" : "bg-transparent"
                   }`}
                   aria-hidden
-                >
-                  {item.icon}
-                </span>
+                />
                 {item.label}
               </Link>
             </li>

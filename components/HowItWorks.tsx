@@ -9,7 +9,7 @@ const steps = [
   {
     n: "02",
     title: "Missões",
-    text: "Desafios de conscientização no app — o aluno participa, não só assiste.",
+    text: "Desafios de conscientização — o aluno participa, não só assiste.",
   },
   {
     n: "03",
@@ -20,31 +20,27 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section id="como-funciona" className="py-20 md:py-28">
-      <div className="mx-auto max-w-6xl px-5 md:px-8">
+    <section id="como-funciona" className="section section-botanical">
+      <div className="section-inner">
         <Reveal>
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-forest-mid">
-            Como funciona
-          </p>
-          <h2 className="mt-3 max-w-2xl font-display text-3xl font-semibold leading-tight text-ink md:text-5xl">
+          <p className="eyebrow text-forest-mid">Como funciona</p>
+          <h2 className="display mt-4 max-w-3xl text-3xl text-ink md:text-5xl">
             Do conhecimento à ação, em três passos
           </h2>
         </Reveal>
 
-        <ol className="mt-14 grid gap-0 md:grid-cols-3">
+        <ol className="mt-16 grid gap-6 md:grid-cols-3">
           {steps.map((step, i) => (
-            <Reveal key={step.n} delayMs={i * 120}>
-              <li
-                className={`relative py-2 md:pr-10 ${
-                  i < steps.length - 1
-                    ? "md:border-r md:border-forest/15"
-                    : ""
-                } ${i > 0 ? "border-t border-forest/15 pt-8 md:border-t-0 md:pt-2 md:pl-10" : ""}`}
-              >
-                <span className="font-display text-5xl font-semibold text-sprout-deep/25">
+            <Reveal key={step.n} delayMs={i * 100}>
+              <li className="panel-soft relative h-full overflow-hidden p-7">
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute -right-2 -top-4 display text-[7rem] leading-none text-forest/[0.06]"
+                >
                   {step.n}
                 </span>
-                <h3 className="mt-2 font-display text-2xl font-semibold text-forest">
+                <p className="eyebrow text-forest-mid">Passo {step.n}</p>
+                <h3 className="mt-4 font-display text-2xl font-semibold text-forest">
                   {step.title}
                 </h3>
                 <p className="mt-3 max-w-xs text-base leading-relaxed text-ash">

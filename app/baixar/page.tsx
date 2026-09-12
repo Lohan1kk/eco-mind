@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { QrInstall } from "@/components/shell/QrInstall";
 
@@ -11,37 +12,36 @@ export const metadata: Metadata = {
 };
 
 const features = [
-  { icon: "◎", text: "Calculadora de pegada de carbono" },
-  { icon: "?", text: "Quiz ambiental com dados reais" },
-  { icon: "⊕", text: "Mapa de queimadas (INPE)" },
-  { icon: "+", text: "Reporte comunitário de focos" },
+  "Calculadora de pegada de carbono",
+  "Quiz ambiental com dados reais",
+  "Mapa de queimadas (INPE)",
+  "Reporte comunitário de focos",
 ];
 
 export default function BaixarPage() {
   return (
     <>
       <Header solid />
-      <main className="min-h-screen bg-atmosphere pt-24 pb-16">
-        <div className="mx-auto max-w-2xl px-5 md:px-8">
+      <main className="min-h-screen bg-mist pt-24 pb-16">
+        <div className="section-inner max-w-2xl">
           <div className="flex items-center gap-4">
             <Image
               src="/brand/icon-ecomind.png"
               alt=""
               width={64}
               height={64}
-              className="h-16 w-16 rounded-2xl shadow-md ring-2 ring-sprout/30"
+              className="h-16 w-16 object-contain"
+              priority
             />
             <div>
-              <h1 className="font-display text-3xl font-semibold text-forest">
-                Baixe a EcoMind
-              </h1>
+              <h1 className="display text-3xl text-forest">Baixe a EcoMind</h1>
               <p className="text-ash">Consciência ambiental + tecnologia</p>
             </div>
           </div>
 
-          <div className="mt-10 grid gap-6 md:grid-cols-[1fr_auto]">
-            <div className="space-y-6">
-              <section className="glass-panel rounded-2xl p-6 shadow-sm">
+          <div className="mt-12 grid gap-10 md:grid-cols-[1fr_auto] md:items-start">
+            <div className="space-y-10">
+              <section>
                 <h2 className="font-display text-xl font-semibold text-forest">
                   Instalar no celular
                 </h2>
@@ -55,32 +55,29 @@ export default function BaixarPage() {
                     Compartilhar → Adicionar à Tela de Início
                   </li>
                 </ul>
-                <Link
-                  href="/"
-                  className="btn-primary mt-5 inline-flex rounded-md bg-forest px-5 py-3 text-sm font-semibold text-mist"
-                >
+                <Link href="/" className="btn btn-dark mt-6">
                   Abrir no navegador
                 </Link>
               </section>
 
-              <section className="glass-panel rounded-2xl p-6 shadow-sm">
+              <section>
                 <h2 className="font-display text-xl font-semibold text-forest">
                   O que inclui
                 </h2>
                 <ul className="mt-4 space-y-3">
-                  {features.map((f) => (
-                    <li key={f.text} className="flex items-center gap-3 text-ash">
-                      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-sprout/30 text-sm text-forest">
-                        {f.icon}
-                      </span>
-                      {f.text}
+                  {features.map((text) => (
+                    <li
+                      key={text}
+                      className="border-l-2 border-sprout-deep/40 pl-4 text-ash"
+                    >
+                      {text}
                     </li>
                   ))}
                 </ul>
               </section>
             </div>
 
-            <section className="glass-panel flex flex-col items-center rounded-2xl p-6 shadow-sm">
+            <section className="flex flex-col items-center border border-[var(--line)] bg-paper px-6 py-6">
               <h2 className="font-display text-lg font-semibold text-forest">
                 QR Code
               </h2>
@@ -91,6 +88,7 @@ export default function BaixarPage() {
           </div>
         </div>
       </main>
+      <Footer />
     </>
   );
 }

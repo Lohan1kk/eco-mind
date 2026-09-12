@@ -1,4 +1,4 @@
-const CACHE_NAME = "ecomind-v2";
+const CACHE_NAME = "ecomind-v3";
 const PRECACHE = [
   "/",
   "/calculadora",
@@ -8,6 +8,7 @@ const PRECACHE = [
   "/manifest.webmanifest",
   "/brand/icon-ecomind.png",
   "/brand/logo-ecomind.png",
+  "/brand/hero-forest.jpg",
 ];
 
 self.addEventListener("install", (event) => {
@@ -31,6 +32,22 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET") return;
   const url = new URL(request.url);
   if (url.pathname.startsWith("/api/")) return;
+
+  // Network-first for HTML navigations so redesigns ship quickly.
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(request).then((cached) => cached || caches.match("/"))),
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(request).then((cached) => {

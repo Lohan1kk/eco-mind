@@ -1,21 +1,14 @@
-import { AlertsPreview } from "@/components/AlertsPreview";
-import { CarbonPreview } from "@/components/CarbonPreview";
-import {
-  ClimateReality,
-  ImpactStats,
-} from "@/components/ClimateSections";
-import { CtaBanner } from "@/components/CtaBanner";
-import { FeaturesGrid } from "@/components/FeaturesGrid";
+import { ClimateReality } from "@/components/ClimateSections";
+import { Encourage } from "@/components/Encourage";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { HowItWorks } from "@/components/HowItWorks";
 import { Idea } from "@/components/Idea";
-import { JoinForm } from "@/components/JoinForm";
 import { Problem } from "@/components/Problem";
-import { QuizPreview } from "@/components/QuizPreview";
 import { School } from "@/components/School";
 import { Team } from "@/components/Team";
+import { Tools } from "@/components/Tools";
 import { TrustStrip } from "@/components/TrustStrip";
 
 export default function Home() {
@@ -25,19 +18,14 @@ export default function Home() {
       <main>
         <Hero />
         <TrustStrip />
-        <FeaturesGrid />
-        <ImpactStats />
         <Problem />
         <Idea />
         <HowItWorks />
-        <CarbonPreview />
+        <Tools />
         <ClimateReality />
-        <QuizPreview />
-        <AlertsPreview />
         <School />
         <Team />
-        <CtaBanner />
-        <JoinForm />
+        <Encourage />
       </main>
       <Footer />
     </>
