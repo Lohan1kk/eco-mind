@@ -27,30 +27,28 @@ const tools = [
 
 export function Tools() {
   return (
-    <section id="ferramentas" className="py-20 md:py-28">
-      <div className="mx-auto max-w-6xl px-5 md:px-8">
+    <section id="ferramentas" className="section bg-mist-soft/50">
+      <div className="section-inner">
         <Reveal>
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-forest-mid">
-            Ferramentas
-          </p>
-          <h2 className="mt-3 max-w-2xl font-display text-3xl font-semibold leading-tight text-ink md:text-5xl">
+          <p className="eyebrow text-forest-mid">Ferramentas</p>
+          <h2 className="display mt-4 max-w-3xl text-3xl text-ink md:text-5xl">
             Três caminhos para plantar consciência
           </h2>
-          <p className="mt-4 max-w-xl text-lg leading-relaxed text-ash">
+          <p className="lede mt-5 max-w-2xl">
             Educação e ação no mesmo lugar — sem ruído, só o essencial para
             começar.
           </p>
         </Reveal>
 
-        <ul className="mt-14 divide-y divide-forest/12 border-y border-forest/12">
+        <ul className="mt-14 divide-y divide-[var(--line)] border-y border-[var(--line)]">
           {tools.map((tool, i) => (
-            <Reveal key={tool.href} delayMs={i * 90}>
+            <Reveal key={tool.href} delayMs={i * 80}>
               <li>
                 <Link
                   href={tool.href}
-                  className="group grid gap-3 py-8 transition md:grid-cols-[4.5rem_1fr_auto] md:items-center md:gap-8 md:py-10"
+                  className="group grid gap-3 py-8 transition md:grid-cols-[5rem_1fr_auto] md:items-center md:gap-10 md:py-10"
                 >
-                  <span className="font-display text-3xl font-semibold text-sprout-deep/30 transition group-hover:text-sprout-deep/55">
+                  <span className="display text-3xl text-sprout-deep/30 transition group-hover:text-sprout-deep/60">
                     {tool.step}
                   </span>
                   <div>

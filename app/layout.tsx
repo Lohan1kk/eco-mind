@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Source_Sans_3 } from "next/font/google";
-import { AppChrome } from "@/components/shell/AppChrome";
+import { AppShell } from "@/components/shell/AppShell";
 import "./globals.css";
 
 const display = Fraunces({
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: "%s · EcoMind",
   },
   description:
-    "App EcoMind: calculadora de pegada de carbono, quiz ambiental, mapa de queimadas INPE e conscientização sobre desmatamento.",
+    "EcoMind: calculadora de pegada de carbono, quiz ambiental, mapa de queimadas INPE e conscientização sobre desmatamento.",
   appleWebApp: {
     capable: true,
     title: "EcoMind",
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1b5e3b",
+  themeColor: "#163d2a",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -90,10 +90,10 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-full bg-atmosphere font-sans text-ink antialiased">
-        <AppChrome>
-          <div id="main-content">{children}</div>
-        </AppChrome>
+      <body className="min-h-full bg-mist font-sans text-ink antialiased">
+        <AppShell>
+          <div id="conteudo-principal">{children}</div>
+        </AppShell>
       </body>
     </html>
   );

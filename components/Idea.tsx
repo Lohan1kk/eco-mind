@@ -3,38 +3,32 @@ import { Reveal } from "./Reveal";
 
 export function Idea() {
   return (
-    <section
-      id="ideia"
-      className="relative border-y border-forest/10 bg-mist-soft/60 py-20 md:py-28"
-    >
-      <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 md:grid-cols-[1.2fr_0.8fr] md:gap-16 md:px-8">
+    <section id="ideia" className="section bg-mist-soft/70">
+      <div className="section-inner grid items-center gap-12 md:grid-cols-[1.15fr_0.85fr] md:gap-20">
         <Reveal>
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-forest-mid">
-            Nossa ideia
-          </p>
-          <h2 className="mt-3 font-display text-3xl font-semibold leading-tight text-forest md:text-5xl">
+          <p className="eyebrow text-forest-mid">Nossa ideia</p>
+          <h2 className="display mt-4 text-3xl text-forest md:text-5xl">
             A semente que vira broto
           </h2>
-          <p className="mt-5 text-lg leading-relaxed text-ash">
-            A EcoMind nasceu na escola. Em vez de só se indignar com as notícias,
-            criamos um app que educa sobre causas e efeitos do desmatamento e das
-            queimadas, propõe missões de conscientização e mostra caminhos
-            práticos para agir.
+          <p className="lede mt-6 max-w-xl">
+            A EcoMind nasceu na escola. Em vez de só reagir às notícias, criamos
+            um app que educa sobre desmatamento e queimadas, propõe missões de
+            conscientização e mostra caminhos práticos para agir.
           </p>
-          <p className="mt-4 text-lg leading-relaxed text-ash">
-            Pequenas ações e conhecimento plantados hoje podem crescer em mudança
-            real — na escola, em casa e na comunidade.
+          <p className="lede mt-4 max-w-xl">
+            Pequenas ações plantadas hoje podem crescer em mudança real — na
+            escola, em casa e na comunidade.
           </p>
         </Reveal>
 
         <Reveal delayMs={120} className="flex justify-center md:justify-end">
           <Image
             src="/brand/logo-ecomind.png"
-            alt="Logo EcoMind: folha e mente conectadas"
-            width={512}
-            height={512}
-            className="h-auto w-44 md:w-52"
-            sizes="(max-width: 768px) 176px, 208px"
+            alt="Logo EcoMind"
+            width={420}
+            height={420}
+            className="h-auto w-48 md:w-56"
+            sizes="(max-width: 768px) 192px, 224px"
           />
         </Reveal>
       </div>

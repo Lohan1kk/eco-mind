@@ -11,8 +11,8 @@ const links = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-forest/10 bg-ink py-12 text-mist/85">
-      <div className="mx-auto flex max-w-6xl flex-col gap-10 px-5 md:flex-row md:items-start md:justify-between md:px-8">
+    <footer className="border-t border-white/10 bg-ink py-14 text-mist/85">
+      <div className="section-inner flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
         <div>
           <div className="flex items-center gap-2.5">
             <Image
@@ -26,7 +26,7 @@ export function Footer() {
               EcoMind
             </span>
           </div>
-          <p className="mt-3 max-w-sm text-sm leading-relaxed text-mist/70">
+          <p className="mt-4 max-w-sm text-sm leading-relaxed text-mist/65">
             Consciência ambiental + tecnologia. Calculadora, quiz, mapa INPE e
             ações concretas para o planeta.
           </p>
@@ -45,10 +45,8 @@ export function Footer() {
         </nav>
       </div>
 
-      <div className="mx-auto mt-10 max-w-6xl border-t border-white/10 px-5 pt-6 text-xs text-mist/55 md:px-8">
-        <p>
-          EcoMind · Projeto desenvolvido por alunos · Colégio Paulo de Tarso
-        </p>
+      <div className="section-inner mt-10 border-t border-white/10 pt-6 text-xs text-mist/50">
+        <p>EcoMind · Projeto de alunos · Colégio Paulo de Tarso</p>
         <p className="mt-2">
           Dados:{" "}
           <a
@@ -58,15 +56,6 @@ export function Footer() {
             rel="noopener noreferrer"
           >
             INPE Queimadas
-          </a>
-          {" · "}
-          <a
-            href="https://github.com/Lohan1kk/eco-mind"
-            className="underline hover:text-sprout"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            GitHub
           </a>
         </p>
       </div>

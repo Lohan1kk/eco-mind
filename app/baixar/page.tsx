@@ -22,26 +22,24 @@ export default function BaixarPage() {
   return (
     <>
       <Header solid />
-      <main className="min-h-screen bg-atmosphere pt-24 pb-16">
-        <div className="mx-auto max-w-2xl px-5 md:px-8">
+      <main className="min-h-screen bg-mist pt-24 pb-16">
+        <div className="section-inner max-w-2xl">
           <div className="flex items-center gap-4">
             <Image
               src="/brand/icon-ecomind.png"
               alt=""
               width={64}
               height={64}
-              className="h-16 w-16 rounded-full ring-1 ring-forest/15"
+              className="h-16 w-16 rounded-full"
               priority
             />
             <div>
-              <h1 className="font-display text-3xl font-semibold text-forest">
-                Baixe a EcoMind
-              </h1>
+              <h1 className="display text-3xl text-forest">Baixe a EcoMind</h1>
               <p className="text-ash">Consciência ambiental + tecnologia</p>
             </div>
           </div>
 
-          <div className="mt-10 grid gap-8 md:grid-cols-[1fr_auto] md:items-start">
+          <div className="mt-12 grid gap-10 md:grid-cols-[1fr_auto] md:items-start">
             <div className="space-y-10">
               <section>
                 <h2 className="font-display text-xl font-semibold text-forest">
@@ -57,10 +55,7 @@ export default function BaixarPage() {
                     Compartilhar → Adicionar à Tela de Início
                   </li>
                 </ul>
-                <Link
-                  href="/"
-                  className="btn-primary mt-6 inline-flex rounded-md bg-forest px-5 py-3 text-sm font-semibold text-mist"
-                >
+                <Link href="/" className="btn btn-dark mt-6">
                   Abrir no navegador
                 </Link>
               </section>
@@ -69,7 +64,7 @@ export default function BaixarPage() {
                 <h2 className="font-display text-xl font-semibold text-forest">
                   O que inclui
                 </h2>
-                <ul className="mt-4 space-y-2">
+                <ul className="mt-4 space-y-3">
                   {features.map((text) => (
                     <li
                       key={text}
@@ -82,7 +77,7 @@ export default function BaixarPage() {
               </section>
             </div>
 
-            <section className="flex flex-col items-center border border-forest/10 bg-white/60 px-6 py-6">
+            <section className="flex flex-col items-center border border-[var(--line)] bg-paper px-6 py-6">
               <h2 className="font-display text-lg font-semibold text-forest">
                 QR Code
               </h2>

@@ -5,28 +5,26 @@ import { Reveal } from "./Reveal";
 
 export function ClimateReality() {
   return (
-    <section id="realidade" className="bg-[#0F1A14] py-20 text-mist md:py-28">
-      <div className="mx-auto max-w-6xl px-5 md:px-8">
+    <section id="realidade" className="section bg-[#101c15] text-mist">
+      <div className="section-inner">
         <Reveal>
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-sprout">
-            A realidade, sem filtro
-          </p>
-          <h2 className="mt-3 max-w-2xl font-display text-3xl font-semibold leading-tight md:text-5xl">
-            Os números não pedem licença pra mudar
+          <p className="eyebrow text-sprout">A realidade</p>
+          <h2 className="display mt-4 max-w-3xl text-3xl md:text-5xl">
+            Os números não pedem licença para mudar
           </h2>
-          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-mist/75">
-            Antes de qualquer app ou calculadora, existe um planeta real
-            reagindo às nossas escolhas.
+          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-mist/70">
+            Antes de qualquer app, existe um planeta reagindo às nossas
+            escolhas.
           </p>
         </Reveal>
 
-        <ul className="mt-14 grid gap-x-10 gap-y-12 md:grid-cols-2">
+        <ul className="mt-14 grid gap-x-12 gap-y-12 md:grid-cols-2">
           {CLIMATE_STATS.map((stat, i) => (
-            <Reveal key={stat.value} delayMs={i * 90}>
+            <Reveal key={stat.value} delayMs={i * 80}>
               <li className="border-t border-mist/15 pt-6">
                 <p
-                  className={`font-display text-3xl font-semibold md:text-4xl ${
-                    stat.trend === "down" ? "text-sprout" : "text-[#e8c07a]"
+                  className={`display text-3xl md:text-4xl ${
+                    stat.trend === "down" ? "text-sprout" : "text-[#e2c48a]"
                   }`}
                 >
                   {stat.trend === "up" ? "↑ " : "↓ "}
