@@ -28,7 +28,7 @@ export function Header({ solid = false }: { solid?: boolean }) {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
+      className={`fixed inset-x-0 top-0 z-50 pt-[env(safe-area-inset-top)] transition-all duration-300 ${
         isSolid
           ? "border-b border-[var(--line)] bg-mist/90 backdrop-blur-md"
           : "bg-transparent"

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { readFiresCache, writeFiresCache } from "@/lib/alerts/firesCache";
 import { isInBrazil } from "@/lib/alerts/geo";
 import { ALERT_LEVELS, LEVEL_META } from "@/lib/alerts/levels";
 import { addLocalReport, readLocalReports } from "@/lib/alerts/localReports";
@@ -45,6 +46,7 @@ export default function FireMap() {
   const [levelFilter, setLevelFilter] = useState<AlertLevel | "all">("all");
   const [refreshing, setRefreshing] = useState(false);
   const [partialWarning, setPartialWarning] = useState<string | null>(null);
+  const [fromCache, setFromCache] = useState(false);
 
   const loadSatellite = useCallback(async (fresh = false) => {
     const url = fresh ? "/api/fires?refresh=1" : "/api/fires";
@@ -74,17 +76,21 @@ export default function FireMap() {
   }, []);
 
   const applySatelliteResult = useCallback(
-    (satellite: FireAlert[], m: FiresMeta) => {
+    (satellite: FireAlert[], m: FiresMeta, cached = false) => {
       setAlerts(mergeAlerts(satellite));
       setMeta(m);
+      setFromCache(cached);
+      if (!cached) {
+        writeFiresCache(satellite, m);
+      }
       if (m.errors?.length) {
-        if (satellite.length === 0) {
+        if (satellite.length === 0 && !cached) {
           setError(m.errors.join(" "));
           setPartialWarning(null);
         } else {
           setPartialWarning(m.errors.join(" "));
         }
-      } else {
+      } else if (!cached) {
         setPartialWarning(null);
       }
     },
@@ -94,7 +100,17 @@ export default function FireMap() {
   useEffect(() => {
     loadSatellite()
       .then(({ satellite, meta: m }) => applySatelliteResult(satellite, m))
-      .catch(() => setError("Não foi possível carregar os focos de queimada."))
+      .catch(() => {
+        const cached = readFiresCache();
+        if (cached) {
+          applySatelliteResult(cached.alerts, cached.meta, true);
+          setPartialWarning(
+            "Sem conexão com o satélite — mostrando último mapa salvo neste aparelho.",
+          );
+        } else {
+          setError("Não foi possível carregar os focos de queimada.");
+        }
+      })
       .finally(() => setLoading(false));
   }, [loadSatellite, applySatelliteResult]);
 
@@ -106,7 +122,15 @@ export default function FireMap() {
       const { satellite, meta: m } = await loadSatellite(true);
       applySatelliteResult(satellite, m);
     } catch {
-      setError("Não foi possível atualizar os dados.");
+      const cached = readFiresCache();
+      if (cached) {
+        applySatelliteResult(cached.alerts, cached.meta, true);
+        setPartialWarning(
+          "Atualização falhou — mantendo último mapa salvo neste aparelho.",
+        );
+      } else {
+        setError("Não foi possível atualizar os dados.");
+      }
     } finally {
       setRefreshing(false);
     }
@@ -343,6 +367,15 @@ export default function FireMap() {
           </p>
         ) : null}
 
+        {fromCache ? (
+          <p className="pointer-events-auto max-w-md rounded-lg border border-forest/15 bg-white/95 px-3 py-1.5 text-[11px] font-medium text-forest shadow-md">
+            Dados em cache neste aparelho
+            {meta?.updatedAt
+              ? ` · ${new Date(meta.updatedAt).toLocaleString("pt-BR")}`
+              : ""}
+          </p>
+        ) : null}
+
         {partialWarning ? (
           <p className="pointer-events-auto max-w-md rounded-lg border border-burn/20 bg-white/95 px-3 py-1.5 text-[11px] text-burn shadow-md">
             {partialWarning}
@@ -350,7 +383,7 @@ export default function FireMap() {
         ) : null}
       </div>
 
-      <div className="pointer-events-none absolute bottom-24 left-3 z-[1100] sm:bottom-6">
+      <div className="pointer-events-none absolute bottom-6 left-3 z-[1100]">
         <div className="pointer-events-auto">
           <FireLegend />
         </div>
@@ -360,7 +393,7 @@ export default function FireMap() {
         type="button"
         onClick={openReport}
         aria-label="Reportar queimada"
-        className="absolute bottom-28 right-4 z-[1100] flex h-14 w-14 items-center justify-center rounded-full bg-red-600 text-3xl font-light text-white shadow-lg transition hover:bg-red-700 md:bottom-6"
+        className="absolute bottom-6 right-4 z-[1100] flex h-14 w-14 items-center justify-center rounded-full bg-red-600 text-3xl font-light text-white shadow-lg transition hover:bg-red-700"
       >
         +
       </button>

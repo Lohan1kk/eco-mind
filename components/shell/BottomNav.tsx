@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { HIDE_BOTTOM_NAV } from "@/lib/pwa";
 
 const NAV = [
   { href: "/", label: "Início" },
@@ -11,13 +12,10 @@ const NAV = [
   { href: "/baixar", label: "Baixar" },
 ];
 
-/** Full-screen map uses its own chrome; hide tab bar there. */
-const HIDE_ON = ["/alerta-queimadas"];
-
 export function BottomNav() {
   const pathname = usePathname();
 
-  if (HIDE_ON.some((p) => pathname.startsWith(p))) return null;
+  if (HIDE_BOTTOM_NAV.some((p) => pathname.startsWith(p))) return null;
 
   return (
     <nav
