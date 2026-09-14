@@ -24,3 +24,9 @@ Dados de satélite: **INPE** (Programa Queimadas, grátis). Opcionalmente **NASA
 - Identidade e história: [`MARCA.md`](MARCA.md)
 - Pitch: [`PITCH.md`](PITCH.md)
 - Assets: [`assets/`](assets/) e `public/brand/`
+
+## Documentação ExpoPT
+
+- Página no site: [`/documentacao`](https://eco-mind-ashy.vercel.app/documentacao)
+- Versão digital (Markdown): [`docs/ExpoPT-EcoMind-digital.md`](docs/ExpoPT-EcoMind-digital.md)
+- Versão para impressão / Classroom: [`docs/ExpoPT-EcoMind-impressao.md`](docs/ExpoPT-EcoMind-impressao.md)
