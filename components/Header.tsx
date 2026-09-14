@@ -10,7 +10,6 @@ const links = [
   { href: "/calculadora", label: "Calculadora" },
   { href: "/quiz", label: "Quiz" },
   { href: "/alerta-queimadas", label: "Mapa" },
-  { href: "/documentacao", label: "Documentação" },
   { href: "/#equipe", label: "Equipe" },
 ];
 
