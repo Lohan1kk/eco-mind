@@ -2,13 +2,14 @@ import type { AlertLevel } from "./types";
 
 /**
  * Maps Fire Radiative Power (MW) to display level.
- * Used by INPE daily and NASA FIRMS (both expose FRP).
+ * Thresholds aligned with typical VIIRS/MODIS FRP distributions
+ * (most detections are low-power; high FRP is rarer).
  */
 export function frpToLevel(frp: number | null | undefined): AlertLevel {
   if (frp == null || Number.isNaN(frp)) return "medio";
-  if (frp >= 80) return "critico";
-  if (frp >= 35) return "alto";
-  if (frp >= 12) return "medio";
+  if (frp >= 100) return "critico";
+  if (frp >= 40) return "alto";
+  if (frp >= 15) return "medio";
   return "baixo";
 }
 

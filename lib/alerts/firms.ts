@@ -38,13 +38,16 @@ function parseFirmsCsv(text: string, sourceTag: string): FireAlert[] {
     const lng = Number.parseFloat(parts[lngIdx]);
     if (Number.isNaN(lat) || Number.isNaN(lng)) return [];
 
+    const confidence = confIdx >= 0 ? parts[confIdx]?.toLowerCase() : "";
+    // Skip low-confidence VIIRS detections for a more realistic map
+    if (confidence === "low" || confidence === "l") return [];
+
     const frp = frpIdx >= 0 ? Number.parseFloat(parts[frpIdx]) : Number.NaN;
     const bright =
       brightIdx >= 0 ? Number.parseFloat(parts[brightIdx]) : Number.NaN;
     const date = dateIdx >= 0 ? parts[dateIdx] : "";
     const time = timeIdx >= 0 ? parts[timeIdx]?.padStart(4, "0") : "0000";
     const satelite = satIdx >= 0 ? parts[satIdx] : "NASA FIRMS";
-    const confidence = confIdx >= 0 ? parts[confIdx] : undefined;
 
     const reportedAt =
       date && time
@@ -93,10 +96,11 @@ function diversifyByGrid(alerts: FireAlert[], limit: number): FireAlert[] {
   }
 
   const quotas = {
-    critico: Math.ceil(limit * 0.22),
-    alto: Math.ceil(limit * 0.26),
-    medio: Math.ceil(limit * 0.28),
-    baixo: Math.ceil(limit * 0.24),
+    // Natural-ish mix: most real detections are low/medium FRP
+    critico: Math.ceil(limit * 0.12),
+    alto: Math.ceil(limit * 0.18),
+    medio: Math.ceil(limit * 0.30),
+    baixo: Math.ceil(limit * 0.40),
   };
 
   const cellCap = Math.max(2, Math.ceil(limit / 90));
@@ -150,11 +154,13 @@ export async function fetchNasaFirmsGlobal(
         const res = await fetch(url, fetchInit);
         if (!res.ok) return [] as FireAlert[];
         const text = await res.text();
-        // Cap parse work — take a large head then diversify
+        // Sample across the file (not only the first lines) for geographic realism
         const lines = text.split("\n");
         const header = lines[0] ?? "";
-        const body = lines.slice(1, 12000);
-        return parseFirmsCsv([header, ...body].join("\n"), `g${i}`);
+        const body = lines.slice(1).filter(Boolean);
+        const stride = Math.max(1, Math.floor(body.length / 8000));
+        const sampled = body.filter((_, idx) => idx % stride === 0).slice(0, 8000);
+        return parseFirmsCsv([header, ...sampled].join("\n"), `g${i}`);
       } catch {
         return [] as FireAlert[];
       }
