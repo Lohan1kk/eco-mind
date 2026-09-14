@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 
+const THEME = "#1b5e3b";
+
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "EcoMind — Consciência ambiental",
@@ -7,9 +9,12 @@ export default function manifest(): MetadataRoute.Manifest {
     description:
       "Calculadora de pegada, quiz ambiental e mapa de queimadas com dados do INPE.",
     start_url: "/",
+    scope: "/",
+    id: "/",
     display: "standalone",
+    orientation: "portrait-primary",
     background_color: "#f7fcf8",
-    theme_color: "#1b5e3b",
+    theme_color: THEME,
     lang: "pt-BR",
     icons: [
       {
@@ -19,20 +24,28 @@ export default function manifest(): MetadataRoute.Manifest {
         purpose: "any",
       },
       {
-        src: "/brand/icon-ecomind.png",
+        src: "/brand/icon-ecomind-maskable.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",
       },
     ],
     shortcuts: [
-      { name: "Calculadora", url: "/calculadora", description: "Calcule sua pegada" },
+      {
+        name: "Calculadora",
+        url: "/calculadora",
+        description: "Calcule sua pegada de carbono",
+      },
       {
         name: "Mapa de queimadas",
         url: "/alerta-queimadas",
-        description: "Focos INPE em tempo real",
+        description: "Focos INPE atualizados",
       },
-      { name: "Quiz", url: "/quiz", description: "Teste seu conhecimento" },
+      {
+        name: "Quiz",
+        url: "/quiz",
+        description: "Teste seu conhecimento",
+      },
     ],
   };
 }
