@@ -7,6 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/calculadora",
     "/quiz",
     "/alerta-queimadas",
+    "/documentacao",
     "/baixar",
   ];
 

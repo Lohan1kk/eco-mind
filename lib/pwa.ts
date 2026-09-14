@@ -1,5 +1,5 @@
 /** Routes where the mobile bottom tab bar is hidden. */
-export const HIDE_BOTTOM_NAV = ["/alerta-queimadas"] as const;
+export const HIDE_BOTTOM_NAV = ["/alerta-queimadas", "/documentacao"] as const;
 
 export function hidesBottomNav(pathname: string | null): boolean {
   if (!pathname) return false;
