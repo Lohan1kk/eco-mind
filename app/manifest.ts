@@ -18,10 +18,22 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: "pt-BR",
     icons: [
       {
+        src: "/brand/icon-ecomind-192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
         src: "/brand/icon-ecomind.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "any",
+      },
+      {
+        src: "/brand/icon-ecomind-maskable-192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "maskable",
       },
       {
         src: "/brand/icon-ecomind-maskable.png",

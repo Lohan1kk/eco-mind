@@ -44,6 +44,13 @@ export default function FireMap() {
   const [refreshing, setRefreshing] = useState(false);
   const [partialWarning, setPartialWarning] = useState<string | null>(null);
   const [fromCache, setFromCache] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [flyTo, setFlyTo] = useState<{
+    lat: number;
+    lng: number;
+    zoom?: number;
+  } | null>(null);
+  const [locating, setLocating] = useState(false);
 
   const loadSatellite = useCallback(async (fresh = false) => {
     const url = fresh ? "/api/fires?refresh=1" : "/api/fires";
@@ -179,6 +186,30 @@ export default function FireMap() {
     );
   }
 
+  function handleLocateMe() {
+    if (!navigator.geolocation) {
+      setError("Geolocalização não disponível neste navegador.");
+      return;
+    }
+    setLocating(true);
+    setError(null);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setFlyTo({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          zoom: 8,
+        });
+        setLocating(false);
+      },
+      () => {
+        setError("Não foi possível obter sua localização.");
+        setLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 12000 },
+    );
+  }
+
   async function handleSubmit(data: {
     lat: number;
     lng: number;
@@ -248,7 +279,7 @@ export default function FireMap() {
       : null;
 
   return (
-    <div className="relative h-[calc(100svh-8.5rem-env(safe-area-inset-bottom))] w-full md:h-[calc(100svh-4rem)]">
+    <div className="relative h-[calc(100svh-7.25rem-env(safe-area-inset-bottom))] w-full touch-manipulation md:h-[calc(100svh-4rem)]">
       {loading ? (
         <div className="flex h-full flex-col items-center justify-center gap-4 bg-mist-soft text-ash">
           <div className="h-12 w-12 animate-pulse-soft rounded-full border-2 border-forest/30 border-t-forest" />
@@ -261,70 +292,97 @@ export default function FireMap() {
           pickMode={pickMode && modalOpen}
           onMapClick={handleMapClick}
           selectedCoords={coords}
+          flyTo={flyTo}
         />
       )}
 
-      {/* z-[1100]: above Leaflet controls */}
-      <div className="pointer-events-none absolute inset-x-0 top-3 z-[1100] flex justify-center px-3">
-        <div
-          className="pointer-events-auto inline-flex rounded-lg border border-forest/15 bg-white/95 p-1 shadow-md backdrop-blur-sm"
-          role="tablist"
-          aria-label="Tipo de mapa"
-        >
-          {(["map", "satellite"] as const).map((mode) => (
-            <button
-              key={mode}
-              type="button"
-              role="tab"
-              aria-selected={layer === mode}
-              onClick={() => setLayer(mode)}
-              className={`rounded-md px-4 py-1.5 text-sm font-semibold transition ${
-                layer === mode
-                  ? "bg-forest text-mist"
-                  : "text-forest hover:bg-forest/10"
-              }`}
-            >
-              {mode === "map" ? "Mapa" : "Satélite"}
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* Top chrome — compact on mobile */}
+      <div className="pointer-events-none absolute inset-x-0 top-2 z-[1100] flex flex-col gap-2 px-2 sm:top-3 sm:px-3">
+        <div className="flex items-start justify-between gap-2">
+          <div
+            className="pointer-events-auto inline-flex rounded-xl border border-forest/15 bg-white/95 p-1 shadow-md backdrop-blur-sm"
+            role="tablist"
+            aria-label="Tipo de mapa"
+          >
+            {(["map", "satellite"] as const).map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                role="tab"
+                aria-selected={layer === mode}
+                onClick={() => setLayer(mode)}
+                className={`min-h-10 rounded-lg px-3 text-sm font-semibold transition sm:px-4 ${
+                  layer === mode
+                    ? "bg-forest text-mist"
+                    : "text-forest hover:bg-forest/10"
+                }`}
+              >
+                {mode === "map" ? "Mapa" : "Satélite"}
+              </button>
+            ))}
+          </div>
 
-      <div className="pointer-events-none absolute left-3 right-3 top-14 z-[1100] flex flex-col gap-2 sm:top-16">
+          <div className="pointer-events-auto flex gap-2">
+            <button
+              type="button"
+              onClick={handleLocateMe}
+              disabled={locating || loading}
+              aria-label="Ir para minha localização"
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-forest/15 bg-white/95 text-lg text-forest shadow-md backdrop-blur-sm transition hover:bg-mist-soft disabled:opacity-50"
+            >
+              {locating ? "…" : "◎"}
+            </button>
+            {!loading ? (
+              <button
+                type="button"
+                onClick={refreshData}
+                disabled={refreshing}
+                aria-label="Atualizar dados"
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-forest/15 bg-white/95 text-lg text-forest shadow-md backdrop-blur-sm transition hover:bg-mist-soft disabled:opacity-50"
+              >
+                <span className={refreshing ? "animate-spin" : ""}>↻</span>
+              </button>
+            ) : null}
+          </div>
+        </div>
+
         <div className="flex flex-wrap items-center gap-2">
           {sourceLabel ? (
-            <div className="pointer-events-auto rounded-lg border border-forest/15 bg-white/95 px-3 py-1.5 text-xs font-medium text-forest shadow-md backdrop-blur-sm">
+            <div className="pointer-events-auto max-w-[70%] truncate rounded-lg border border-forest/15 bg-white/95 px-2.5 py-1.5 text-[11px] font-medium text-forest shadow-md backdrop-blur-sm sm:max-w-none sm:text-xs">
               {sourceLabel}
               {freshnessLabel}
               <span className="ml-1 text-ash/70">
-                · {filteredAlerts.length} visíveis
+                · {filteredAlerts.length}
               </span>
             </div>
           ) : !loading ? (
-            <div className="pointer-events-auto rounded-lg border border-burn/20 bg-white/95 px-3 py-1.5 text-xs font-medium text-burn shadow-md">
+            <div className="pointer-events-auto rounded-lg border border-burn/20 bg-white/95 px-2.5 py-1.5 text-[11px] font-medium text-burn shadow-md">
               Sem focos no momento
             </div>
           ) : null}
 
-          {!loading ? (
+          {showLevelFilters ? (
             <button
               type="button"
-              onClick={refreshData}
-              disabled={refreshing}
-              aria-label="Atualizar dados"
-              className="pointer-events-auto flex h-8 w-8 items-center justify-center rounded-lg border border-forest/15 bg-white/95 text-forest shadow-md backdrop-blur-sm transition hover:bg-mist-soft disabled:opacity-50"
+              onClick={() => setFiltersOpen((v) => !v)}
+              className="pointer-events-auto min-h-9 rounded-lg border border-forest/15 bg-white/95 px-3 text-xs font-semibold text-forest shadow-md backdrop-blur-sm md:hidden"
+              aria-expanded={filtersOpen}
             >
-              <span className={refreshing ? "animate-spin" : ""}>↻</span>
+              {filtersOpen ? "Fechar filtros" : "Filtros"}
             </button>
           ) : null}
         </div>
 
         {showLevelFilters ? (
-          <div className="pointer-events-auto flex max-w-full flex-wrap gap-1 rounded-lg border border-forest/15 bg-white/95 p-1 shadow-md backdrop-blur-sm">
+          <div
+            className={`pointer-events-auto max-w-full gap-1 overflow-x-auto rounded-xl border border-forest/15 bg-white/95 p-1 shadow-md backdrop-blur-sm ${
+              filtersOpen ? "flex" : "hidden md:flex"
+            }`}
+          >
             <button
               type="button"
               onClick={() => setLevelFilter("all")}
-              className={`rounded-md px-2 py-1 text-[10px] font-semibold uppercase ${
+              className={`min-h-9 shrink-0 rounded-lg px-3 text-xs font-semibold ${
                 levelFilter === "all"
                   ? "bg-forest text-mist"
                   : "text-ash hover:bg-forest/10"
@@ -337,7 +395,7 @@ export default function FireMap() {
                 key={level}
                 type="button"
                 onClick={() => setLevelFilter(level)}
-                className={`rounded-md px-2 py-1 text-[10px] font-semibold uppercase ${
+                className={`min-h-9 shrink-0 rounded-lg px-3 text-xs font-semibold ${
                   levelFilter === level
                     ? "text-mist"
                     : "text-ash hover:bg-forest/10"
@@ -376,7 +434,7 @@ export default function FireMap() {
 
       <div className="pointer-events-none absolute bottom-6 left-3 z-[1100]">
         <div className="pointer-events-auto">
-          <FireLegend />
+          <FireLegend compact />
         </div>
       </div>
 
@@ -384,7 +442,7 @@ export default function FireMap() {
         type="button"
         onClick={openReport}
         aria-label="Reportar queimada"
-        className="absolute bottom-6 right-4 z-[1100] flex h-14 w-14 items-center justify-center rounded-full bg-red-600 text-3xl font-light text-white shadow-lg transition hover:bg-red-700"
+        className="absolute bottom-6 right-4 z-[1100] flex h-14 w-14 items-center justify-center rounded-full bg-red-600 text-3xl font-light text-white shadow-lg transition hover:bg-red-700 active:scale-95"
       >
         +
       </button>
