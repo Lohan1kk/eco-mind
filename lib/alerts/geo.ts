@@ -8,3 +8,7 @@ export const BRAZIL_BBOX_FIRMS = "-33.75,-74.0,5.27,-34.0";
 
 export const BRAZIL_CENTER: [number, number] = [-14.235, -51.9253];
 export const BRAZIL_DEFAULT_ZOOM = 4;
+
+/** World view for the fire map. */
+export const WORLD_CENTER: [number, number] = [10, 5];
+export const WORLD_DEFAULT_ZOOM = 2;

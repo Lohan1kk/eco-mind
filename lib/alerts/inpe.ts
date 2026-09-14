@@ -79,7 +79,7 @@ function parse10MinCsv(text: string): FireAlert[] {
     .slice(0, 280);
 }
 
-function parseDailyCsv(text: string, limit: number): FireAlert[] {
+function parseDailyCsv(text: string): FireAlert[] {
   const lines = text.trim().split("\n");
   if (lines.length < 2) return [];
 
@@ -120,9 +120,39 @@ function parseDailyCsv(text: string, limit: number): FireAlert[] {
     ];
   });
 
-  return rows
-    .sort((a, b) => (b.frp ?? 0) - (a.frp ?? 0))
-    .slice(0, limit);
+  return rows.sort((a, b) => (b.frp ?? 0) - (a.frp ?? 0));
+}
+
+/** Keep Brazil coverage readable: mix severity levels, not only top FRP. */
+function diversifyInpeLevels(alerts: FireAlert[], limit: number): FireAlert[] {
+  const byLevel: Record<string, FireAlert[]> = {
+    critico: [],
+    alto: [],
+    medio: [],
+    baixo: [],
+  };
+  for (const a of alerts) {
+    byLevel[a.level]?.push(a);
+  }
+  const quotas = {
+    critico: Math.ceil(limit * 0.25),
+    alto: Math.ceil(limit * 0.25),
+    medio: Math.ceil(limit * 0.25),
+    baixo: Math.ceil(limit * 0.25),
+  };
+  const picked: FireAlert[] = [];
+  for (const level of ["critico", "alto", "medio", "baixo"] as const) {
+    picked.push(...byLevel[level].slice(0, quotas[level]));
+  }
+  if (picked.length < limit) {
+    const ids = new Set(picked.map((p) => p.id));
+    for (const a of alerts) {
+      if (ids.has(a.id)) continue;
+      picked.push(a);
+      if (picked.length >= limit) break;
+    }
+  }
+  return picked.slice(0, limit);
 }
 
 export async function fetchInpeFires(options?: {
@@ -133,20 +163,7 @@ export async function fetchInpeFires(options?: {
 }> {
   const fresh = Boolean(options?.fresh);
 
-  const latest10 = await findLatest10MinFile(fresh);
-  if (latest10) {
-    const res = await fetch(
-      `${INPE_10MIN_DIR}${latest10}`,
-      fetchOpts(fresh, 600),
-    );
-    if (res.ok) {
-      const alerts = parse10MinCsv(await res.text());
-      if (alerts.length > 0) {
-        return { alerts, source: "inpe-10min" };
-      }
-    }
-  }
-
+  // Prefer daily CSV: includes FRP → proper crítico/alto/médio/baixo levels.
   const dailyUrl = `${INPE_DAILY_BR}${latestDailyFilename()}`;
   let res = await fetch(dailyUrl, fetchOpts(fresh, 3600));
 
@@ -162,10 +179,27 @@ export async function fetchInpeFires(options?: {
     );
   }
 
-  if (!res.ok) {
-    throw new Error("INPE indisponível.");
+  if (res.ok) {
+    const alerts = diversifyInpeLevels(parseDailyCsv(await res.text()), 320);
+    if (alerts.length > 0) {
+      return { alerts, source: "inpe-daily" };
+    }
   }
 
-  const alerts = parseDailyCsv(await res.text(), 300);
-  return { alerts, source: "inpe-daily" };
+  // Fallback: 10-min (no FRP column — levels stay médio unless we infer later)
+  const latest10 = await findLatest10MinFile(fresh);
+  if (latest10) {
+    const tenRes = await fetch(
+      `${INPE_10MIN_DIR}${latest10}`,
+      fetchOpts(fresh, 600),
+    );
+    if (tenRes.ok) {
+      const alerts = parse10MinCsv(await tenRes.text());
+      if (alerts.length > 0) {
+        return { alerts, source: "inpe-10min" };
+      }
+    }
+  }
+
+  throw new Error("INPE indisponível.");
 }

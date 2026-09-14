@@ -7,7 +7,7 @@ export function FireLegend() {
       aria-label="Legenda de níveis de alerta"
     >
       <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ash">
-        Nível de alerta
+        Identificação (FRP)
       </p>
       <ul className="space-y-1.5">
         {ALERT_LEVELS.map((level) => (
@@ -21,6 +21,10 @@ export function FireLegend() {
           </li>
         ))}
       </ul>
+      <p className="mt-2 max-w-[11rem] text-[10px] leading-snug text-ash/75">
+        Crítico ≥80 MW · Alto ≥35 · Médio ≥12 · Baixo &lt;12. Toque no pin para
+        ver FRP e satélite.
+      </p>
     </div>
   );
 }

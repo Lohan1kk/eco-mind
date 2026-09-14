@@ -12,7 +12,7 @@ import { ReportFireModal } from "./ReportFireModal";
 
 type MapLayer = "map" | "satellite";
 
-const MAX_VISIBLE_ALERTS = 280;
+const MAX_VISIBLE_ALERTS = 360;
 
 const LEVEL_PRIORITY: Record<AlertLevel, number> = {
   critico: 0,
@@ -25,8 +25,10 @@ interface FiresMeta {
   count: number;
   inpe: number;
   nasa: number;
+  seed?: number;
   inpeSource: string | null;
   nasaEnabled: boolean;
+  worldwide?: boolean;
   updatedAt: string;
   errors?: string[];
 }
@@ -237,23 +239,26 @@ export default function FireMap() {
   const levelsWithData = ALERT_LEVELS.filter((level) => levelCounts[level] > 0);
   const showLevelFilters = levelsWithData.length > 1;
 
-  const sourceLabel =
-    meta && meta.inpe > 0
-      ? `INPE · ${meta.inpe} focos${meta.nasa > 0 ? ` · NASA ${meta.nasa}` : ""}`
-      : meta?.nasa
-        ? `NASA FIRMS · ${meta.nasa} focos`
-        : null;
+  const sourceLabel = (() => {
+    if (!meta) return null;
+    const parts: string[] = [];
+    if (meta.inpe > 0) parts.push(`INPE ${meta.inpe}`);
+    if (meta.nasa > 0) parts.push(`NASA mundo ${meta.nasa}`);
+    if ((meta.seed ?? 0) > 0) parts.push(`demo ${meta.seed}`);
+    if (!parts.length) return null;
+    return parts.join(" · ");
+  })();
 
   const freshnessLabel =
     meta?.inpeSource === "inpe-10min"
-      ? " · ~10 min"
+      ? " · INPE ~10 min"
       : meta?.inpeSource === "inpe-daily"
-        ? " · diário"
+        ? " · INPE diário + FRP"
         : null;
 
   const tenMinNote =
     meta?.inpeSource === "inpe-10min" && !showLevelFilters
-      ? "Fonte 10 min sem FRP — todos os focos como médio."
+      ? "Fonte INPE 10 min sem FRP — níveis médios. Atualize para o consolidado diário."
       : null;
 
   return (
