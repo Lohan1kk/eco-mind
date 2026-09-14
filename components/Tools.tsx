@@ -13,7 +13,7 @@ const tools = [
     href: "/quiz",
     step: "02",
     title: "Quiz",
-    desc: "Teste o que você sabe sobre clima, Amazônia e impacto pessoal.",
+    desc: "Teste o que você sabe sobre o conteúdo da EcoMind: problema, ferramentas e dados do clima.",
     cta: "Fazer o quiz",
   },
   {
