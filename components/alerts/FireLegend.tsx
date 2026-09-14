@@ -22,7 +22,7 @@ export function FireLegend() {
         ))}
       </ul>
       <p className="mt-2 max-w-[11rem] text-[10px] leading-snug text-ash/75">
-        Crítico ≥80 MW · Alto ≥35 · Médio ≥12 · Baixo &lt;12. Toque no pin para
+        Crítico ≥100 MW · Alto ≥40 · Médio ≥15 · Baixo &lt;15. Toque no pin para
         ver FRP e satélite.
       </p>
     </div>

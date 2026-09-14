@@ -17,7 +17,17 @@ Abra [http://localhost:3000](http://localhost:3000).
 
 Mapa de queimadas: [http://localhost:3000/alerta-queimadas](http://localhost:3000/alerta-queimadas)
 
-Dados de satélite: **INPE** (Brasil, diário com FRP) + **NASA FIRMS** global 24h (CSV público, sem chave). Opcionalmente `FIRMS_MAP_KEY` no `.env.local` para API por área.
+Dados de satélite: **INPE** (Brasil, diário com FRP) + **NASA FIRMS** global 24h (CSV público).
+
+Chave opcional — coloque em `.env.local` (local) ou nas Environment Variables da Vercel (produção):
+
+```bash
+# .env.local
+FIRMS_MAP_KEY=sua_chave_aqui
+```
+
+Peça a chave em: https://firms.modaps.eosdis.nasa.gov/api/map_key/  
+Modelo: [`.env.example`](.env.example)
 
 ## Marca
 

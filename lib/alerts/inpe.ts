@@ -135,10 +135,10 @@ function diversifyInpeLevels(alerts: FireAlert[], limit: number): FireAlert[] {
     byLevel[a.level]?.push(a);
   }
   const quotas = {
-    critico: Math.ceil(limit * 0.25),
-    alto: Math.ceil(limit * 0.25),
-    medio: Math.ceil(limit * 0.25),
-    baixo: Math.ceil(limit * 0.25),
+    critico: Math.ceil(limit * 0.15),
+    alto: Math.ceil(limit * 0.2),
+    medio: Math.ceil(limit * 0.3),
+    baixo: Math.ceil(limit * 0.35),
   };
   const picked: FireAlert[] = [];
   for (const level of ["critico", "alto", "medio", "baixo"] as const) {

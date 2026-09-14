@@ -9,6 +9,7 @@ export interface FiresCacheMeta {
   seed?: number;
   inpeSource: string | null;
   nasaEnabled: boolean;
+  firmsKeyConfigured?: boolean;
   worldwide?: boolean;
   updatedAt: string;
   errors?: string[];

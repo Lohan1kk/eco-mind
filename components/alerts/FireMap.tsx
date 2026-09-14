@@ -5,6 +5,7 @@ import { readFiresCache, writeFiresCache } from "@/lib/alerts/firesCache";
 import { isInBrazil } from "@/lib/alerts/geo";
 import { ALERT_LEVELS, LEVEL_META } from "@/lib/alerts/levels";
 import { addLocalReport, readLocalReports } from "@/lib/alerts/localReports";
+import { selectVisibleAlerts } from "@/lib/alerts/selectVisible";
 import type { AlertLevel, FireAlert } from "@/lib/alerts/types";
 import { FireLegend } from "./FireLegend";
 import { MapView } from "./MapView";
@@ -12,14 +13,7 @@ import { ReportFireModal } from "./ReportFireModal";
 
 type MapLayer = "map" | "satellite";
 
-const MAX_VISIBLE_ALERTS = 360;
-
-const LEVEL_PRIORITY: Record<AlertLevel, number> = {
-  critico: 0,
-  alto: 1,
-  medio: 2,
-  baixo: 3,
-};
+const MAX_VISIBLE_ALERTS = 400;
 
 interface FiresMeta {
   count: number;
@@ -28,6 +22,7 @@ interface FiresMeta {
   seed?: number;
   inpeSource: string | null;
   nasaEnabled: boolean;
+  firmsKeyConfigured?: boolean;
   worldwide?: boolean;
   updatedAt: string;
   errors?: string[];
@@ -216,16 +211,7 @@ export default function FireMap() {
         ? alerts
         : alerts.filter((a) => a.level === levelFilter);
 
-    const users = byLevel.filter((a) => a.source === "user");
-    const sats = byLevel
-      .filter((a) => a.source !== "user")
-      .sort(
-        (a, b) =>
-          LEVEL_PRIORITY[a.level] - LEVEL_PRIORITY[b.level] ||
-          (b.frp ?? 0) - (a.frp ?? 0),
-      );
-
-    return [...users, ...sats].slice(0, MAX_VISIBLE_ALERTS);
+    return selectVisibleAlerts(byLevel, MAX_VISIBLE_ALERTS);
   }, [alerts, levelFilter]);
 
   const levelCounts = ALERT_LEVELS.reduce(
