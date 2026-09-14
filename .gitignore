@@ -44,3 +44,7 @@ next-env.d.ts
 qa-screenshot-*.webp
 ecomind-demo.mp4
 qa-screenshot-*.webp
+
+# docs locais ExpoPT
+/docs/
+/projects/
