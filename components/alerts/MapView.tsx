@@ -9,7 +9,7 @@ import {
   useMap,
   useMapEvents,
 } from "react-leaflet";
-import { BRAZIL_CENTER, BRAZIL_DEFAULT_ZOOM } from "@/lib/alerts/geo";
+import { WORLD_CENTER, WORLD_DEFAULT_ZOOM } from "@/lib/alerts/geo";
 import { LEVEL_META } from "@/lib/alerts/levels";
 import type { FireAlert } from "@/lib/alerts/types";
 import { createPinIcon } from "./createPinIcon";
@@ -88,8 +88,8 @@ export function MapView({
 
   return (
     <MapContainer
-      center={BRAZIL_CENTER}
-      zoom={BRAZIL_DEFAULT_ZOOM}
+      center={WORLD_CENTER}
+      zoom={WORLD_DEFAULT_ZOOM}
       className="z-0 h-full w-full"
       style={{ height: "100%", width: "100%" }}
       scrollWheelZoom
@@ -110,16 +110,27 @@ export function MapView({
           icon={createPinIcon(alert.level)}
         >
           <Popup>
-            <div className="min-w-[170px] text-sm">
-              <p className="font-semibold text-ink">
+            <div className="min-w-[180px] text-sm">
+              <p
+                className="font-semibold"
+                style={{ color: LEVEL_META[alert.level].color }}
+              >
                 {LEVEL_META[alert.level].label}
               </p>
+              {alert.frp != null ? (
+                <p className="mt-1 text-xs font-medium text-ink">
+                  FRP {alert.frp.toFixed(1)} MW
+                </p>
+              ) : null}
               {alert.municipio ? (
                 <p className="mt-1 text-ash">
                   {[alert.municipio, alert.estado].filter(Boolean).join(" · ")}
                 </p>
               ) : alert.description ? (
                 <p className="mt-1 text-ash">{alert.description}</p>
+              ) : null}
+              {alert.bioma ? (
+                <p className="mt-1 text-xs text-ash/80">Bioma: {alert.bioma}</p>
               ) : null}
               {alert.satelite ? (
                 <p className="mt-1 text-xs text-ash/80">
@@ -131,12 +142,14 @@ export function MapView({
               </p>
               <p className="mt-1 text-[10px] uppercase tracking-wide text-ash/60">
                 {alert.source === "inpe"
-                  ? "INPE"
+                  ? "INPE Brasil"
                   : alert.source === "nasa"
-                    ? "NASA FIRMS"
+                    ? "NASA FIRMS · mundo"
                     : alert.source === "user"
                       ? "Reporte neste aparelho"
-                      : "EcoMind"}
+                      : alert.source === "seed"
+                        ? "Demonstração EcoMind"
+                        : "EcoMind"}
               </p>
             </div>
           </Popup>

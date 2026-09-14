@@ -5,7 +5,7 @@ import { Header } from "@/components/Header";
 export const metadata: Metadata = {
   title: "Alerta de queimadas",
   description:
-    "Mapa interativo de alertas de queimadas no Brasil com dados do INPE. Veja níveis de risco e reporte novos focos.",
+    "Mapa mundial de focos de queimada com níveis por FRP (INPE Brasil + NASA FIRMS). Veja risco e reporte focos no Brasil.",
 };
 
 export default function AlertaQueimadasPage() {
@@ -21,9 +21,9 @@ export default function AlertaQueimadasPage() {
             Alerta de queimadas
           </h1>
           <p className="mt-1 max-w-2xl text-sm text-ash">
-            Focos de satélite (INPE; NASA quando disponível). A frequência
-            depende da fonte — 10 min ou consolidado do dia. Toque no + para
-            marcar um foco neste aparelho.
+            Focos no mundo (NASA FIRMS) e detalhe do Brasil (INPE), coloridos por
+            intensidade (FRP): crítico, alto, médio e baixo. Toque no pin para
+            identificar. O + marca um foco no Brasil neste aparelho.
           </p>
         </div>
         <AlertaQueimadasClient />
