@@ -1,13 +1,14 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
+import { SmokeCursor } from "@/components/ui/smoke-cursor";
 import { hidesBottomNav } from "@/lib/pwa";
 import { BottomNav } from "./BottomNav";
 import { InstallBanner } from "./InstallBanner";
 import { OfflineIndicator } from "./OfflineIndicator";
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const hideNav = hidesBottomNav(pathname);
 
@@ -19,6 +20,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      <SmokeCursor />
       <OfflineIndicator />
       <a
         href="#conteudo-principal"
