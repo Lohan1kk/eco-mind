@@ -63,6 +63,19 @@ function FixMapSize({ layer }: { layer: MapLayer }) {
   return null;
 }
 
+function FlyToLocation({
+  target,
+}: {
+  target: { lat: number; lng: number; zoom?: number } | null;
+}) {
+  const map = useMap();
+  useEffect(() => {
+    if (!target) return;
+    map.flyTo([target.lat, target.lng], target.zoom ?? 10, { duration: 1.1 });
+  }, [map, target]);
+  return null;
+}
+
 function formatReportedAt(value: string) {
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return value;
@@ -75,6 +88,7 @@ interface MapViewProps {
   pickMode: boolean;
   onMapClick: (lat: number, lng: number) => void;
   selectedCoords: { lat: number; lng: number } | null;
+  flyTo: { lat: number; lng: number; zoom?: number } | null;
 }
 
 export function MapView({
@@ -83,6 +97,7 @@ export function MapView({
   pickMode,
   onMapClick,
   selectedCoords,
+  flyTo,
 }: MapViewProps) {
   const tile = TILES[layer];
 
@@ -90,8 +105,9 @@ export function MapView({
     <MapContainer
       center={WORLD_CENTER}
       zoom={WORLD_DEFAULT_ZOOM}
-      className="z-0 h-full w-full"
+      className="z-0 h-full w-full touch-manipulation"
       style={{ height: "100%", width: "100%" }}
+      zoomControl
       scrollWheelZoom
     >
       <TileLayer
@@ -101,6 +117,7 @@ export function MapView({
         maxZoom={tile.maxZoom}
       />
       <FixMapSize layer={layer} />
+      <FlyToLocation target={flyTo} />
       <MapClickHandler enabled={pickMode} onClick={onMapClick} />
 
       {alerts.map((alert) => (
@@ -159,7 +176,7 @@ export function MapView({
       {selectedCoords ? (
         <Marker
           position={[selectedCoords.lat, selectedCoords.lng]}
-          icon={createPinIcon("critico")}
+          icon={createPinIcon("critico", { selected: true })}
         />
       ) : null}
     </MapContainer>

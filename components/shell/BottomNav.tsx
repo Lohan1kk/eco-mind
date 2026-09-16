@@ -32,14 +32,12 @@ export function BottomNav() {
             <li key={item.href} className="flex-1">
               <Link
                 href={item.href}
-                className={`flex flex-col items-center gap-1 px-1 py-2.5 text-[10px] font-semibold uppercase tracking-wide transition ${
-                  active
-                    ? "text-forest"
-                    : "text-ash/70 hover:text-forest"
+                className={`flex min-h-12 flex-col items-center justify-center gap-1 px-1 py-2 text-[11px] font-semibold uppercase tracking-wide transition active:opacity-80 ${
+                  active ? "text-forest" : "text-ash/70 hover:text-forest"
                 }`}
               >
                 <span
-                  className={`h-1 w-5 rounded-full transition ${
+                  className={`h-1.5 w-5 rounded-full transition ${
                     active ? "bg-forest" : "bg-transparent"
                   }`}
                   aria-hidden
