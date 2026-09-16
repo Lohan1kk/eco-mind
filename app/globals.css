@@ -373,34 +373,34 @@ input[type="range"] {
   pointer-events: none;
 }
 
-/* Light sections: swirl across the field, soft rectangular scrim for ink */
+/* Light sections: gentle swirl — clearer and weaker */
 .verdant-wash--light .verdant-wash__shader {
-  opacity: 0.28;
-  mix-blend-mode: multiply;
+  opacity: 0.12;
+  mix-blend-mode: soft-light;
 }
 
 .verdant-wash--light .verdant-wash__veil {
   background:
     linear-gradient(
       90deg,
-      rgba(247, 252, 248, 0.12) 0%,
-      rgba(247, 252, 248, 0.5) 18%,
-      rgba(247, 252, 248, 0.62) 50%,
-      rgba(247, 252, 248, 0.5) 82%,
-      rgba(247, 252, 248, 0.12) 100%
+      rgba(247, 252, 248, 0.45) 0%,
+      rgba(247, 252, 248, 0.78) 16%,
+      rgba(247, 252, 248, 0.88) 50%,
+      rgba(247, 252, 248, 0.78) 84%,
+      rgba(247, 252, 248, 0.45) 100%
     ),
     linear-gradient(
       180deg,
-      rgba(238, 247, 241, 0.18) 0%,
-      rgba(238, 247, 241, 0.42) 28%,
-      rgba(238, 247, 241, 0.42) 72%,
-      rgba(238, 247, 241, 0.18) 100%
+      rgba(238, 247, 241, 0.5) 0%,
+      rgba(238, 247, 241, 0.72) 24%,
+      rgba(238, 247, 241, 0.72) 76%,
+      rgba(238, 247, 241, 0.5) 100%
     );
 }
 
-/* Dark sections: luminous wash + rectangular deep veil */
+/* Dark sections: soft luminous wash */
 .verdant-wash--dark .verdant-wash__shader {
-  opacity: 0.34;
+  opacity: 0.16;
   mix-blend-mode: soft-light;
 }
 
@@ -408,35 +408,35 @@ input[type="range"] {
   background:
     linear-gradient(
       90deg,
-      rgba(8, 22, 16, 0.15) 0%,
-      rgba(8, 22, 16, 0.48) 20%,
-      rgba(8, 22, 16, 0.58) 50%,
-      rgba(8, 22, 16, 0.48) 80%,
-      rgba(8, 22, 16, 0.15) 100%
+      rgba(8, 22, 16, 0.35) 0%,
+      rgba(8, 22, 16, 0.62) 18%,
+      rgba(8, 22, 16, 0.72) 50%,
+      rgba(8, 22, 16, 0.62) 82%,
+      rgba(8, 22, 16, 0.35) 100%
     ),
     linear-gradient(
       180deg,
-      rgba(8, 22, 16, 0.2) 0%,
-      rgba(8, 22, 16, 0.4) 30%,
-      rgba(8, 22, 16, 0.4) 70%,
-      rgba(8, 22, 16, 0.2) 100%
+      rgba(8, 22, 16, 0.4) 0%,
+      rgba(8, 22, 16, 0.58) 28%,
+      rgba(8, 22, 16, 0.58) 72%,
+      rgba(8, 22, 16, 0.4) 100%
     );
 }
 
 @media (min-width: 768px) {
   .verdant-wash--light .verdant-wash__shader {
-    opacity: 0.32;
+    opacity: 0.14;
   }
 
   .verdant-wash--dark .verdant-wash__shader {
-    opacity: 0.4;
+    opacity: 0.18;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .verdant-wash--light .verdant-wash__shader,
   .verdant-wash--dark .verdant-wash__shader {
-    opacity: 0.2;
+    opacity: 0.08;
   }
 }
 

@@ -45,8 +45,8 @@ export function VerdantWash({
         <VerdantSwirl
           className="verdant-wash__shader"
           speed={speed}
-          energy={1.4}
-          maxDpr={1.35}
+          energy={1.15}
+          maxDpr={1.25}
           active={visible}
           opacity={1}
         />
