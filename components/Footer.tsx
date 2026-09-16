@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { SectionAtmosphere } from "@/components/ui/section-atmosphere";
 
 const links = [
   { href: "/calculadora", label: "Calculadora" },
@@ -11,8 +12,9 @@ const links = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-white/10 bg-ink py-14 text-mist/85">
-      <div className="section-inner flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
+    <footer className="relative overflow-hidden border-t border-white/10 bg-ink py-14 text-mist/85">
+      <SectionAtmosphere variant="deep" />
+      <div className="section-inner relative z-[1] flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
         <div>
           <div className="flex items-center gap-2.5">
             <Image
@@ -45,7 +47,7 @@ export function Footer() {
         </nav>
       </div>
 
-      <div className="section-inner mt-10 border-t border-white/10 pt-6 text-xs text-mist/50">
+      <div className="section-inner relative z-[1] mt-10 border-t border-white/10 pt-6 text-xs text-mist/50">
         <p>EcoMind · Projeto de alunos · Colégio Paulo de Tarso</p>
         <p className="mt-2">
           Dados:{" "}

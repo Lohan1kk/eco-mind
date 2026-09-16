@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { QrInstall } from "@/components/shell/QrInstall";
+import { PageAtmosphereShell } from "@/components/ui/page-atmosphere-shell";
 
 export const metadata: Metadata = {
   title: "Baixar app",
@@ -22,7 +23,7 @@ export default function BaixarPage() {
   return (
     <>
       <Header solid />
-      <main className="min-h-screen bg-mist pt-24 pb-16">
+      <PageAtmosphereShell variant="soft" className="bg-mist pt-24 pb-16">
         <div className="section-inner max-w-2xl">
           <div className="flex items-center gap-4">
             <Image
@@ -87,7 +88,7 @@ export default function BaixarPage() {
             </section>
           </div>
         </div>
-      </main>
+      </PageAtmosphereShell>
       <Footer />
     </>
   );
