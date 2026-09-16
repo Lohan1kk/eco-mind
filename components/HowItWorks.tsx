@@ -1,4 +1,5 @@
 import { Reveal } from "./Reveal";
+import { SectionAtmosphere } from "@/components/ui/section-atmosphere";
 
 const steps = [
   {
@@ -20,8 +21,9 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section id="como-funciona" className="section section-botanical">
-      <div className="section-inner">
+    <section id="como-funciona" className="section section-botanical relative overflow-hidden">
+      <SectionAtmosphere variant="soft" />
+      <div className="section-inner relative z-[1]">
         <Reveal>
           <p className="eyebrow text-forest-mid">Como funciona</p>
           <h2 className="display mt-4 max-w-3xl text-3xl text-ink md:text-5xl">

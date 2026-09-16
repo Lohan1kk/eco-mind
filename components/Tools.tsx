@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Reveal } from "./Reveal";
+import { SectionAtmosphere } from "@/components/ui/section-atmosphere";
 
 const tools = [
   {
@@ -27,8 +28,9 @@ const tools = [
 
 export function Tools() {
   return (
-    <section id="ferramentas" className="section section-soft">
-      <div className="section-inner">
+    <section id="ferramentas" className="section section-soft relative overflow-hidden">
+      <SectionAtmosphere variant="soft" />
+      <div className="section-inner relative z-[1]">
         <Reveal>
           <p className="eyebrow text-forest-mid">Ferramentas</p>
           <h2 className="display mt-4 max-w-3xl text-3xl text-ink md:text-5xl">

@@ -1,4 +1,5 @@
 import { Reveal } from "./Reveal";
+import { SectionAtmosphere } from "@/components/ui/section-atmosphere";
 
 const points = [
   "Aprendizado ativo: o aluno participa, não só assiste",
@@ -9,8 +10,9 @@ const points = [
 
 export function School() {
   return (
-    <section id="escola" className="section bg-forest text-mist">
-      <div className="section-inner">
+    <section id="escola" className="section relative overflow-hidden bg-forest text-mist">
+      <SectionAtmosphere variant="deep" />
+      <div className="section-inner relative z-[1]">
         <Reveal>
           <p className="eyebrow text-sprout">Na escola</p>
           <h2 className="display mt-4 max-w-3xl text-3xl md:text-5xl">

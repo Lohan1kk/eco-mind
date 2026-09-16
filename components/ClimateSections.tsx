@@ -2,11 +2,13 @@
 
 import { CLIMATE_STATS } from "@/data/climate-stats";
 import { Reveal } from "./Reveal";
+import { SectionAtmosphere } from "@/components/ui/section-atmosphere";
 
 export function ClimateReality() {
   return (
-    <section id="realidade" className="section bg-[#101c15] text-mist">
-      <div className="section-inner">
+    <section id="realidade" className="section relative overflow-hidden bg-[#101c15] text-mist">
+      <SectionAtmosphere variant="deep" />
+      <div className="section-inner relative z-[1]">
         <Reveal>
           <p className="eyebrow text-sprout">A realidade</p>
           <h2 className="display mt-4 max-w-3xl text-3xl md:text-5xl">

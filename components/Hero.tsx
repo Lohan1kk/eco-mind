@@ -2,29 +2,22 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import {
-  motion,
-  useMotionValue,
-  useReducedMotion,
-  useSpring,
-  useTransform,
-} from "framer-motion";
-import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { ForestAtmosphere } from "@/components/ui/forest-atmosphere";
 import { pressTransition, softEase } from "./motion/variants";
 
-const BG = "/brand/hero-wilderness.jpg";
-const FG = "/brand/hero-wilderness-foreground.png";
+const BG = "/brand/hero-ecomind-hq.jpg";
 
 const copyContainer = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.13, delayChildren: 0.35 },
+    transition: { staggerChildren: 0.12, delayChildren: 0.3 },
   },
 };
 
 const copyItem = {
-  hidden: { opacity: 0, y: 22 },
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
@@ -33,7 +26,7 @@ const copyItem = {
 };
 
 const brandItem = {
-  hidden: { opacity: 0, y: 28, scale: 0.98 },
+  hidden: { opacity: 0, y: 24, scale: 0.98 },
   visible: {
     opacity: 1,
     y: 0,
@@ -43,63 +36,13 @@ const brandItem = {
 };
 
 /**
- * Wilderness-style multi-layer hover parallax.
- * Critical: pointer drives MotionValues / a ref only — never React setState per frame
- * (that was freezing the page).
+ * Clean professional hero: HQ photo + light WebGL mist + subtle ken-burns.
+ * No multi-layer parallax (stability first).
  */
 export function Hero() {
   const reduce = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
-  const pointerRef = useRef({ x: 0, y: 0 });
-  const finePointerRef = useRef(false);
   const [active, setActive] = useState(true);
-  const [canHover, setCanHover] = useState(false);
-
-  const rawX = useMotionValue(0);
-  const rawY = useMotionValue(0);
-  const hovering = useMotionValue(0);
-
-  const springX = useSpring(rawX, { stiffness: 70, damping: 24, mass: 0.45 });
-  const springY = useSpring(rawY, { stiffness: 70, damping: 24, mass: 0.45 });
-  const springHover = useSpring(hovering, { stiffness: 110, damping: 22 });
-
-  // Far / mid / near — top-level transforms only (no nested hook helper)
-  const farX = useTransform(
-    [springX, springHover],
-    ([x, h]: number[]) => (x as number) * 12 * (h as number),
-  );
-  const farY = useTransform(
-    [springY, springHover],
-    ([y, h]: number[]) => (y as number) * 8 * (h as number),
-  );
-  const midX = useTransform(
-    [springX, springHover],
-    ([x, h]: number[]) => (x as number) * 26 * (h as number),
-  );
-  const midY = useTransform(
-    [springY, springHover],
-    ([y, h]: number[]) => (y as number) * 16 * (h as number),
-  );
-  const nearX = useTransform(
-    [springX, springHover],
-    ([x, h]: number[]) => (x as number) * 52 * (h as number),
-  );
-  const nearY = useTransform(
-    [springY, springHover],
-    ([y, h]: number[]) => (y as number) * 32 * (h as number),
-  );
-  const nearScale = useTransform(springHover, (h) => 1.08 + (h as number) * 0.04);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(pointer: fine)");
-    const sync = () => {
-      finePointerRef.current = mq.matches;
-      setCanHover(mq.matches);
-    };
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
 
   useEffect(() => {
     const node = sectionRef.current;
@@ -112,32 +55,6 @@ export function Hero() {
     return () => io.disconnect();
   }, []);
 
-  // Sync springs → shader ref without React re-renders
-  useEffect(() => {
-    const unX = springX.on("change", (x) => {
-      pointerRef.current.x = x;
-    });
-    const unY = springY.on("change", (y) => {
-      pointerRef.current.y = y;
-    });
-    return () => {
-      unX();
-      unY();
-    };
-  }, [springX, springY]);
-
-  const onPointerMove = (e: PointerEvent<HTMLElement>) => {
-    if (reduce || !finePointerRef.current) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / Math.max(rect.width, 1) - 0.5;
-    const y = (e.clientY - rect.top) / Math.max(rect.height, 1) - 0.5;
-    const cx = Math.max(-0.5, Math.min(0.5, x));
-    const cy = Math.max(-0.5, Math.min(0.5, y));
-    rawX.set(cx);
-    rawY.set(cy);
-    pointerRef.current = { x: cx, y: cy };
-  };
-
   const ambientOn = !reduce && active;
 
   return (
@@ -145,36 +62,21 @@ export function Hero() {
       ref={sectionRef}
       id="topo"
       className="relative min-h-[100svh] overflow-hidden bg-[#0a1610]"
-      onPointerEnter={() => {
-        if (!reduce && finePointerRef.current) hovering.set(1);
-      }}
-      onPointerLeave={() => {
-        hovering.set(0);
-        rawX.set(0);
-        rawY.set(0);
-        pointerRef.current = { x: 0, y: 0 };
-      }}
-      onPointerMove={onPointerMove}
     >
-      {/* FAR — photo + slow ken-burns */}
       <motion.div
-        className="absolute inset-[-5%] will-change-transform"
-        style={reduce ? undefined : { x: farX, y: farY }}
-        initial={reduce ? false : { opacity: 0.7, scale: 1.1 }}
+        className="absolute inset-[-4%] will-change-transform"
+        initial={reduce ? false : { opacity: 0.75, scale: 1.08 }}
         animate={
           ambientOn
-            ? {
-                opacity: 1,
-                scale: [1.08, 1.12, 1.08],
-              }
-            : { opacity: 1, scale: 1.08 }
+            ? { opacity: 1, scale: [1.05, 1.09, 1.05] }
+            : { opacity: 1, scale: 1.05 }
         }
         transition={
           ambientOn
             ? {
                 opacity: { duration: 1.2, ease: softEase },
                 scale: {
-                  duration: 28,
+                  duration: 26,
                   ease: "easeInOut",
                   repeat: Infinity,
                   repeatType: "mirror",
@@ -189,53 +91,21 @@ export function Hero() {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[58%_42%]"
+          className="object-cover object-[55%_40%]"
         />
       </motion.div>
 
-      {/* MID — atmosphere shader (pointer via ref) */}
       {!reduce ? (
-        <motion.div
-          className="pointer-events-none absolute inset-0"
-          style={{ x: midX, y: midY }}
-        >
-          <ForestAtmosphere
-            intensity={active ? 1 : 0.3}
-            pointerRef={pointerRef}
-            active={active}
-          />
-        </motion.div>
+        <ForestAtmosphere intensity={active ? 0.55 : 0.25} active={active} />
       ) : null}
 
-      {/* NEAR — foreground silhouette */}
-      {!reduce ? (
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute inset-[-6%] will-change-transform"
-          style={{ x: nearX, y: nearY, scale: nearScale }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1.1, delay: 0.2, ease: softEase }}
-        >
-          <Image
-            src={FG}
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-[58%_50%]"
-          />
-        </motion.div>
-      ) : null}
-
-      {/* Legibility veil */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
           background: `
-            linear-gradient(105deg, rgba(10,22,16,0.72) 0%, rgba(10,22,16,0.38) 42%, rgba(10,22,16,0.08) 70%, rgba(10,22,16,0.22) 100%),
-            linear-gradient(to top, rgba(10,22,16,0.7) 0%, transparent 48%)
+            linear-gradient(105deg, rgba(10,22,16,0.7) 0%, rgba(10,22,16,0.35) 42%, rgba(10,22,16,0.08) 72%, rgba(10,22,16,0.22) 100%),
+            linear-gradient(to top, rgba(10,22,16,0.65) 0%, transparent 48%)
           `,
         }}
       />
@@ -278,7 +148,7 @@ export function Hero() {
 
           <motion.div className="mt-9 flex flex-wrap gap-3" variants={copyItem}>
             <motion.div
-              whileHover={reduce || !canHover ? undefined : { y: -2 }}
+              whileHover={reduce ? undefined : { y: -2 }}
               whileTap={reduce ? undefined : { scale: 0.98 }}
               transition={pressTransition}
             >
@@ -287,7 +157,7 @@ export function Hero() {
               </Link>
             </motion.div>
             <motion.div
-              whileHover={reduce || !canHover ? undefined : { y: -2 }}
+              whileHover={reduce ? undefined : { y: -2 }}
               whileTap={reduce ? undefined : { scale: 0.98 }}
               transition={pressTransition}
             >

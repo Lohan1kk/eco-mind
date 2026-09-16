@@ -1,10 +1,12 @@
 import Image from "next/image";
 import { Reveal } from "./Reveal";
+import { SectionAtmosphere } from "@/components/ui/section-atmosphere";
 
 export function Idea() {
   return (
-    <section id="ideia" className="section section-botanical">
-      <div className="section-inner grid items-center gap-12 md:grid-cols-[1.15fr_0.85fr] md:gap-16">
+    <section id="ideia" className="section section-botanical relative overflow-hidden">
+      <SectionAtmosphere variant="soft" />
+      <div className="section-inner relative z-[1] grid items-center gap-12 md:grid-cols-[1.15fr_0.85fr] md:gap-16">
         <Reveal>
           <p className="eyebrow text-forest-mid">Nossa ideia</p>
           <h2 className="display mt-4 text-3xl text-forest md:text-5xl">
