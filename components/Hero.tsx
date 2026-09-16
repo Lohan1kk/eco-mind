@@ -58,16 +58,19 @@ export function Hero() {
   const springY = useSpring(rawY, { stiffness: 60, damping: 22, mass: 0.5 });
   const springHover = useSpring(hovering, { stiffness: 100, damping: 20 });
 
-  // Photo parallax (subtle — UI/UX Pro Max: small delta, decorative only)
-  const photoX = useTransform(
+  // Hover parallax on top of ambient ken-burns (decorative, clamped)
+  const hoverX = useTransform(
     [springX, springHover],
-    ([x, h]: number[]) => (x as number) * 28 * (h as number),
+    ([x, h]: number[]) => (x as number) * 24 * (h as number),
   );
-  const photoY = useTransform(
+  const hoverY = useTransform(
     [springY, springHover],
-    ([y, h]: number[]) => (y as number) * 20 * (h as number),
+    ([y, h]: number[]) => (y as number) * 16 * (h as number),
   );
-  const photoScale = useTransform(springHover, (h) => 1.06 + h * 0.02);
+  const hoverScale = useTransform(
+    springHover,
+    (h) => 1 + (h as number) * 0.018,
+  );
 
   const [pointer, setPointer] = useState({ x: 0, y: 0 });
 
@@ -112,7 +115,9 @@ export function Hero() {
     rawY.set(Math.max(-0.5, Math.min(0.5, y)));
   };
 
-  const transform = useMotionTemplate`translate3d(${photoX}px, ${photoY}px, 0) scale(${photoScale})`;
+  const hoverTransform = useMotionTemplate`translate3d(${hoverX}px, ${hoverY}px, 0) scale(${hoverScale})`;
+
+  const ambientOn = !reduce && active;
 
   return (
     <section
@@ -129,22 +134,44 @@ export function Hero() {
       }}
       onPointerMove={onPointerMove}
     >
-      {/* Photographic hero — cinematic forest graded for left copy */}
+      {/* Photographic hero — continuous ken-burns + hover parallax */}
       <motion.div
-        className="absolute inset-[-4%] will-change-transform"
-        style={reduce ? undefined : { transform }}
-        initial={reduce ? false : { scale: 1.12, opacity: 0.7 }}
-        animate={{ scale: reduce ? 1 : 1.06, opacity: 1 }}
-        transition={{ duration: reduce ? 0 : 1.6, ease: softEase }}
+        className="absolute inset-[-8%] will-change-transform"
+        initial={reduce ? false : { opacity: 0.65, scale: 1.1 }}
+        animate={
+          ambientOn
+            ? {
+                opacity: 1,
+                scale: [1.08, 1.14, 1.1, 1.08],
+                x: ["0%", "1.4%", "-1%", "0%"],
+                y: ["0%", "-0.9%", "1.1%", "0%"],
+              }
+            : { opacity: 1, scale: 1.08, x: "0%", y: "0%" }
+        }
+        transition={
+          ambientOn
+            ? {
+                opacity: { duration: 1.4, ease: softEase },
+                scale: { duration: 32, ease: "easeInOut", repeat: Infinity },
+                x: { duration: 36, ease: "easeInOut", repeat: Infinity },
+                y: { duration: 40, ease: "easeInOut", repeat: Infinity },
+              }
+            : { duration: 0.6, ease: softEase }
+        }
       >
-        <Image
-          src={FOREST}
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-[center_35%]"
-        />
+        <motion.div
+          className="absolute inset-0 will-change-transform"
+          style={reduce ? undefined : { transform: hoverTransform }}
+        >
+          <Image
+            src={FOREST}
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-[center_35%]"
+          />
+        </motion.div>
       </motion.div>
 
       {/* High-quality WebGL atmosphere: mist + god rays */}
