@@ -5,36 +5,18 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { ForestAtmosphere } from "@/components/ui/forest-atmosphere";
-import { pressTransition, softEase } from "./motion/variants";
+import {
+  hoverLift,
+  pressTransition,
+  scaleSoft,
+  softEase,
+  staggerHero,
+  staggerItemSoft,
+  tapPress,
+} from "@/components/motion";
 
 /** True 4K forest photograph (not AI-upscaled). */
 const BG = "/brand/hero-ecomind-4k.jpg";
-
-const copyContainer = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.12, delayChildren: 0.28 },
-  },
-};
-
-const copyItem = {
-  hidden: { opacity: 0, y: 18 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.65, ease: softEase },
-  },
-};
-
-const brandItem = {
-  hidden: { opacity: 0, y: 22, scale: 0.98 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.8, ease: softEase },
-  },
-};
 
 export function Hero() {
   const reduce = useReducedMotion();
@@ -112,11 +94,11 @@ export function Hero() {
       <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-6xl flex-col justify-end px-5 pb-16 pt-28 md:px-8 md:pb-24 md:pt-36">
         <motion.div
           className="max-w-2xl"
-          variants={copyContainer}
+          variants={staggerHero}
           initial={reduce ? false : "hidden"}
           animate="visible"
         >
-          <motion.div className="mb-7" variants={brandItem}>
+          <motion.div className="mb-7" variants={scaleSoft}>
             <Image
               src="/brand/logo-ecomind.png"
               alt="EcoMind"
@@ -132,23 +114,26 @@ export function Hero() {
 
           <motion.h1
             className="display max-w-xl text-2xl text-sprout md:text-4xl"
-            variants={copyItem}
+            variants={staggerItemSoft}
           >
             Cada decisão é uma semente.
           </motion.h1>
 
           <motion.p
             className="mt-5 max-w-lg text-base leading-relaxed text-mist/88 md:text-xl"
-            variants={copyItem}
+            variants={staggerItemSoft}
           >
             Consciência ambiental + tecnologia para educar, calcular impacto e
             acompanhar queimadas — na escola, em casa e na comunidade.
           </motion.p>
 
-          <motion.div className="mt-9 flex flex-wrap gap-3" variants={copyItem}>
+          <motion.div
+            className="mt-9 flex flex-wrap gap-3"
+            variants={staggerItemSoft}
+          >
             <motion.div
-              whileHover={reduce ? undefined : { y: -2 }}
-              whileTap={reduce ? undefined : { scale: 0.98 }}
+              whileHover={reduce ? undefined : hoverLift}
+              whileTap={reduce ? undefined : tapPress}
               transition={pressTransition}
             >
               <Link href="/calculadora" className="btn btn-primary cursor-pointer">
@@ -156,8 +141,8 @@ export function Hero() {
               </Link>
             </motion.div>
             <motion.div
-              whileHover={reduce ? undefined : { y: -2 }}
-              whileTap={reduce ? undefined : { scale: 0.98 }}
+              whileHover={reduce ? undefined : hoverLift}
+              whileTap={reduce ? undefined : tapPress}
               transition={pressTransition}
             >
               <Link

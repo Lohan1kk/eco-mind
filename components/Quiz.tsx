@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { QUIZ_QUESTIONS } from "@/data/quiz";
-import { enterTransition, pressTransition } from "./motion/variants";
+import { enterTransition, pressTransition, tapPress } from "@/components/motion";
 
 export function Quiz() {
   const [current, setCurrent] = useState(0);
@@ -86,7 +86,7 @@ export function Quiz() {
               type="button"
               onClick={reset}
               className="btn-primary cursor-pointer rounded-md bg-forest px-5 py-3 text-sm font-semibold text-mist"
-              whileTap={reduce ? undefined : { scale: 0.98 }}
+              whileTap={reduce ? undefined : tapPress}
               transition={pressTransition}
             >
               Jogar novamente

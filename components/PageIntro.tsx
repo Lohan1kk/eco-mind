@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
-import { heroItem, heroStagger } from "./motion/variants";
+import { staggerContainer, staggerItem } from "@/components/motion";
 
 export function PageIntro({
   eyebrow,
@@ -21,21 +21,21 @@ export function PageIntro({
 
   return (
     <motion.div
-      variants={heroStagger}
+      variants={staggerContainer}
       initial={reduce ? false : "hidden"}
       animate="visible"
     >
-      <motion.p className={eyebrowClassName ?? "eyebrow"} variants={heroItem}>
+      <motion.p className={eyebrowClassName ?? "eyebrow"} variants={staggerItem}>
         {eyebrow}
       </motion.p>
       <motion.h1
         className={titleClassName ?? "display mt-3 text-3xl md:text-5xl"}
-        variants={heroItem}
+        variants={staggerItem}
       >
         {title}
       </motion.h1>
       {children ? (
-        <motion.div variants={heroItem}>{children}</motion.div>
+        <motion.div variants={staggerItem}>{children}</motion.div>
       ) : null}
     </motion.div>
   );
