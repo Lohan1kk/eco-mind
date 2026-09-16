@@ -3,6 +3,7 @@ import { CarbonCalculator } from "@/components/CarbonCalculator";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { PageIntro } from "@/components/PageIntro";
+import { VerdantPageShell } from "@/components/ui/verdant-page-shell";
 
 export const metadata: Metadata = {
   title: "Calculadora de pegada",
@@ -14,7 +15,7 @@ export default function CalculadoraPage() {
   return (
     <>
       <Header solid />
-      <main className="min-h-screen bg-[#101c15] pt-24 pb-16">
+      <VerdantPageShell>
         <div className="section-inner">
           <PageIntro
             eyebrow="Ferramenta"
@@ -31,7 +32,7 @@ export default function CalculadoraPage() {
             <CarbonCalculator />
           </div>
         </div>
-      </main>
+      </VerdantPageShell>
       <Footer />
     </>
   );
