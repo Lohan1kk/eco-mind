@@ -7,38 +7,35 @@ import { useEffect, useRef, useState } from "react";
 import { ForestAtmosphere } from "@/components/ui/forest-atmosphere";
 import { pressTransition, softEase } from "./motion/variants";
 
-const BG = "/brand/hero-ecomind-hq.jpg";
+/** True 4K forest photograph (not AI-upscaled). */
+const BG = "/brand/hero-ecomind-4k.jpg";
 
 const copyContainer = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.12, delayChildren: 0.3 },
+    transition: { staggerChildren: 0.12, delayChildren: 0.28 },
   },
 };
 
 const copyItem = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 18 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: softEase },
+    transition: { duration: 0.65, ease: softEase },
   },
 };
 
 const brandItem = {
-  hidden: { opacity: 0, y: 24, scale: 0.98 },
+  hidden: { opacity: 0, y: 22, scale: 0.98 },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: 0.85, ease: softEase },
+    transition: { duration: 0.8, ease: softEase },
   },
 };
 
-/**
- * Clean professional hero: HQ photo + light WebGL mist + subtle ken-burns.
- * No multi-layer parallax (stability first).
- */
 export function Hero() {
   const reduce = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
@@ -63,26 +60,27 @@ export function Hero() {
       id="topo"
       className="relative min-h-[100svh] overflow-hidden bg-[#0a1610]"
     >
+      {/* Minimal scale so sharpness of the 4K source is preserved */}
       <motion.div
-        className="absolute inset-[-4%] will-change-transform"
-        initial={reduce ? false : { opacity: 0.75, scale: 1.08 }}
+        className="absolute inset-0 will-change-transform"
+        initial={reduce ? false : { opacity: 0.8, scale: 1.04 }}
         animate={
           ambientOn
-            ? { opacity: 1, scale: [1.05, 1.09, 1.05] }
-            : { opacity: 1, scale: 1.05 }
+            ? { opacity: 1, scale: [1.02, 1.045, 1.02] }
+            : { opacity: 1, scale: 1.02 }
         }
         transition={
           ambientOn
             ? {
-                opacity: { duration: 1.2, ease: softEase },
+                opacity: { duration: 1.1, ease: softEase },
                 scale: {
-                  duration: 26,
+                  duration: 30,
                   ease: "easeInOut",
                   repeat: Infinity,
                   repeatType: "mirror",
                 },
               }
-            : { duration: 0.5, ease: softEase }
+            : { duration: 0.45, ease: softEase }
         }
       >
         <Image
@@ -90,13 +88,14 @@ export function Hero() {
           alt=""
           fill
           priority
+          quality={92}
           sizes="100vw"
-          className="object-cover object-[55%_40%]"
+          className="object-cover object-[52%_38%]"
         />
       </motion.div>
 
       {!reduce ? (
-        <ForestAtmosphere intensity={active ? 0.55 : 0.25} active={active} />
+        <ForestAtmosphere intensity={active ? 0.42 : 0.2} active={active} />
       ) : null}
 
       <div
@@ -104,8 +103,8 @@ export function Hero() {
         className="pointer-events-none absolute inset-0"
         style={{
           background: `
-            linear-gradient(105deg, rgba(10,22,16,0.7) 0%, rgba(10,22,16,0.35) 42%, rgba(10,22,16,0.08) 72%, rgba(10,22,16,0.22) 100%),
-            linear-gradient(to top, rgba(10,22,16,0.65) 0%, transparent 48%)
+            linear-gradient(105deg, rgba(10,22,16,0.68) 0%, rgba(10,22,16,0.32) 40%, rgba(10,22,16,0.06) 70%, rgba(10,22,16,0.2) 100%),
+            linear-gradient(to top, rgba(10,22,16,0.6) 0%, transparent 46%)
           `,
         }}
       />

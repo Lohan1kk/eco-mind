@@ -3,6 +3,7 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { PageIntro } from "@/components/PageIntro";
 import { Quiz } from "@/components/Quiz";
+import { PageAtmosphereShell } from "@/components/ui/page-atmosphere-shell";
 
 export const metadata: Metadata = {
   title: "Quiz ambiental",
@@ -14,7 +15,7 @@ export default function QuizPage() {
   return (
     <>
       <Header solid />
-      <main className="min-h-screen bg-mist pt-24 pb-16">
+      <PageAtmosphereShell variant="mist" className="bg-mist pt-24 pb-16">
         <div className="section-inner">
           <PageIntro
             eyebrow="Educar"
@@ -31,7 +32,7 @@ export default function QuizPage() {
             <Quiz />
           </div>
         </div>
-      </main>
+      </PageAtmosphereShell>
       <Footer />
     </>
   );
