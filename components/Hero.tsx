@@ -3,29 +3,29 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
+import {
+  HeroParallaxStrips,
+  useHeroStripHover,
+} from "./HeroParallaxStrips";
 import { heroItem, heroStagger, pressTransition } from "./motion/variants";
 
 export function Hero() {
   const reduce = useReducedMotion();
+  const stripHover = useHeroStripHover();
 
   return (
-    <section id="topo" className="relative min-h-[100svh] overflow-hidden">
-      <motion.div
-        className="absolute inset-0"
-        initial={reduce ? false : { scale: 1.06 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: reduce ? 0 : 1.4, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <Image
-          src="/brand/hero-forest.jpg"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-[center_30%]"
-        />
-      </motion.div>
-      <div aria-hidden className="hero-overlay absolute inset-0" />
+    <section
+      id="topo"
+      className="relative min-h-[100svh] overflow-hidden"
+      onPointerEnter={reduce ? undefined : stripHover.onPointerEnter}
+      onPointerLeave={reduce ? undefined : stripHover.onPointerLeave}
+      onPointerMove={reduce ? undefined : stripHover.onPointerMove}
+    >
+      <HeroParallaxStrips
+        hoverY={stripHover.hoverY}
+        hovering={stripHover.hovering}
+      />
+      <div aria-hidden className="hero-overlay pointer-events-none absolute inset-0" />
 
       <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-6xl flex-col justify-end px-5 pb-16 pt-28 md:px-8 md:pb-24 md:pt-36">
         <motion.div
@@ -64,12 +64,18 @@ export function Hero() {
           </motion.p>
 
           <motion.div className="mt-9 flex flex-wrap gap-3" variants={heroItem}>
-            <motion.div whileTap={reduce ? undefined : { scale: 0.98 }} transition={pressTransition}>
+            <motion.div
+              whileTap={reduce ? undefined : { scale: 0.98 }}
+              transition={pressTransition}
+            >
               <Link href="/calculadora" className="btn btn-primary">
                 Calcular minha pegada
               </Link>
             </motion.div>
-            <motion.div whileTap={reduce ? undefined : { scale: 0.98 }} transition={pressTransition}>
+            <motion.div
+              whileTap={reduce ? undefined : { scale: 0.98 }}
+              transition={pressTransition}
+            >
               <Link href="/alerta-queimadas" className="btn btn-ghost">
                 Ver mapa de queimadas
               </Link>
