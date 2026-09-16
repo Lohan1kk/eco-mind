@@ -2,13 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { QUIZ_QUESTIONS } from "@/data/quiz";
+import { enterTransition, pressTransition } from "./motion/variants";
 
 export function Quiz() {
   const [current, setCurrent] = useState(0);
   const [score, setScore] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [finished, setFinished] = useState(false);
+  const reduce = useReducedMotion();
 
   const question = QUIZ_QUESTIONS[current];
   const progress = finished
@@ -46,7 +49,12 @@ export function Quiz() {
           : "Continue aprendendo!";
 
     return (
-      <div className="mx-auto max-w-lg text-center">
+      <motion.div
+        className="mx-auto max-w-lg text-center"
+        initial={reduce ? false : { opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={enterTransition}
+      >
         <div className="border border-forest/12 bg-white/70 px-8 py-10">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-forest-mid">
             Resultado
@@ -62,9 +70,11 @@ export function Quiz() {
             ({pct}%)
           </p>
           <div className="mx-auto mt-6 h-2 max-w-xs overflow-hidden rounded-full bg-mist-soft">
-            <div
-              className="h-full rounded-full bg-forest-mid transition-all duration-700"
-              style={{ width: `${pct}%` }}
+            <motion.div
+              className="h-full rounded-full bg-forest-mid"
+              initial={reduce ? false : { width: 0 }}
+              animate={{ width: `${pct}%` }}
+              transition={{ duration: reduce ? 0 : 0.7, ease: [0.22, 1, 0.36, 1] }}
             />
           </div>
           <p className="mt-6 text-sm leading-relaxed text-ash">
@@ -72,19 +82,21 @@ export function Quiz() {
             escolhas do dia a dia.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <button
+            <motion.button
               type="button"
               onClick={reset}
-              className="btn-primary rounded-md bg-forest px-5 py-3 text-sm font-semibold text-mist"
+              className="btn-primary cursor-pointer rounded-md bg-forest px-5 py-3 text-sm font-semibold text-mist"
+              whileTap={reduce ? undefined : { scale: 0.98 }}
+              transition={pressTransition}
             >
               Jogar novamente
-            </button>
+            </motion.button>
             <Link href="/calculadora" className="btn-secondary">
               Calcular pegada
             </Link>
           </div>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
@@ -98,53 +110,75 @@ export function Quiz() {
           <span>{score} acertos</span>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-mist-soft">
-          <div
-            className="h-full rounded-full bg-forest-mid transition-all duration-500"
-            style={{ width: `${progress}%` }}
+          <motion.div
+            className="h-full rounded-full bg-forest-mid"
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: reduce ? 0 : 0.45, ease: [0.22, 1, 0.36, 1] }}
           />
         </div>
       </div>
 
-      <div className="border border-forest/12 bg-white/75 px-6 py-7 sm:px-8 sm:py-8">
-        <h2 className="font-display text-lg font-semibold text-ink sm:text-xl">
-          {question.q}
-        </h2>
-        <div className="mt-6 grid gap-3">
-          {question.options.map((opt, i) => {
-            const isCorrect = i === question.correct;
-            const isSelected = i === selected;
-            let cls =
-              "border-forest/15 bg-white hover:border-forest-mid/40 hover:bg-mist-soft";
-            if (selected !== null) {
-              if (isCorrect)
-                cls = "border-sprout-deep bg-sprout/25";
-              else if (isSelected) cls = "border-burn/40 bg-[#f8efe8]";
-              else cls = "border-forest/5 bg-mist/50 opacity-55";
-            }
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={question.q}
+          className="border border-forest/12 bg-white/75 px-6 py-7 sm:px-8 sm:py-8"
+          initial={reduce ? false : { opacity: 0, x: 18 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={reduce ? undefined : { opacity: 0, x: -14 }}
+          transition={enterTransition}
+        >
+          <h2 className="font-display text-lg font-semibold text-ink sm:text-xl">
+            {question.q}
+          </h2>
+          <div className="mt-6 grid gap-3">
+            {question.options.map((opt, i) => {
+              const isCorrect = i === question.correct;
+              const isSelected = i === selected;
+              let cls =
+                "border-forest/15 bg-white hover:border-forest-mid/40 hover:bg-mist-soft";
+              if (selected !== null) {
+                if (isCorrect)
+                  cls = "border-sprout-deep bg-sprout/25";
+                else if (isSelected) cls = "border-burn/40 bg-[#f8efe8]";
+                else cls = "border-forest/5 bg-mist/50 opacity-55";
+              }
 
-            return (
-              <button
-                key={opt}
-                type="button"
-                onClick={() => handleAnswer(i)}
-                disabled={selected !== null}
-                className={`flex items-center gap-3 border px-4 py-3.5 text-left text-sm font-medium text-ink transition sm:text-base ${cls}`}
+              return (
+                <motion.button
+                  key={opt}
+                  type="button"
+                  onClick={() => handleAnswer(i)}
+                  disabled={selected !== null}
+                  className={`flex cursor-pointer items-center gap-3 border px-4 py-3.5 text-left text-sm font-medium text-ink transition sm:text-base ${cls}`}
+                  whileTap={
+                    reduce || selected !== null ? undefined : { scale: 0.99 }
+                  }
+                  transition={pressTransition}
+                >
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center bg-forest/10 text-xs font-bold text-forest-mid">
+                    {String.fromCharCode(65 + i)}
+                  </span>
+                  {opt}
+                </motion.button>
+              );
+            })}
+          </div>
+
+          <AnimatePresence>
+            {selected !== null ? (
+              <motion.p
+                className="mt-5 bg-mist-soft px-4 py-3 text-sm leading-relaxed text-ash"
+                initial={reduce ? false : { opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduce ? undefined : { opacity: 0 }}
+                transition={{ duration: reduce ? 0 : 0.35 }}
               >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center bg-forest/10 text-xs font-bold text-forest-mid">
-                  {String.fromCharCode(65 + i)}
-                </span>
-                {opt}
-              </button>
-            );
-          })}
-        </div>
-
-        {selected !== null ? (
-          <p className="mt-5 bg-mist-soft px-4 py-3 text-sm leading-relaxed text-ash animate-fade-in">
-            {question.feedback}
-          </p>
-        ) : null}
-      </div>
+                {question.feedback}
+              </motion.p>
+            ) : null}
+          </AnimatePresence>
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }

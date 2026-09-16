@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import type { ReactNode } from "react";
+import { enterTransition, fadeUp } from "./motion/variants";
 
 export function Reveal({
   children,
@@ -11,38 +13,22 @@ export function Reveal({
   className?: string;
   delayMs?: number;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
 
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      node.classList.add("is-visible");
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          node.classList.add("is-visible");
-          observer.unobserve(node);
-        }
-      },
-      { threshold: 0.15, rootMargin: "0px 0px -40px 0px" },
-    );
-
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
+  if (reduce) {
+    return <div className={className}>{children}</div>;
+  }
 
   return (
-    <div
-      ref={ref}
-      className={`reveal ${className}`}
-      style={delayMs ? { transitionDelay: `${delayMs}ms` } : undefined}
+    <motion.div
+      className={className}
+      variants={fadeUp}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.15, margin: "0px 0px -40px 0px" }}
+      transition={{ ...enterTransition, delay: delayMs / 1000 }}
     >
       {children}
-    </div>
+    </motion.div>
   );
 }

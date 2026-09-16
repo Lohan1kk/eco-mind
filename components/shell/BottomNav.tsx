@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion, useReducedMotion } from "framer-motion";
 import { HIDE_BOTTOM_NAV } from "@/lib/pwa";
+import { pressTransition } from "@/components/motion/variants";
 
 const NAV = [
   { href: "/", label: "Início" },
@@ -14,6 +16,7 @@ const NAV = [
 
 export function BottomNav() {
   const pathname = usePathname();
+  const reduce = useReducedMotion();
 
   if (HIDE_BOTTOM_NAV.some((p) => pathname.startsWith(p))) return null;
 
@@ -38,12 +41,15 @@ export function BottomNav() {
                     : "text-ash/70 hover:text-forest"
                 }`}
               >
-                <span
-                  className={`h-1 w-5 rounded-full transition ${
-                    active ? "bg-forest" : "bg-transparent"
-                  }`}
-                  aria-hidden
-                />
+                <span className="relative flex h-1 w-5 items-center justify-center" aria-hidden>
+                  {active ? (
+                    <motion.span
+                      layoutId={reduce ? undefined : "nav-active-dot"}
+                      className="absolute h-1 w-5 rounded-full bg-forest"
+                      transition={pressTransition}
+                    />
+                  ) : null}
+                </span>
                 {item.label}
               </Link>
             </li>
