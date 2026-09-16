@@ -98,8 +98,8 @@ body {
 
 .panel-soft {
   border: 1px solid rgba(22, 61, 42, 0.1);
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
   border-radius: 1.25rem;
 }
 
@@ -352,77 +352,119 @@ input[type="range"] {
   border-width: 0;
 }
 
-/* Partial Verdant Swirl accents — corner orbs, not full-bleed backgrounds */
-.verdant-accent {
+/* Full-bleed Verdant wash — pale mist / muted glow, reading plate for copy */
+.verdant-wash {
   pointer-events: none;
   position: absolute;
+  inset: 0;
   z-index: 0;
-  width: min(26rem, 78vw);
-  height: min(26rem, 78vw);
   overflow: hidden;
-  border-radius: 50%;
-  -webkit-mask-image: radial-gradient(
-    circle at center,
-    #000 12%,
-    rgba(0, 0, 0, 0.55) 42%,
-    transparent 72%
-  );
-  mask-image: radial-gradient(
-    circle at center,
-    #000 12%,
-    rgba(0, 0, 0, 0.55) 42%,
-    transparent 72%
-  );
+  border-radius: 0;
 }
 
-.verdant-accent--tl {
-  top: -18%;
-  left: -12%;
+.verdant-wash__shader {
+  border-radius: 0 !important;
 }
 
-.verdant-accent--tr {
-  top: -16%;
-  right: -14%;
+.verdant-wash__veil,
+.verdant-wash__plate {
+  position: absolute;
+  inset: 0;
+  border-radius: 0;
+  pointer-events: none;
 }
 
-.verdant-accent--bl {
-  bottom: -20%;
-  left: -14%;
-}
-
-.verdant-accent--br {
-  bottom: -18%;
-  right: -12%;
-}
-
-.verdant-accent--light {
-  opacity: 0.42;
+/* Light: airy mint silk — color stays near paper, never swamp green */
+.verdant-wash--light .verdant-wash__shader {
+  opacity: 0.55;
   mix-blend-mode: multiply;
 }
 
-.verdant-accent--dark {
-  opacity: 0.38;
+.verdant-wash--light .verdant-wash__veil {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(247, 252, 248, 0.2) 0%,
+      rgba(247, 252, 248, 0.55) 10%,
+      rgba(247, 252, 248, 0.55) 90%,
+      rgba(247, 252, 248, 0.2) 100%
+    );
+}
+
+/* Straight reading plate: almost opaque where text lives */
+.verdant-wash--light .verdant-wash__plate {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.72) 14%,
+    rgba(255, 255, 255, 0.88) 28%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0.88) 72%,
+    rgba(255, 255, 255, 0.72) 86%,
+    transparent 100%
+  );
+}
+
+/* Dark: muted sage, soft and quiet under mist text */
+.verdant-wash--dark .verdant-wash__shader {
+  opacity: 0.14;
   mix-blend-mode: soft-light;
 }
 
+.verdant-wash--dark .verdant-wash__veil {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(10, 22, 16, 0.25) 0%,
+      rgba(10, 22, 16, 0.45) 12%,
+      rgba(10, 22, 16, 0.45) 88%,
+      rgba(10, 22, 16, 0.25) 100%
+    );
+}
+
+.verdant-wash--dark .verdant-wash__plate {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(8, 20, 15, 0.55) 16%,
+    rgba(8, 20, 15, 0.72) 32%,
+    rgba(8, 20, 15, 0.78) 50%,
+    rgba(8, 20, 15, 0.72) 68%,
+    rgba(8, 20, 15, 0.55) 84%,
+    transparent 100%
+  );
+}
+
 @media (min-width: 768px) {
-  .verdant-accent {
-    width: min(32rem, 46vw);
-    height: min(32rem, 46vw);
+  .verdant-wash--light .verdant-wash__shader {
+    opacity: 0.6;
   }
 
-  .verdant-accent--light {
-    opacity: 0.48;
+  .verdant-wash--dark .verdant-wash__shader {
+    opacity: 0.16;
   }
 
-  .verdant-accent--dark {
-    opacity: 0.44;
+  .verdant-wash--light .verdant-wash__plate {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.68) 12%,
+      rgba(255, 255, 255, 0.86) 24%,
+      rgba(255, 255, 255, 0.9) 50%,
+      rgba(255, 255, 255, 0.86) 76%,
+      rgba(255, 255, 255, 0.68) 88%,
+      transparent 100%
+    );
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .verdant-accent {
-    opacity: 0.28;
+  .verdant-wash--light .verdant-wash__shader {
+    opacity: 0.35;
+  }
+
+  .verdant-wash--dark .verdant-wash__shader {
+    opacity: 0.08;
   }
 }
 

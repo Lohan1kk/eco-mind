@@ -1,6 +1,6 @@
 import { Reveal } from "./Reveal";
 import { SectionAtmosphere } from "@/components/ui/section-atmosphere";
-import { VerdantAccent } from "@/components/ui/verdant-accent";
+import { VerdantWash } from "@/components/ui/verdant-accent";
 
 const items = [
   {
@@ -24,7 +24,7 @@ export function Problem() {
   return (
     <section id="problema" className="section section-warm relative overflow-hidden">
       <SectionAtmosphere variant="mist" />
-      <VerdantAccent corner="tr" tone="light" speed={0.7} />
+      <VerdantWash tone="light" speed={0.38} />
       <div className="section-inner relative z-[1]">
         <Reveal>
           <p className="eyebrow text-burn">O problema</p>
