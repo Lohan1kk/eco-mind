@@ -32,6 +32,7 @@ uniform vec3 u_c2;
 uniform vec3 u_c3;
 uniform vec3 u_c4;
 uniform float u_speed;
+uniform float u_energy;
 
 float hash(vec2 p) {
   p = fract(p * vec2(123.34, 456.21));
@@ -75,29 +76,34 @@ void main() {
   float aspect = u_resolution.x / max(u_resolution.y, 1.0);
   vec2 p = (uv - 0.5) * vec2(aspect, 1.0);
 
-  float t = u_time * u_speed;
+  float e = max(u_energy, 1.0);
+  float t = u_time * u_speed * (0.85 + 0.25 * e);
 
-  // Silk swirl: rotate + dual domain warp
-  float ang = t * 0.12;
+  // Silk swirl: rotate + dual domain warp (energy makes flow livelier)
+  float ang = t * (0.12 + 0.08 * (e - 1.0));
   float ca = cos(ang);
   float sa = sin(ang);
   p = mat2(ca, -sa, sa, ca) * p;
 
-  float n1 = fbm(p * 2.2 + vec2(t * 0.15, -t * 0.08));
-  vec2 q = p + vec2(n1 * 0.85, fbm(p * 2.0 - t * 0.1) * 0.85);
-  float n2 = fbm(q * 2.6 + vec2(-t * 0.12, t * 0.18));
-  vec2 r = q + vec2(n2 * 0.7, fbm(q * 3.1 + t * 0.09) * 0.7);
+  float warp = 0.85 + 0.35 * (e - 1.0);
+  float n1 = fbm(p * 2.2 + vec2(t * 0.18, -t * 0.1));
+  vec2 q = p + vec2(n1 * warp, fbm(p * 2.0 - t * 0.12) * warp);
+  float n2 = fbm(q * 2.6 + vec2(-t * 0.14, t * 0.22));
+  vec2 r = q + vec2(n2 * (0.7 + 0.2 * (e - 1.0)), fbm(q * 3.1 + t * 0.11) * 0.7);
 
-  float silk = fbm(r * 2.4 + t * 0.05);
-  silk = silk * 0.72 + n2 * 0.28;
+  float silk = fbm(r * 2.4 + t * 0.07);
+  silk = silk * 0.68 + n2 * 0.32;
 
   // Soft vignette keeps edges deep green
   float vig = smoothstep(1.35, 0.15, length(p * 1.05));
   silk = mix(silk * 0.35, silk, vig);
 
   vec3 col = palette(silk);
-  // Subtle brightness pulse like silk sheen
-  col += u_c4 * (0.04 * sin(silk * 6.28318 + t) + 0.02);
+  // Silk sheen — stronger when energy > 1
+  float sheen = (0.04 + 0.05 * (e - 1.0)) * sin(silk * 6.28318 + t * (1.0 + 0.4 * (e - 1.0)));
+  col += u_c4 * (sheen + 0.02 + 0.015 * (e - 1.0));
+  // Extra sprout flicker for living wash
+  col = mix(col, u_c3, 0.06 * (e - 1.0) * (0.5 + 0.5 * sin(t * 1.7 + silk * 4.0)));
 
   gl_FragColor = vec4(col, 1.0);
 }
@@ -136,12 +142,21 @@ type VerdantSwirlProps = {
   speed?: number;
   /** Opacity of the canvas layer (default 1) */
   opacity?: number;
+  /** Motion / sheen intensity (1 = classic CTA, >1 = livelier wash) */
+  energy?: number;
+  /** Cap device pixel ratio for lighter washes (default 1.75) */
+  maxDpr?: number;
+  /** Pause RAF when false (offscreen) */
+  active?: boolean;
 };
 
 export function VerdantSwirl({
   className = "",
   speed = 1,
   opacity = 1,
+  energy = 1,
+  maxDpr = 1.75,
+  active = true,
 }: VerdantSwirlProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const reduce = useReducedMotion();
@@ -188,6 +203,7 @@ export function VerdantSwirl({
     const uTime = gl.getUniformLocation(program, "u_time");
     const uRes = gl.getUniformLocation(program, "u_resolution");
     const uSpeed = gl.getUniformLocation(program, "u_speed");
+    const uEnergy = gl.getUniformLocation(program, "u_energy");
     const uC1 = gl.getUniformLocation(program, "u_c1");
     const uC2 = gl.getUniformLocation(program, "u_c2");
     const uC3 = gl.getUniformLocation(program, "u_c3");
@@ -203,13 +219,15 @@ export function VerdantSwirl({
     gl.uniform3fv(uC3, c3);
     gl.uniform3fv(uC4, c4);
     gl.uniform1f(uSpeed, reduce ? 0 : speed);
+    gl.uniform1f(uEnergy, energy);
 
     let raf = 0;
     let start = performance.now();
-    let frozen = reduce;
+    let frozen = reduce || !active;
+    let elapsedAtPause = 1.8;
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+      const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
       const pw = Math.max(1, Math.floor(w * dpr));
@@ -224,7 +242,7 @@ export function VerdantSwirl({
 
     const draw = (now: number) => {
       resize();
-      const t = frozen ? 1.8 : (now - start) / 1000;
+      const t = frozen ? elapsedAtPause : (now - start) / 1000;
       gl.uniform1f(uTime, t);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
       if (!frozen) raf = requestAnimationFrame(draw);
@@ -251,7 +269,7 @@ export function VerdantSwirl({
       gl.deleteShader(fs);
       gl.deleteBuffer(buf);
     };
-  }, [reduce, speed]);
+  }, [reduce, speed, energy, maxDpr, active]);
 
   return (
     <canvas

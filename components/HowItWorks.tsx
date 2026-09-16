@@ -1,6 +1,6 @@
 import { Reveal } from "./Reveal";
 import { SectionAtmosphere } from "@/components/ui/section-atmosphere";
-import { VerdantAccent } from "@/components/ui/verdant-accent";
+import { VerdantWash } from "@/components/ui/verdant-accent";
 
 const steps = [
   {
@@ -24,7 +24,7 @@ export function HowItWorks() {
   return (
     <section id="como-funciona" className="section section-botanical relative overflow-hidden">
       <SectionAtmosphere variant="soft" />
-      <VerdantAccent corner="tl" tone="light" speed={0.72} />
+      <VerdantWash tone="light" speed={1.08} />
       <div className="section-inner relative z-[1]">
         <Reveal>
           <p className="eyebrow text-forest-mid">Como funciona</p>

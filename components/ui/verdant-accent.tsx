@@ -3,36 +3,24 @@
 import { useEffect, useRef, useState } from "react";
 import { VerdantSwirl } from "@/components/ui/verdant-swirl";
 
-export type VerdantAccentCorner = "tl" | "tr" | "bl" | "br";
-
-type VerdantAccentProps = {
-  /** Which corner hosts the decorative swirl orb */
-  corner?: VerdantAccentCorner;
-  /** light = soft blend on botanical/cream sections; dark = glow on forest panels */
+type VerdantWashProps = {
+  /** light = botanical/cream sections; dark = forest panels */
   tone?: "light" | "dark";
-  /** Animation speed (default 0.75) */
+  /** Animation speed (default 1.05 — slightly livelier than CTA) */
   speed?: number;
   className?: string;
 };
 
-const CORNER_CLASS: Record<VerdantAccentCorner, string> = {
-  tl: "verdant-accent--tl",
-  tr: "verdant-accent--tr",
-  bl: "verdant-accent--bl",
-  br: "verdant-accent--br",
-};
-
 /**
- * Partial Verdant Swirl motif — same silk shader as the CTA section,
- * clipped to a soft orb so it decorates a corner instead of filling the section.
- * WebGL only mounts while the accent is near the viewport.
+ * Full-bleed rectangular Verdant Swirl wash for section backgrounds.
+ * Same silk shader as the final CTA, but lower opacity + a straight-edged
+ * readability veil so body copy stays clear while the field stays alive.
  */
-export function VerdantAccent({
-  corner = "br",
+export function VerdantWash({
   tone = "light",
-  speed = 0.75,
+  speed = 1.05,
   className = "",
-}: VerdantAccentProps) {
+}: VerdantWashProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -41,7 +29,7 @@ export function VerdantAccent({
     if (!node) return;
     const io = new IntersectionObserver(
       ([entry]) => setVisible(entry.isIntersecting),
-      { rootMargin: "120px", threshold: 0.01 },
+      { rootMargin: "160px", threshold: 0.01 },
     );
     io.observe(node);
     return () => io.disconnect();
@@ -51,9 +39,22 @@ export function VerdantAccent({
     <div
       ref={rootRef}
       aria-hidden
-      className={`verdant-accent verdant-accent--${tone} ${CORNER_CLASS[corner]} ${className}`}
+      className={`verdant-wash verdant-wash--${tone} ${className}`}
     >
-      {visible ? <VerdantSwirl speed={speed} opacity={1} /> : null}
+      {visible ? (
+        <VerdantSwirl
+          className="verdant-wash__shader"
+          speed={speed}
+          energy={1.4}
+          maxDpr={1.35}
+          active={visible}
+          opacity={1}
+        />
+      ) : null}
+      <div className="verdant-wash__veil" />
     </div>
   );
 }
+
+/** @deprecated Use VerdantWash — kept as alias during migration */
+export const VerdantAccent = VerdantWash;
