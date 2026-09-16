@@ -14,7 +14,7 @@ import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { ForestAtmosphere } from "@/components/ui/forest-atmosphere";
 import { pressTransition, softEase } from "./motion/variants";
 
-const FOREST = "/brand/hero-forest.jpg";
+const FOREST = "/brand/hero-ecomind-v2.jpg";
 
 const copyContainer = {
   hidden: {},
@@ -169,7 +169,7 @@ export function Hero() {
             fill
             priority
             sizes="100vw"
-            className="object-cover object-[center_35%]"
+            className="object-cover object-[58%_40%]"
           />
         </motion.div>
       </motion.div>
@@ -193,8 +193,8 @@ export function Hero() {
         transition={{ duration: 1.1, delay: 0.15, ease: softEase }}
         style={{
           background: `
-            linear-gradient(105deg, rgba(10,22,16,0.78) 0%, rgba(10,22,16,0.42) 42%, rgba(10,22,16,0.12) 72%, rgba(10,22,16,0.28) 100%),
-            linear-gradient(to top, rgba(10,22,16,0.7) 0%, transparent 45%)
+            linear-gradient(105deg, rgba(10,22,16,0.62) 0%, rgba(10,22,16,0.28) 40%, rgba(10,22,16,0.06) 70%, rgba(10,22,16,0.2) 100%),
+            linear-gradient(to top, rgba(10,22,16,0.55) 0%, transparent 48%)
           `,
         }}
       />
