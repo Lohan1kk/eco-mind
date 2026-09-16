@@ -13,8 +13,8 @@ type VerdantWashProps = {
 
 /**
  * Full-bleed rectangular wash behind section content.
- * Light tone uses a high-key mist palette (not the dark CTA greens) plus a
- * straight reading plate so headlines and body stay crisp.
+ * Light tone: soft celadon mist (more visible silk, gentle reading plate).
+ * Dark tone: muted sage glow — leave as-is when refining light only.
  */
 export function VerdantWash({
   tone = "light",
@@ -47,7 +47,7 @@ export function VerdantWash({
         <VerdantSwirl
           className="verdant-wash__shader"
           speed={speed}
-          energy={1.02}
+          energy={isLight ? 1.08 : 1.02}
           maxDpr={1.2}
           active={visible}
           opacity={1}
