@@ -352,6 +352,80 @@ input[type="range"] {
   border-width: 0;
 }
 
+/* Partial Verdant Swirl accents — corner orbs, not full-bleed backgrounds */
+.verdant-accent {
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+  width: min(26rem, 78vw);
+  height: min(26rem, 78vw);
+  overflow: hidden;
+  border-radius: 50%;
+  -webkit-mask-image: radial-gradient(
+    circle at center,
+    #000 12%,
+    rgba(0, 0, 0, 0.55) 42%,
+    transparent 72%
+  );
+  mask-image: radial-gradient(
+    circle at center,
+    #000 12%,
+    rgba(0, 0, 0, 0.55) 42%,
+    transparent 72%
+  );
+}
+
+.verdant-accent--tl {
+  top: -18%;
+  left: -12%;
+}
+
+.verdant-accent--tr {
+  top: -16%;
+  right: -14%;
+}
+
+.verdant-accent--bl {
+  bottom: -20%;
+  left: -14%;
+}
+
+.verdant-accent--br {
+  bottom: -18%;
+  right: -12%;
+}
+
+.verdant-accent--light {
+  opacity: 0.42;
+  mix-blend-mode: multiply;
+}
+
+.verdant-accent--dark {
+  opacity: 0.38;
+  mix-blend-mode: soft-light;
+}
+
+@media (min-width: 768px) {
+  .verdant-accent {
+    width: min(32rem, 46vw);
+    height: min(32rem, 46vw);
+  }
+
+  .verdant-accent--light {
+    opacity: 0.48;
+  }
+
+  .verdant-accent--dark {
+    opacity: 0.44;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .verdant-accent {
+    opacity: 0.28;
+  }
+}
+
 /* Lightweight section atmospheres (CSS only — no WebGL per section) */
 .section-atmosphere {
   position: absolute;

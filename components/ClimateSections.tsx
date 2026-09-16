@@ -3,11 +3,13 @@
 import { CLIMATE_STATS } from "@/data/climate-stats";
 import { Reveal } from "./Reveal";
 import { SectionAtmosphere } from "@/components/ui/section-atmosphere";
+import { VerdantAccent } from "@/components/ui/verdant-accent";
 
 export function ClimateReality() {
   return (
     <section id="realidade" className="section relative overflow-hidden bg-[#101c15] text-mist">
       <SectionAtmosphere variant="deep" />
+      <VerdantAccent corner="tl" tone="dark" speed={0.8} />
       <div className="section-inner relative z-[1]">
         <Reveal>
           <p className="eyebrow text-sprout">A realidade</p>

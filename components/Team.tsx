@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Reveal } from "./Reveal";
 import { SectionAtmosphere } from "@/components/ui/section-atmosphere";
+import { VerdantAccent } from "@/components/ui/verdant-accent";
 
 const team = [
   {
@@ -29,6 +30,7 @@ export function Team() {
   return (
     <section id="equipe" className="section section-soft relative overflow-hidden">
       <SectionAtmosphere variant="soft" />
+      <VerdantAccent corner="tr" tone="light" speed={0.7} />
       <div className="section-inner relative z-[1]">
         <Reveal>
           <p className="eyebrow text-forest-mid">Equipe</p>
