@@ -14,22 +14,23 @@ import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { ForestAtmosphere } from "@/components/ui/forest-atmosphere";
 import { pressTransition, softEase } from "./motion/variants";
 
-const FOREST = "/brand/hero-ecomind-v2.jpg";
+const BG = "/brand/hero-wilderness.jpg";
+const FG = "/brand/hero-wilderness-foreground.png";
 
 const copyContainer = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.13, delayChildren: 0.35 },
+    transition: { staggerChildren: 0.13, delayChildren: 0.4 },
   },
 };
 
 const copyItem = {
-  hidden: { opacity: 0, y: 24, filter: "blur(6px)" },
+  hidden: { opacity: 0, y: 26, filter: "blur(6px)" },
   visible: {
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
-    transition: { duration: 0.8, ease: softEase },
+    transition: { duration: 0.85, ease: softEase },
   },
 };
 
@@ -40,8 +41,22 @@ const brandItem = {
     y: 0,
     scale: 1,
     filter: "blur(0px)",
-    transition: { duration: 0.95, ease: softEase },
+    transition: { duration: 1, ease: softEase },
   },
+};
+
+type LayerConfig = {
+  translate: number;
+  scale: number;
+  extraScale: number;
+  blur: number;
+};
+
+/** Depth multipliers — foreground moves the most (Wilderness pattern) */
+const LAYERS: Record<"far" | "mid" | "near", LayerConfig> = {
+  far: { translate: 14, scale: 1.06, extraScale: 0.02, blur: 1.5 },
+  mid: { translate: 28, scale: 1.08, extraScale: 0.03, blur: 0 },
+  near: { translate: 60, scale: 1.12, extraScale: 0.05, blur: 0 },
 };
 
 export function Hero() {
@@ -50,40 +65,22 @@ export function Hero() {
   const [active, setActive] = useState(true);
   const [finePointer, setFinePointer] = useState(false);
 
+  // Pointer state — clamped -0.5..0.5
   const rawX = useMotionValue(0);
   const rawY = useMotionValue(0);
   const hovering = useMotionValue(0);
 
-  const springX = useSpring(rawX, { stiffness: 60, damping: 22, mass: 0.5 });
-  const springY = useSpring(rawY, { stiffness: 60, damping: 22, mass: 0.5 });
-  const springHover = useSpring(hovering, { stiffness: 100, damping: 20 });
-
-  // Hover parallax on top of ambient ken-burns (decorative, clamped)
-  const hoverX = useTransform(
-    [springX, springHover],
-    ([x, h]: number[]) => (x as number) * 24 * (h as number),
-  );
-  const hoverY = useTransform(
-    [springY, springHover],
-    ([y, h]: number[]) => (y as number) * 16 * (h as number),
-  );
-  const hoverScale = useTransform(
-    springHover,
-    (h) => 1 + (h as number) * 0.018,
-  );
+  const springX = useSpring(rawX, { stiffness: 55, damping: 22, mass: 0.55 });
+  const springY = useSpring(rawY, { stiffness: 55, damping: 22, mass: 0.55 });
+  const springHover = useSpring(hovering, { stiffness: 90, damping: 22 });
 
   const [pointer, setPointer] = useState({ x: 0, y: 0 });
-
   useEffect(() => {
-    const unsubX = springX.on("change", (x) =>
-      setPointer((p) => ({ ...p, x })),
-    );
-    const unsubY = springY.on("change", (y) =>
-      setPointer((p) => ({ ...p, y })),
-    );
+    const unX = springX.on("change", (x) => setPointer((p) => ({ ...p, x })));
+    const unY = springY.on("change", (y) => setPointer((p) => ({ ...p, y })));
     return () => {
-      unsubX();
-      unsubY();
+      unX();
+      unY();
     };
   }, [springX, springY]);
 
@@ -115,9 +112,30 @@ export function Hero() {
     rawY.set(Math.max(-0.5, Math.min(0.5, y)));
   };
 
-  const hoverTransform = useMotionTemplate`translate3d(${hoverX}px, ${hoverY}px, 0) scale(${hoverScale})`;
-
   const ambientOn = !reduce && active;
+
+  // Reusable transform per layer (depth-weighted)
+  const useLayerTransform = (layer: LayerConfig) => {
+    const x = useTransform(
+      [springX, springHover],
+      ([px, h]: number[]) =>
+        (px as number) * layer.translate * (h as number) * (finePointer ? 1 : 0),
+    );
+    const y = useTransform(
+      [springY, springHover],
+      ([py, h]: number[]) =>
+        (py as number) * layer.translate * 0.6 * (h as number) * (finePointer ? 1 : 0),
+    );
+    const scale = useTransform(
+      springHover,
+      (h) => layer.scale + (h as number) * layer.extraScale,
+    );
+    return useMotionTemplate`translate3d(${x}px, ${y}px, 0) scale(${scale})`;
+  };
+
+  const farTransform = useLayerTransform(LAYERS.far);
+  const midTransform = useLayerTransform(LAYERS.mid);
+  const nearTransform = useLayerTransform(LAYERS.near);
 
   return (
     <section
@@ -134,47 +152,47 @@ export function Hero() {
       }}
       onPointerMove={onPointerMove}
     >
-      {/* Photographic hero — continuous ken-burns + hover parallax */}
+      {/* --- FAR: photograph background (slow ken-burns) --- */}
       <motion.div
-        className="absolute inset-[-8%] will-change-transform"
-        initial={reduce ? false : { opacity: 0.65, scale: 1.1 }}
+        className="absolute inset-[-6%] will-change-transform"
+        initial={reduce ? false : { opacity: 0.6, scale: 1.14 }}
         animate={
           ambientOn
             ? {
                 opacity: 1,
-                scale: [1.08, 1.14, 1.1, 1.08],
-                x: ["0%", "1.4%", "-1%", "0%"],
-                y: ["0%", "-0.9%", "1.1%", "0%"],
+                scale: [1.1, 1.16, 1.12, 1.1],
+                x: ["0%", "1%", "-0.8%", "0%"],
+                y: ["0%", "-0.8%", "0.9%", "0%"],
               }
-            : { opacity: 1, scale: 1.08, x: "0%", y: "0%" }
+            : { opacity: 1, scale: 1.1 }
         }
         transition={
           ambientOn
             ? {
                 opacity: { duration: 1.4, ease: softEase },
-                scale: { duration: 32, ease: "easeInOut", repeat: Infinity },
-                x: { duration: 36, ease: "easeInOut", repeat: Infinity },
-                y: { duration: 40, ease: "easeInOut", repeat: Infinity },
+                scale: { duration: 34, ease: "easeInOut", repeat: Infinity },
+                x: { duration: 38, ease: "easeInOut", repeat: Infinity },
+                y: { duration: 42, ease: "easeInOut", repeat: Infinity },
               }
             : { duration: 0.6, ease: softEase }
         }
       >
         <motion.div
           className="absolute inset-0 will-change-transform"
-          style={reduce ? undefined : { transform: hoverTransform }}
+          style={reduce ? undefined : { transform: farTransform, filter: `blur(${LAYERS.far.blur}px)` }}
         >
           <Image
-            src={FOREST}
+            src={BG}
             alt=""
             fill
             priority
             sizes="100vw"
-            className="object-cover object-[58%_40%]"
+            className="object-cover object-[58%_42%]"
           />
         </motion.div>
       </motion.div>
 
-      {/* High-quality WebGL atmosphere: mist + god rays */}
+      {/* --- ATMOSPHERE (mid depth): WebGL mist + god rays --- */}
       {!reduce ? (
         <ForestAtmosphere
           intensity={active ? 1 : 0.35}
@@ -184,21 +202,57 @@ export function Hero() {
         />
       ) : null}
 
-      {/* Legibility veil — stronger on left for brand */}
+      {/* --- MID: subtle vignette that also parallaxes --- */}
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute inset-[-4%]"
+        style={reduce ? undefined : { transform: midTransform }}
+      >
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `radial-gradient(ellipse 90% 70% at 62% 40%, transparent 45%, rgba(10,22,16,0.55) 100%)`,
+          }}
+        />
+      </motion.div>
+
+      {/* --- NEAR: silhouetted foreground foliage (heaviest parallax) --- */}
+      {!reduce ? (
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute inset-[-8%] will-change-transform"
+          style={{ transform: nearTransform }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.3, delay: 0.25, ease: softEase }}
+        >
+          <Image
+            src={FG}
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-[58%_50%]"
+          />
+        </motion.div>
+      ) : null}
+
+      {/* --- LEGIBILITY VEIL (asymmetric: darker on left for copy) --- */}
       <motion.div
         aria-hidden
         className="pointer-events-none absolute inset-0"
         initial={reduce ? false : { opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1.1, delay: 0.15, ease: softEase }}
+        transition={{ duration: 1.1, delay: 0.2, ease: softEase }}
         style={{
           background: `
-            linear-gradient(105deg, rgba(10,22,16,0.62) 0%, rgba(10,22,16,0.28) 40%, rgba(10,22,16,0.06) 70%, rgba(10,22,16,0.2) 100%),
-            linear-gradient(to top, rgba(10,22,16,0.55) 0%, transparent 48%)
+            linear-gradient(105deg, rgba(10,22,16,0.72) 0%, rgba(10,22,16,0.38) 42%, rgba(10,22,16,0.08) 70%, rgba(10,22,16,0.22) 100%),
+            linear-gradient(to top, rgba(10,22,16,0.7) 0%, transparent 48%)
           `,
         }}
       />
 
+      {/* --- COPY --- */}
       <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-6xl flex-col justify-end px-5 pb-16 pt-28 md:px-8 md:pb-24 md:pt-36">
         <motion.div
           className="max-w-2xl"
