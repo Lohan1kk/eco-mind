@@ -11,12 +11,12 @@ export const VERDANT_COLORS = {
   highlight: "#F4FFC7",
 } as const;
 
-/** High-key mist for light content sections — no swamp greens under ink */
+/** High-key mist for light content sections — soft celadon silk, still ink-safe */
 export const VERDANT_MIST = {
-  deep: "#F7FCF8",
-  forest: "#E4F2E9",
-  sprout: "#C9E5D4",
-  highlight: "#E8F4D8",
+  deep: "#EEF6F1",
+  forest: "#C4DFD1",
+  sprout: "#8FCBAA",
+  highlight: "#D8EBB8",
 } as const;
 
 /** Muted glow for dark panels — soft sage, not neon CTA */
@@ -256,7 +256,7 @@ export function VerdantSwirl({
     gl.uniform3fv(uC4, c4);
     gl.uniform1f(uSpeed, reduce ? 0 : speed);
     gl.uniform1f(uEnergy, energy);
-    gl.uniform1f(uKey, palette === "mist" ? 1 : palette === "glow" ? 0.25 : 0);
+    gl.uniform1f(uKey, palette === "mist" ? 0.55 : palette === "glow" ? 0.25 : 0);
 
     let raf = 0;
     let start = performance.now();

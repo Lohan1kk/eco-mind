@@ -374,33 +374,32 @@ input[type="range"] {
   pointer-events: none;
 }
 
-/* Light: airy mint silk — color stays near paper, never swamp green */
+/* Light: soft celadon silk — visible motion, airy (dark tone untouched) */
 .verdant-wash--light .verdant-wash__shader {
-  opacity: 0.55;
-  mix-blend-mode: multiply;
+  opacity: 0.38;
+  mix-blend-mode: soft-light;
 }
 
 .verdant-wash--light .verdant-wash__veil {
-  background:
-    linear-gradient(
-      90deg,
-      rgba(247, 252, 248, 0.2) 0%,
-      rgba(247, 252, 248, 0.55) 10%,
-      rgba(247, 252, 248, 0.55) 90%,
-      rgba(247, 252, 248, 0.2) 100%
-    );
+  background: linear-gradient(
+    90deg,
+    rgba(238, 246, 241, 0.15) 0%,
+    rgba(238, 246, 241, 0.28) 18%,
+    rgba(238, 246, 241, 0.28) 82%,
+    rgba(238, 246, 241, 0.15) 100%
+  );
 }
 
-/* Straight reading plate: almost opaque where text lives */
+/* Gentle reading plate — silk stays visible under copy */
 .verdant-wash--light .verdant-wash__plate {
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.72) 14%,
-    rgba(255, 255, 255, 0.88) 28%,
-    rgba(255, 255, 255, 0.9) 50%,
-    rgba(255, 255, 255, 0.88) 72%,
-    rgba(255, 255, 255, 0.72) 86%,
+    rgba(255, 255, 255, 0.28) 16%,
+    rgba(255, 255, 255, 0.48) 34%,
+    rgba(255, 255, 255, 0.52) 50%,
+    rgba(255, 255, 255, 0.48) 66%,
+    rgba(255, 255, 255, 0.28) 84%,
     transparent 100%
   );
 }
@@ -437,7 +436,7 @@ input[type="range"] {
 
 @media (min-width: 768px) {
   .verdant-wash--light .verdant-wash__shader {
-    opacity: 0.6;
+    opacity: 0.42;
   }
 
   .verdant-wash--dark .verdant-wash__shader {
@@ -448,11 +447,11 @@ input[type="range"] {
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(255, 255, 255, 0.68) 12%,
-      rgba(255, 255, 255, 0.86) 24%,
-      rgba(255, 255, 255, 0.9) 50%,
-      rgba(255, 255, 255, 0.86) 76%,
-      rgba(255, 255, 255, 0.68) 88%,
+      rgba(255, 255, 255, 0.22) 14%,
+      rgba(255, 255, 255, 0.42) 30%,
+      rgba(255, 255, 255, 0.48) 50%,
+      rgba(255, 255, 255, 0.42) 70%,
+      rgba(255, 255, 255, 0.22) 86%,
       transparent 100%
     );
   }
@@ -460,7 +459,7 @@ input[type="range"] {
 
 @media (prefers-reduced-motion: reduce) {
   .verdant-wash--light .verdant-wash__shader {
-    opacity: 0.35;
+    opacity: 0.22;
   }
 
   .verdant-wash--dark .verdant-wash__shader {
