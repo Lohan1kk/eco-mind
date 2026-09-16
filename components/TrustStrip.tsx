@@ -1,3 +1,5 @@
+import { SectionAtmosphere } from "@/components/ui/section-atmosphere";
+
 const badges = [
   "Dados INPE",
   "Projeto escolar",
@@ -7,8 +9,9 @@ const badges = [
 
 export function TrustStrip() {
   return (
-    <section className="section-soft border-b border-[var(--line)]">
-      <div className="section-inner flex flex-wrap items-center justify-center gap-x-3 gap-y-3 py-7 md:gap-x-4">
+    <section className="section-soft relative overflow-hidden border-b border-[var(--line)]">
+      <SectionAtmosphere variant="soft" />
+      <div className="section-inner relative z-[1] flex flex-wrap items-center justify-center gap-x-3 gap-y-3 py-7 md:gap-x-4">
         {badges.map((badge, i) => (
           <div key={badge} className="flex items-center gap-3 md:gap-4">
             {i > 0 ? (

@@ -5,7 +5,7 @@ export default function NotFound() {
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-5 text-center">
       <Image
-        src="/brand/hero-wilderness.jpg"
+        src="/brand/hero-ecomind-hq.jpg"
         alt=""
         fill
         className="object-cover opacity-25"

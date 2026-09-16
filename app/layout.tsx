@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     siteName: "EcoMind",
     images: [
       {
-        url: "/brand/hero-wilderness.jpg",
+        url: "/brand/hero-ecomind-hq.jpg",
         width: 2560,
         height: 1440,
         alt: "Floresta — EcoMind",
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "EcoMind",
     description: "Calculadora, quiz e mapa de queimadas com dados do INPE.",
-    images: ["/brand/hero-wilderness.jpg"],
+    images: ["/brand/hero-ecomind-hq.jpg"],
   },
 };
 
@@ -84,7 +84,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${display.variable} ${body.variable} h-full`}>
       <head>
-        <link rel="preload" as="image" href="/brand/hero-wilderness.jpg" />
+        <link rel="preload" as="image" href="/brand/hero-ecomind-hq.jpg" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

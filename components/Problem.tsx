@@ -1,4 +1,5 @@
 import { Reveal } from "./Reveal";
+import { SectionAtmosphere } from "@/components/ui/section-atmosphere";
 
 const items = [
   {
@@ -20,8 +21,9 @@ const items = [
 
 export function Problem() {
   return (
-    <section id="problema" className="section section-warm">
-      <div className="section-inner">
+    <section id="problema" className="section section-warm relative overflow-hidden">
+      <SectionAtmosphere variant="mist" />
+      <div className="section-inner relative z-[1]">
         <Reveal>
           <p className="eyebrow text-burn">O problema</p>
           <h2 className="display mt-4 max-w-3xl text-3xl text-ink md:text-5xl">

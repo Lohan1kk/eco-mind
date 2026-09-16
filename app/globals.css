@@ -352,6 +352,90 @@ input[type="range"] {
   border-width: 0;
 }
 
+/* Lightweight section atmospheres (CSS only — no WebGL per section) */
+.section-atmosphere {
+  position: absolute;
+  inset: -12%;
+  opacity: 0.55;
+  background-size: 140% 140%;
+  animation: atmosphere-drift 22s ease-in-out infinite alternate;
+  will-change: background-position, opacity;
+}
+
+.section-atmosphere.is-paused {
+  animation: none;
+  background-position: 50% 50%;
+}
+
+.section-atmosphere--soft {
+  background-image:
+    radial-gradient(ellipse 55% 45% at 12% 20%, rgba(200, 239, 212, 0.35), transparent 60%),
+    radial-gradient(ellipse 50% 50% at 88% 75%, rgba(47, 122, 79, 0.12), transparent 55%),
+    radial-gradient(ellipse 40% 35% at 60% 10%, rgba(22, 61, 42, 0.06), transparent 50%);
+}
+
+.section-atmosphere--mist {
+  background-image:
+    radial-gradient(ellipse 60% 50% at 8% 30%, rgba(154, 98, 66, 0.1), transparent 55%),
+    radial-gradient(ellipse 55% 45% at 92% 20%, rgba(200, 239, 212, 0.28), transparent 55%),
+    radial-gradient(ellipse 45% 40% at 50% 90%, rgba(47, 122, 79, 0.1), transparent 50%);
+}
+
+.section-atmosphere--deep {
+  opacity: 0.45;
+  background-image:
+    radial-gradient(ellipse 55% 50% at 15% 25%, rgba(124, 229, 119, 0.12), transparent 55%),
+    radial-gradient(ellipse 50% 45% at 85% 70%, rgba(14, 124, 90, 0.18), transparent 55%),
+    radial-gradient(ellipse 40% 35% at 50% 0%, rgba(244, 255, 199, 0.06), transparent 50%);
+}
+
+.section-atmosphere-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  animation: grain-shift 8s steps(6) infinite;
+}
+
+.section-atmosphere-grain.is-paused {
+  animation: none;
+}
+
+@keyframes atmosphere-drift {
+  0% {
+    background-position: 0% 40%;
+    opacity: 0.45;
+  }
+  50% {
+    background-position: 60% 55%;
+    opacity: 0.62;
+  }
+  100% {
+    background-position: 100% 30%;
+    opacity: 0.5;
+  }
+}
+
+@keyframes grain-shift {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(-1%, 1%);
+  }
+  50% {
+    transform: translate(1%, -1%);
+  }
+  75% {
+    transform: translate(-1%, -1%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -370,5 +454,10 @@ input[type="range"] {
 
   .btn:hover {
     transform: none;
+  }
+
+  .section-atmosphere,
+  .section-atmosphere-grain {
+    animation: none !important;
   }
 }

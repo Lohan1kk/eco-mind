@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Reveal } from "./Reveal";
+import { SectionAtmosphere } from "@/components/ui/section-atmosphere";
 
 const team = [
   {
@@ -26,8 +27,9 @@ const team = [
 
 export function Team() {
   return (
-    <section id="equipe" className="section section-soft">
-      <div className="section-inner">
+    <section id="equipe" className="section section-soft relative overflow-hidden">
+      <SectionAtmosphere variant="soft" />
+      <div className="section-inner relative z-[1]">
         <Reveal>
           <p className="eyebrow text-forest-mid">Equipe</p>
           <h2 className="display mt-4 text-3xl text-ink md:text-5xl">
