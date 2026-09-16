@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type MutableRefObject } from "react";
 import { useReducedMotion } from "framer-motion";
 
 /**
  * Atmospheric forest mist + god-ray shader for EcoMind hero.
- * Transparent WebGL overlay: soft volumetric shafts and drifting fog
- * in brand greens — composites over the photographic hero.
+ * Transparent WebGL overlay — reads pointer from a ref (no React re-renders).
  */
 const VERT = `
 attribute vec2 a_position;
@@ -21,7 +20,7 @@ precision highp float;
 uniform float u_time;
 uniform vec2 u_resolution;
 uniform float u_intensity;
-uniform vec2 u_pointer; // -0.5..0.5, softened
+uniform vec2 u_pointer;
 
 float hash(vec2 p) {
   p = fract(p * vec2(123.34, 456.21));
@@ -56,17 +55,12 @@ void main() {
   vec2 uv = gl_FragCoord.xy / u_resolution.xy;
   float aspect = u_resolution.x / max(u_resolution.y, 1.0);
   vec2 p = (uv - 0.5) * vec2(aspect, 1.0);
-
   float t = u_time * 0.12;
-
-  // Pointer gently steers mist drift (hero hover)
   vec2 drift = p + u_pointer * 0.22;
 
-  // Volumetric mist sheets
   float mist = fbm(drift * 1.8 + vec2(t * 0.35, -t * 0.2));
   mist = mist * 0.65 + fbm(drift * 3.2 - vec2(t * 0.15, t * 0.25)) * 0.35;
 
-  // God rays from upper-right canopy (matches generated hero light)
   vec2 rayOrigin = vec2(0.42, -0.55) + u_pointer * 0.08;
   vec2 toRay = drift - rayOrigin;
   float ang = atan(toRay.y, toRay.x);
@@ -74,26 +68,22 @@ void main() {
   rays *= smoothstep(1.2, 0.15, length(toRay));
   rays *= 0.55 + 0.45 * mist;
 
-  // EcoMind greens
-  vec3 deep = vec3(0.012, 0.071, 0.055);      // #03120E
-  vec3 forest = vec3(0.055, 0.486, 0.353);    // #0E7C5A
-  vec3 sprout = vec3(0.486, 0.898, 0.467);    // #7CE577
-  vec3 light = vec3(0.957, 1.0, 0.78);        // #F4FFC7
+  vec3 deep = vec3(0.012, 0.071, 0.055);
+  vec3 forest = vec3(0.055, 0.486, 0.353);
+  vec3 sprout = vec3(0.486, 0.898, 0.467);
+  vec3 light = vec3(0.957, 1.0, 0.78);
 
   float fogBody = smoothstep(0.25, 0.85, mist);
   vec3 fogColor = mix(forest, sprout, fogBody * 0.55);
   fogColor = mix(fogColor, light, rays * 0.65);
 
-  // Stronger mist on left (copy zone) + soft overall
   float leftVeil = smoothstep(0.85, 0.05, uv.x);
   float alpha = fogBody * 0.22 * u_intensity;
   alpha += rays * 0.18 * u_intensity;
   alpha += leftVeil * mist * 0.12 * u_intensity;
   alpha = clamp(alpha, 0.0, 0.55);
 
-  // Slight deep tint in shadows
   vec3 col = mix(deep, fogColor, 0.85 + rays * 0.15);
-
   gl_FragColor = vec4(col, alpha);
 }
 `;
@@ -115,30 +105,27 @@ function compile(
   return shader;
 }
 
+type Pointer = { x: number; y: number };
+
 type ForestAtmosphereProps = {
   className?: string;
-  /** 0–1 overall strength */
   intensity?: number;
-  /** Normalized pointer -0.5..0.5 */
-  pointerX?: number;
-  pointerY?: number;
+  /** Shared ref updated by Hero without React setState */
+  pointerRef?: MutableRefObject<Pointer>;
   active?: boolean;
 };
 
 export function ForestAtmosphere({
   className = "",
   intensity = 1,
-  pointerX = 0,
-  pointerY = 0,
+  pointerRef,
   active = true,
 }: ForestAtmosphereProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const reduce = useReducedMotion();
-  const pointerRef = useRef({ x: pointerX, y: pointerY });
+  const localPointer = useRef<Pointer>({ x: 0, y: 0 });
   const intensityRef = useRef(intensity);
   const activeRef = useRef(active);
-
-  pointerRef.current = { x: pointerX, y: pointerY };
   intensityRef.current = intensity;
   activeRef.current = active;
 
@@ -193,9 +180,11 @@ export function ForestAtmosphere({
     let raf = 0;
     const start = performance.now();
     const frozen = Boolean(reduce);
+    let lastW = 0;
+    let lastH = 0;
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
       const pw = Math.max(1, Math.floor(w * dpr));
@@ -203,9 +192,16 @@ export function ForestAtmosphere({
       if (canvas.width !== pw || canvas.height !== ph) {
         canvas.width = pw;
         canvas.height = ph;
+        gl.viewport(0, 0, pw, ph);
+        gl.uniform2f(uRes, pw, ph);
+        lastW = pw;
+        lastH = ph;
+      } else if (lastW !== pw || lastH !== ph) {
+        gl.viewport(0, 0, pw, ph);
+        gl.uniform2f(uRes, pw, ph);
+        lastW = pw;
+        lastH = ph;
       }
-      gl.viewport(0, 0, canvas.width, canvas.height);
-      gl.uniform2f(uRes, canvas.width, canvas.height);
     };
 
     const draw = (now: number) => {
@@ -214,16 +210,13 @@ export function ForestAtmosphere({
         return;
       }
       resize();
+      const ptr = pointerRef?.current ?? localPointer.current;
       const t = frozen ? 2.4 : (now - start) / 1000;
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.uniform1f(uTime, t);
       gl.uniform1f(uIntensity, intensityRef.current);
-      gl.uniform2f(
-        uPointer,
-        pointerRef.current.x,
-        pointerRef.current.y,
-      );
+      gl.uniform2f(uPointer, ptr.x, ptr.y);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
       if (!frozen) raf = requestAnimationFrame(draw);
     };
@@ -246,7 +239,7 @@ export function ForestAtmosphere({
       gl.deleteShader(fs);
       gl.deleteBuffer(buf);
     };
-  }, [reduce]);
+  }, [reduce, pointerRef]);
 
   return (
     <canvas
