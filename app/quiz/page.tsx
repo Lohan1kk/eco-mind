@@ -6,7 +6,7 @@ import { Quiz } from "@/components/Quiz";
 export const metadata: Metadata = {
   title: "Quiz ambiental",
   description:
-    "Teste seu conhecimento sobre clima, Amazônia e pegada de carbono.",
+    "Quiz sobre o conteúdo da EcoMind: desmatamento, queimadas, ferramentas do app e dados do clima.",
 };
 
 export default function QuizPage() {
@@ -17,11 +17,11 @@ export default function QuizPage() {
         <div className="section-inner">
           <p className="eyebrow text-forest-mid">Educar</p>
           <h1 className="display mt-3 text-3xl text-forest md:text-5xl">
-            Quanto você sabe sobre o planeta?
+            Quanto você sabe sobre a EcoMind?
           </h1>
           <p className="lede mt-4 max-w-xl">
-            Cinco perguntas com feedback imediato — para plantar conhecimento de
-            verdade.
+            Dez perguntas baseadas nos textos e dados do site — com feedback
+            imediato após cada resposta.
           </p>
           <div className="mt-12">
             <Quiz />
