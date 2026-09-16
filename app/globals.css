@@ -352,7 +352,7 @@ input[type="range"] {
   border-width: 0;
 }
 
-/* Full-bleed Verdant wash — straight edges, readable via veil (not round orbs) */
+/* Full-bleed Verdant wash — pale mist / muted glow, reading plate for copy */
 .verdant-wash {
   pointer-events: none;
   position: absolute;
@@ -366,41 +366,48 @@ input[type="range"] {
   border-radius: 0 !important;
 }
 
-.verdant-wash__veil {
+.verdant-wash__veil,
+.verdant-wash__plate {
   position: absolute;
   inset: 0;
   border-radius: 0;
   pointer-events: none;
 }
 
-/* Light sections: gentle swirl — clearer and weaker */
+/* Light: airy mint silk — color stays near paper, never swamp green */
 .verdant-wash--light .verdant-wash__shader {
-  opacity: 0.12;
-  mix-blend-mode: soft-light;
+  opacity: 0.55;
+  mix-blend-mode: multiply;
 }
 
 .verdant-wash--light .verdant-wash__veil {
   background:
     linear-gradient(
       90deg,
-      rgba(247, 252, 248, 0.45) 0%,
-      rgba(247, 252, 248, 0.78) 16%,
-      rgba(247, 252, 248, 0.88) 50%,
-      rgba(247, 252, 248, 0.78) 84%,
-      rgba(247, 252, 248, 0.45) 100%
-    ),
-    linear-gradient(
-      180deg,
-      rgba(238, 247, 241, 0.5) 0%,
-      rgba(238, 247, 241, 0.72) 24%,
-      rgba(238, 247, 241, 0.72) 76%,
-      rgba(238, 247, 241, 0.5) 100%
+      rgba(247, 252, 248, 0.2) 0%,
+      rgba(247, 252, 248, 0.55) 10%,
+      rgba(247, 252, 248, 0.55) 90%,
+      rgba(247, 252, 248, 0.2) 100%
     );
 }
 
-/* Dark sections: soft luminous wash */
+/* Straight reading plate: almost opaque where text lives */
+.verdant-wash--light .verdant-wash__plate {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.72) 14%,
+    rgba(255, 255, 255, 0.88) 28%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0.88) 72%,
+    rgba(255, 255, 255, 0.72) 86%,
+    transparent 100%
+  );
+}
+
+/* Dark: muted sage, soft and quiet under mist text */
 .verdant-wash--dark .verdant-wash__shader {
-  opacity: 0.16;
+  opacity: 0.14;
   mix-blend-mode: soft-light;
 }
 
@@ -408,33 +415,54 @@ input[type="range"] {
   background:
     linear-gradient(
       90deg,
-      rgba(8, 22, 16, 0.35) 0%,
-      rgba(8, 22, 16, 0.62) 18%,
-      rgba(8, 22, 16, 0.72) 50%,
-      rgba(8, 22, 16, 0.62) 82%,
-      rgba(8, 22, 16, 0.35) 100%
-    ),
-    linear-gradient(
-      180deg,
-      rgba(8, 22, 16, 0.4) 0%,
-      rgba(8, 22, 16, 0.58) 28%,
-      rgba(8, 22, 16, 0.58) 72%,
-      rgba(8, 22, 16, 0.4) 100%
+      rgba(10, 22, 16, 0.25) 0%,
+      rgba(10, 22, 16, 0.45) 12%,
+      rgba(10, 22, 16, 0.45) 88%,
+      rgba(10, 22, 16, 0.25) 100%
     );
+}
+
+.verdant-wash--dark .verdant-wash__plate {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(8, 20, 15, 0.55) 16%,
+    rgba(8, 20, 15, 0.72) 32%,
+    rgba(8, 20, 15, 0.78) 50%,
+    rgba(8, 20, 15, 0.72) 68%,
+    rgba(8, 20, 15, 0.55) 84%,
+    transparent 100%
+  );
 }
 
 @media (min-width: 768px) {
   .verdant-wash--light .verdant-wash__shader {
-    opacity: 0.14;
+    opacity: 0.6;
   }
 
   .verdant-wash--dark .verdant-wash__shader {
-    opacity: 0.18;
+    opacity: 0.16;
+  }
+
+  .verdant-wash--light .verdant-wash__plate {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.68) 12%,
+      rgba(255, 255, 255, 0.86) 24%,
+      rgba(255, 255, 255, 0.9) 50%,
+      rgba(255, 255, 255, 0.86) 76%,
+      rgba(255, 255, 255, 0.68) 88%,
+      transparent 100%
+    );
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .verdant-wash--light .verdant-wash__shader,
+  .verdant-wash--light .verdant-wash__shader {
+    opacity: 0.35;
+  }
+
   .verdant-wash--dark .verdant-wash__shader {
     opacity: 0.08;
   }

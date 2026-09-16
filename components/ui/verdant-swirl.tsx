@@ -11,6 +11,33 @@ export const VERDANT_COLORS = {
   highlight: "#F4FFC7",
 } as const;
 
+/** High-key mist for light content sections — no swamp greens under ink */
+export const VERDANT_MIST = {
+  deep: "#F7FCF8",
+  forest: "#E4F2E9",
+  sprout: "#C9E5D4",
+  highlight: "#E8F4D8",
+} as const;
+
+/** Muted glow for dark panels — soft sage, not neon CTA */
+export const VERDANT_GLOW = {
+  deep: "#0c1813",
+  forest: "#1a4032",
+  sprout: "#3d7358",
+  highlight: "#9bb89a",
+} as const;
+
+export type VerdantPalette = "classic" | "mist" | "glow";
+
+const PALETTES: Record<
+  VerdantPalette,
+  { deep: string; forest: string; sprout: string; highlight: string }
+> = {
+  classic: VERDANT_COLORS,
+  mist: VERDANT_MIST,
+  glow: VERDANT_GLOW,
+};
+
 const VERT = `
 attribute vec2 a_position;
 void main() {
@@ -33,6 +60,7 @@ uniform vec3 u_c3;
 uniform vec3 u_c4;
 uniform float u_speed;
 uniform float u_energy;
+uniform float u_key;
 
 float hash(vec2 p) {
   p = fract(p * vec2(123.34, 456.21));
@@ -94,16 +122,19 @@ void main() {
   float silk = fbm(r * 2.15 + t * 0.04);
   silk = silk * 0.7 + n2 * 0.3;
 
-  // Soft vignette keeps edges deep green
+  // Vignette: classic goes deep at edges; high-key (mist) stays airy
   float vig = smoothstep(1.35, 0.15, length(p * 1.05));
-  silk = mix(silk * 0.35, silk, vig);
+  float edgeMul = mix(0.35, 0.82, clamp(u_key, 0.0, 1.0));
+  silk = mix(silk * edgeMul, silk, vig);
 
   vec3 col = palette(silk);
   // Silk sheen — gentle when energy is near 1
-  float sheen = (0.03 + 0.03 * (e - 1.0)) * sin(silk * 6.28318 + t * (0.7 + 0.2 * (e - 1.0)));
-  col += u_c4 * (sheen + 0.015 + 0.01 * (e - 1.0));
+  float sheen = (0.025 + 0.02 * (e - 1.0)) * sin(silk * 6.28318 + t * (0.7 + 0.2 * (e - 1.0)));
+  col += u_c4 * (sheen + 0.012 + 0.008 * (e - 1.0));
   // Soft sprout drift for living wash
-  col = mix(col, u_c3, 0.04 * (e - 1.0) * (0.5 + 0.5 * sin(t * 0.9 + silk * 3.0)));
+  col = mix(col, u_c3, 0.03 * (e - 1.0) * (0.5 + 0.5 * sin(t * 0.9 + silk * 3.0)));
+  // Lift mist washes toward paper so ink stays crisp
+  col = mix(col, u_c1, 0.22 * clamp(u_key, 0.0, 1.0));
 
   gl_FragColor = vec4(col, 1.0);
 }
@@ -148,6 +179,8 @@ type VerdantSwirlProps = {
   maxDpr?: number;
   /** Pause RAF when false (offscreen) */
   active?: boolean;
+  /** Color story: classic CTA, mist (light sections), glow (dark sections) */
+  palette?: VerdantPalette;
 };
 
 export function VerdantSwirl({
@@ -157,6 +190,7 @@ export function VerdantSwirl({
   energy = 1,
   maxDpr = 1.75,
   active = true,
+  palette = "classic",
 }: VerdantSwirlProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const reduce = useReducedMotion();
@@ -204,15 +238,17 @@ export function VerdantSwirl({
     const uRes = gl.getUniformLocation(program, "u_resolution");
     const uSpeed = gl.getUniformLocation(program, "u_speed");
     const uEnergy = gl.getUniformLocation(program, "u_energy");
+    const uKey = gl.getUniformLocation(program, "u_key");
     const uC1 = gl.getUniformLocation(program, "u_c1");
     const uC2 = gl.getUniformLocation(program, "u_c2");
     const uC3 = gl.getUniformLocation(program, "u_c3");
     const uC4 = gl.getUniformLocation(program, "u_c4");
 
-    const c1 = hexToRgb(VERDANT_COLORS.deep);
-    const c2 = hexToRgb(VERDANT_COLORS.forest);
-    const c3 = hexToRgb(VERDANT_COLORS.sprout);
-    const c4 = hexToRgb(VERDANT_COLORS.highlight);
+    const swatch = PALETTES[palette];
+    const c1 = hexToRgb(swatch.deep);
+    const c2 = hexToRgb(swatch.forest);
+    const c3 = hexToRgb(swatch.sprout);
+    const c4 = hexToRgb(swatch.highlight);
 
     gl.uniform3fv(uC1, c1);
     gl.uniform3fv(uC2, c2);
@@ -220,6 +256,7 @@ export function VerdantSwirl({
     gl.uniform3fv(uC4, c4);
     gl.uniform1f(uSpeed, reduce ? 0 : speed);
     gl.uniform1f(uEnergy, energy);
+    gl.uniform1f(uKey, palette === "mist" ? 1 : palette === "glow" ? 0.25 : 0);
 
     let raf = 0;
     let start = performance.now();
@@ -269,7 +306,7 @@ export function VerdantSwirl({
       gl.deleteShader(fs);
       gl.deleteBuffer(buf);
     };
-  }, [reduce, speed, energy, maxDpr, active]);
+  }, [reduce, speed, energy, maxDpr, active, palette]);
 
   return (
     <canvas
