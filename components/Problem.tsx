@@ -1,4 +1,6 @@
+import { CloudFog } from "lucide-react";
 import { Reveal } from "./Reveal";
+import { SmokeCard } from "@/components/ui/smoke-card";
 
 const items = [
   {
@@ -33,20 +35,38 @@ export function Problem() {
           </p>
         </Reveal>
 
-        <div className="mt-16 grid gap-8 md:grid-cols-3 md:gap-6">
-          {items.map((item, i) => (
-            <Reveal key={item.title} delayMs={i * 90}>
-              <article className="panel-soft h-full p-6 md:p-7">
-                <span className="display text-4xl text-burn/25">{item.n}</span>
-                <h3 className="mt-4 font-display text-xl font-semibold text-earth">
-                  {item.title}
-                </h3>
-                <p className="mt-3 text-base leading-relaxed text-ash">
-                  {item.text}
+        <div className="mt-14 grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-14">
+          <Reveal>
+            <div className="overflow-hidden rounded-2xl border border-forest/10 bg-forest p-5 shadow-sm md:p-6">
+              <div className="mb-4 flex items-center gap-2 text-sprout/85">
+                <CloudFog className="h-4 w-4 shrink-0" aria-hidden strokeWidth={1.75} />
+                <p className="text-xs font-semibold uppercase tracking-[0.18em]">
+                  Névoa da floresta
                 </p>
-              </article>
-            </Reveal>
-          ))}
+              </div>
+              <SmokeCard className="aspect-[4/5] w-full max-h-[22rem] sm:aspect-square sm:max-h-none" />
+              <p className="mt-4 text-sm leading-relaxed text-mist/70">
+                Passe o cursor sobre o quadro. A névoa verde acompanha o gesto —
+                como o ar da floresta, frágil e em movimento.
+              </p>
+            </div>
+          </Reveal>
+
+          <div className="grid gap-6 sm:grid-cols-1 md:gap-5">
+            {items.map((item, i) => (
+              <Reveal key={item.title} delayMs={i * 90}>
+                <article className="panel-soft h-full p-6 md:p-7">
+                  <span className="display text-4xl text-burn/25">{item.n}</span>
+                  <h3 className="mt-4 font-display text-xl font-semibold text-earth">
+                    {item.title}
+                  </h3>
+                  <p className="mt-3 text-base leading-relaxed text-ash">
+                    {item.text}
+                  </p>
+                </article>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </div>
     </section>
