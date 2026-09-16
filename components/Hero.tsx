@@ -2,74 +2,174 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
 import {
-  HeroParallaxStrips,
-  useHeroStripHover,
-} from "./HeroParallaxStrips";
+  motion,
+  useMotionTemplate,
+  useMotionValue,
+  useReducedMotion,
+  useSpring,
+  useTransform,
+} from "framer-motion";
+import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { ForestAtmosphere } from "@/components/ui/forest-atmosphere";
 import { pressTransition, softEase } from "./motion/variants";
+
+const FOREST = "/brand/hero-forest.jpg";
 
 const copyContainer = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.14, delayChildren: 0.55 },
+    transition: { staggerChildren: 0.13, delayChildren: 0.35 },
   },
 };
 
 const copyItem = {
-  hidden: { opacity: 0, y: 28, filter: "blur(8px)" },
+  hidden: { opacity: 0, y: 24, filter: "blur(6px)" },
   visible: {
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
-    transition: { duration: 0.85, ease: softEase },
+    transition: { duration: 0.8, ease: softEase },
   },
 };
 
 const brandItem = {
-  hidden: { opacity: 0, y: 36, scale: 0.96, filter: "blur(10px)" },
+  hidden: { opacity: 0, y: 32, scale: 0.97, filter: "blur(8px)" },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
     filter: "blur(0px)",
-    transition: { duration: 1, ease: softEase },
+    transition: { duration: 0.95, ease: softEase },
   },
 };
 
 export function Hero() {
   const reduce = useReducedMotion();
-  const stripHover = useHeroStripHover();
+  const sectionRef = useRef<HTMLElement>(null);
+  const [active, setActive] = useState(true);
+  const [finePointer, setFinePointer] = useState(false);
+
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+  const hovering = useMotionValue(0);
+
+  const springX = useSpring(rawX, { stiffness: 60, damping: 22, mass: 0.5 });
+  const springY = useSpring(rawY, { stiffness: 60, damping: 22, mass: 0.5 });
+  const springHover = useSpring(hovering, { stiffness: 100, damping: 20 });
+
+  // Photo parallax (subtle — UI/UX Pro Max: small delta, decorative only)
+  const photoX = useTransform(
+    [springX, springHover],
+    ([x, h]: number[]) => (x as number) * 28 * (h as number),
+  );
+  const photoY = useTransform(
+    [springY, springHover],
+    ([y, h]: number[]) => (y as number) * 20 * (h as number),
+  );
+  const photoScale = useTransform(springHover, (h) => 1.06 + h * 0.02);
+
+  const [pointer, setPointer] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const unsubX = springX.on("change", (x) =>
+      setPointer((p) => ({ ...p, x })),
+    );
+    const unsubY = springY.on("change", (y) =>
+      setPointer((p) => ({ ...p, y })),
+    );
+    return () => {
+      unsubX();
+      unsubY();
+    };
+  }, [springX, springY]);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(pointer: fine)");
+    const sync = () => setFinePointer(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
+    const node = sectionRef.current;
+    if (!node) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setActive(entry.isIntersecting),
+      { threshold: 0.08 },
+    );
+    io.observe(node);
+    return () => io.disconnect();
+  }, []);
+
+  const onPointerMove = (e: PointerEvent<HTMLElement>) => {
+    if (reduce || !finePointer) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / Math.max(rect.width, 1) - 0.5;
+    const y = (e.clientY - rect.top) / Math.max(rect.height, 1) - 0.5;
+    rawX.set(Math.max(-0.5, Math.min(0.5, x)));
+    rawY.set(Math.max(-0.5, Math.min(0.5, y)));
+  };
+
+  const transform = useMotionTemplate`translate3d(${photoX}px, ${photoY}px, 0) scale(${photoScale})`;
 
   return (
     <section
+      ref={sectionRef}
       id="topo"
-      className="relative min-h-[100svh] overflow-hidden"
-      onPointerEnter={reduce ? undefined : stripHover.onPointerEnter}
-      onPointerLeave={reduce ? undefined : stripHover.onPointerLeave}
-      onPointerMove={reduce ? undefined : stripHover.onPointerMove}
+      className="relative min-h-[100svh] overflow-hidden bg-[#0a1610]"
+      onPointerEnter={() => {
+        if (!reduce && finePointer) hovering.set(1);
+      }}
+      onPointerLeave={() => {
+        hovering.set(0);
+        rawX.set(0);
+        rawY.set(0);
+      }}
+      onPointerMove={onPointerMove}
     >
-      <HeroParallaxStrips
-        pointerX={stripHover.pointerX}
-        pointerY={stripHover.pointerY}
-        hovering={stripHover.hovering}
-      />
+      {/* Photographic hero — cinematic forest graded for left copy */}
+      <motion.div
+        className="absolute inset-[-4%] will-change-transform"
+        style={reduce ? undefined : { transform }}
+        initial={reduce ? false : { scale: 1.12, opacity: 0.7 }}
+        animate={{ scale: reduce ? 1 : 1.06, opacity: 1 }}
+        transition={{ duration: reduce ? 0 : 1.6, ease: softEase }}
+      >
+        <Image
+          src={FOREST}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[center_35%]"
+        />
+      </motion.div>
 
+      {/* High-quality WebGL atmosphere: mist + god rays */}
+      {!reduce ? (
+        <ForestAtmosphere
+          intensity={active ? 1 : 0.35}
+          pointerX={finePointer ? pointer.x : 0}
+          pointerY={finePointer ? pointer.y : 0}
+          active={active}
+        />
+      ) : null}
+
+      {/* Legibility veil — stronger on left for brand */}
       <motion.div
         aria-hidden
-        className="hero-overlay pointer-events-none absolute inset-0"
+        className="pointer-events-none absolute inset-0"
         initial={reduce ? false : { opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1.2, delay: 0.2, ease: softEase }}
-      />
-
-      {/* Soft bottom vignette for CTA legibility */}
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-[#0a1610]/85 via-[#0a1610]/35 to-transparent"
-        initial={reduce ? false : { opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 0.4 }}
+        transition={{ duration: 1.1, delay: 0.15, ease: softEase }}
+        style={{
+          background: `
+            linear-gradient(105deg, rgba(10,22,16,0.78) 0%, rgba(10,22,16,0.42) 42%, rgba(10,22,16,0.12) 72%, rgba(10,22,16,0.28) 100%),
+            linear-gradient(to top, rgba(10,22,16,0.7) 0%, transparent 45%)
+          `,
+        }}
       />
 
       <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-6xl flex-col justify-end px-5 pb-16 pt-28 md:px-8 md:pb-24 md:pt-36">
@@ -80,20 +180,14 @@ export function Hero() {
           animate="visible"
         >
           <motion.div className="mb-7" variants={brandItem}>
-            <motion.div
-              initial={reduce ? false : { rotate: -6, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              transition={{ duration: 1.1, delay: 0.65, ease: softEase }}
-            >
-              <Image
-                src="/brand/logo-ecomind.png"
-                alt="EcoMind"
-                width={120}
-                height={120}
-                className="h-14 w-14 object-contain drop-shadow-md md:h-16 md:w-16"
-                priority
-              />
-            </motion.div>
+            <Image
+              src="/brand/logo-ecomind.png"
+              alt="EcoMind"
+              width={120}
+              height={120}
+              className="h-14 w-14 object-contain drop-shadow-md md:h-16 md:w-16"
+              priority
+            />
             <p className="display mt-4 text-5xl text-mist md:text-7xl">
               EcoMind
             </p>
