@@ -324,14 +324,17 @@ export function VerdantSwirlSection({
   className = "",
   innerClassName = "",
   speed = 1,
+  id,
 }: {
   children: ReactNode;
   className?: string;
   innerClassName?: string;
   speed?: number;
+  id?: string;
 }) {
   return (
     <section
+      id={id}
       className={`relative overflow-hidden bg-[#03120E] ${className}`}
     >
       <VerdantSwirl speed={speed} />

@@ -1,4 +1,4 @@
-import { Reveal } from "./Reveal";
+import { Reveal, StaggerItem, StaggerReveal } from "@/components/motion";
 import { SectionAtmosphere } from "@/components/ui/section-atmosphere";
 import { VerdantWash } from "@/components/ui/verdant-accent";
 
@@ -26,16 +26,20 @@ export function HowItWorks() {
       <SectionAtmosphere variant="soft" />
       <VerdantWash tone="light" speed={0.4} />
       <div className="section-inner relative z-[1]">
-        <Reveal>
-          <p className="eyebrow text-forest-mid">Como funciona</p>
-          <h2 className="display mt-4 max-w-3xl text-3xl text-ink md:text-5xl">
-            Do conhecimento à ação, em três passos
-          </h2>
-        </Reveal>
+        <StaggerReveal staggerChildren={0.1} delayChildren={0.04}>
+          <StaggerItem soft>
+            <p className="eyebrow text-forest-mid">Como funciona</p>
+          </StaggerItem>
+          <StaggerItem>
+            <h2 className="display mt-4 max-w-3xl text-3xl text-ink md:text-5xl">
+              Do conhecimento à ação, em três passos
+            </h2>
+          </StaggerItem>
+        </StaggerReveal>
 
         <ol className="mt-16 grid gap-6 md:grid-cols-3">
           {steps.map((step, i) => (
-            <Reveal key={step.n} delayMs={i * 100}>
+            <Reveal key={step.n} delayMs={120 + i * 110} variant="fadeUp">
               <li className="panel-soft relative h-full overflow-hidden p-7">
                 <span
                   aria-hidden

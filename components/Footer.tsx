@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Reveal, StaggerItem, StaggerReveal } from "@/components/motion";
 import { SectionAtmosphere } from "@/components/ui/section-atmosphere";
 
 const links = [
@@ -15,7 +16,7 @@ export function Footer() {
     <footer className="relative overflow-hidden border-t border-white/10 bg-ink py-14 text-mist/85">
       <SectionAtmosphere variant="deep" />
       <div className="section-inner relative z-[1] flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
-        <div>
+        <Reveal variant="fadeUp">
           <div className="flex items-center gap-2.5">
             <Image
               src="/brand/icon-ecomind.png"
@@ -32,22 +33,30 @@ export function Footer() {
             Consciência ambiental + tecnologia. Calculadora, quiz, mapa INPE e
             ações concretas para o planeta.
           </p>
-        </div>
+        </Reveal>
 
         <nav aria-label="Rodapé">
-          <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+          <StaggerReveal
+            className="flex flex-wrap gap-x-6 gap-y-2 text-sm"
+            staggerChildren={0.06}
+            delayChildren={0.12}
+          >
             {links.map((link) => (
-              <li key={link.href}>
+              <StaggerItem key={link.href} soft>
                 <Link href={link.href} className="hover:text-sprout">
                   {link.label}
                 </Link>
-              </li>
+              </StaggerItem>
             ))}
-          </ul>
+          </StaggerReveal>
         </nav>
       </div>
 
-      <div className="section-inner relative z-[1] mt-10 border-t border-white/10 pt-6 text-xs text-mist/50">
+      <Reveal
+        className="section-inner relative z-[1] mt-10 border-t border-white/10 pt-6 text-xs text-mist/50"
+        delayMs={140}
+        variant="fade"
+      >
         <p>EcoMind · Projeto de alunos · Colégio Paulo de Tarso</p>
         <p className="mt-2">
           Dados:{" "}
@@ -60,7 +69,7 @@ export function Footer() {
             INPE Queimadas
           </a>
         </p>
-      </div>
+      </Reveal>
     </footer>
   );
 }

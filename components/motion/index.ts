@@ -39,4 +39,4 @@ export {
   type StaggerOptions,
 } from "./variants";
 
-export { Reveal } from "./Reveal";
+export { Reveal, StaggerReveal, StaggerItem, MotionPress } from "./Reveal";
