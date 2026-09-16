@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Reveal } from "./Reveal";
+import { Reveal, StaggerItem, StaggerReveal } from "@/components/motion";
 import { SectionAtmosphere } from "@/components/ui/section-atmosphere";
 import { VerdantWash } from "@/components/ui/verdant-accent";
 
@@ -33,20 +33,26 @@ export function Tools() {
       <SectionAtmosphere variant="soft" />
       <VerdantWash tone="light" speed={0.37} />
       <div className="section-inner relative z-[1]">
-        <Reveal>
-          <p className="eyebrow text-forest-mid">Ferramentas</p>
-          <h2 className="display mt-4 max-w-3xl text-3xl text-ink md:text-5xl">
-            Três caminhos para plantar consciência
-          </h2>
-          <p className="lede mt-5 max-w-2xl">
-            Educação e ação no mesmo lugar — sem ruído, só o essencial para
-            começar.
-          </p>
-        </Reveal>
+        <StaggerReveal staggerChildren={0.1} delayChildren={0.04}>
+          <StaggerItem soft>
+            <p className="eyebrow text-forest-mid">Ferramentas</p>
+          </StaggerItem>
+          <StaggerItem>
+            <h2 className="display mt-4 max-w-3xl text-3xl text-ink md:text-5xl">
+              Três caminhos para plantar consciência
+            </h2>
+          </StaggerItem>
+          <StaggerItem soft>
+            <p className="lede mt-5 max-w-2xl">
+              Educação e ação no mesmo lugar — sem ruído, só o essencial para
+              começar.
+            </p>
+          </StaggerItem>
+        </StaggerReveal>
 
         <ul className="mt-14 space-y-4">
           {tools.map((tool, i) => (
-            <Reveal key={tool.href} delayMs={i * 80}>
+            <Reveal key={tool.href} delayMs={140 + i * 110} variant="slideUp">
               <li>
                 <Link
                   href={tool.href}

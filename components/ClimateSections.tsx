@@ -1,7 +1,11 @@
 "use client";
 
 import { CLIMATE_STATS } from "@/data/climate-stats";
-import { Reveal } from "./Reveal";
+import {
+  Reveal,
+  StaggerItem,
+  StaggerReveal,
+} from "@/components/motion";
 import { SectionAtmosphere } from "@/components/ui/section-atmosphere";
 import { VerdantWash } from "@/components/ui/verdant-accent";
 
@@ -11,20 +15,26 @@ export function ClimateReality() {
       <SectionAtmosphere variant="deep" />
       <VerdantWash tone="dark" speed={0.42} />
       <div className="section-inner relative z-[1]">
-        <Reveal>
-          <p className="eyebrow text-sprout">A realidade</p>
-          <h2 className="display mt-4 max-w-3xl text-3xl md:text-5xl">
-            Os números não pedem licença para mudar
-          </h2>
-          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-mist/70">
-            Antes de qualquer app, existe um planeta reagindo às nossas
-            escolhas.
-          </p>
-        </Reveal>
+        <StaggerReveal staggerChildren={0.11} delayChildren={0.04}>
+          <StaggerItem soft>
+            <p className="eyebrow text-sprout">A realidade</p>
+          </StaggerItem>
+          <StaggerItem>
+            <h2 className="display mt-4 max-w-3xl text-3xl md:text-5xl">
+              Os números não pedem licença para mudar
+            </h2>
+          </StaggerItem>
+          <StaggerItem soft>
+            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-mist/70">
+              Antes de qualquer app, existe um planeta reagindo às nossas
+              escolhas.
+            </p>
+          </StaggerItem>
+        </StaggerReveal>
 
         <ul className="mt-14 grid gap-x-12 gap-y-12 md:grid-cols-2">
           {CLIMATE_STATS.map((stat, i) => (
-            <Reveal key={stat.value} delayMs={i * 80}>
+            <Reveal key={stat.value} delayMs={140 + i * 100} variant="fadeUp">
               <li className="border-t border-mist/15 pt-6">
                 <p
                   className={`display text-3xl md:text-4xl ${

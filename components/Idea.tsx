@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Reveal } from "./Reveal";
+import { Reveal, StaggerItem, StaggerReveal } from "@/components/motion";
 import { SectionAtmosphere } from "@/components/ui/section-atmosphere";
 import { VerdantWash } from "@/components/ui/verdant-accent";
 
@@ -9,24 +9,33 @@ export function Idea() {
       <SectionAtmosphere variant="soft" />
       <VerdantWash tone="light" speed={0.36} />
       <div className="section-inner relative z-[1] grid items-center gap-12 md:grid-cols-[1.15fr_0.85fr] md:gap-16">
-        <Reveal>
-          <p className="eyebrow text-forest-mid">Nossa ideia</p>
-          <h2 className="display mt-4 text-3xl text-forest md:text-5xl">
-            A semente que vira broto
-          </h2>
-          <p className="lede mt-6 max-w-xl">
-            A EcoMind nasceu na escola. Em vez de só reagir às notícias, criamos
-            um app que educa sobre desmatamento e queimadas, oferece ferramentas
-            práticas e mostra caminhos concretos para agir.
-          </p>
-          <p className="lede mt-4 max-w-xl">
-            Pequenas ações plantadas hoje podem crescer em mudança real — na
-            escola, em casa e na comunidade.
-          </p>
-        </Reveal>
+        <StaggerReveal staggerChildren={0.1} delayChildren={0.04}>
+          <StaggerItem soft>
+            <p className="eyebrow text-forest-mid">Nossa ideia</p>
+          </StaggerItem>
+          <StaggerItem>
+            <h2 className="display mt-4 text-3xl text-forest md:text-5xl">
+              A semente que vira broto
+            </h2>
+          </StaggerItem>
+          <StaggerItem soft>
+            <p className="lede mt-6 max-w-xl">
+              A EcoMind nasceu na escola. Em vez de só reagir às notícias, criamos
+              um app que educa sobre desmatamento e queimadas, oferece ferramentas
+              práticas e mostra caminhos concretos para agir.
+            </p>
+          </StaggerItem>
+          <StaggerItem soft>
+            <p className="lede mt-4 max-w-xl">
+              Pequenas ações plantadas hoje podem crescer em mudança real — na
+              escola, em casa e na comunidade.
+            </p>
+          </StaggerItem>
+        </StaggerReveal>
 
         <Reveal
-          delayMs={120}
+          delayMs={160}
+          variant="scale"
           className="flex flex-col items-center justify-center text-center md:items-end md:text-right"
         >
           <Image

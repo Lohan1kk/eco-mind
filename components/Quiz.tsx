@@ -4,7 +4,14 @@ import { useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { QUIZ_QUESTIONS } from "@/data/quiz";
-import { enterTransition, pressTransition } from "./motion/variants";
+import {
+  enterTransition,
+  pressTransition,
+  softEase,
+  stagger,
+  staggerItemSoft,
+  tapPress,
+} from "@/components/motion";
 
 export function Quiz() {
   const [current, setCurrent] = useState(0);
@@ -86,7 +93,7 @@ export function Quiz() {
               type="button"
               onClick={reset}
               className="btn-primary cursor-pointer rounded-md bg-forest px-5 py-3 text-sm font-semibold text-mist"
-              whileTap={reduce ? undefined : { scale: 0.98 }}
+              whileTap={reduce ? undefined : tapPress}
               transition={pressTransition}
             >
               Jogar novamente
@@ -130,7 +137,12 @@ export function Quiz() {
           <h2 className="font-display text-lg font-semibold text-ink sm:text-xl">
             {question.q}
           </h2>
-          <div className="mt-6 grid gap-3">
+          <motion.div
+            className="mt-6 grid gap-3"
+            variants={stagger(0.05, 0.08)}
+            initial={reduce ? false : "hidden"}
+            animate="visible"
+          >
             {question.options.map((opt, i) => {
               const isCorrect = i === question.correct;
               const isSelected = i === selected;
@@ -150,6 +162,7 @@ export function Quiz() {
                   onClick={() => handleAnswer(i)}
                   disabled={selected !== null}
                   className={`flex cursor-pointer items-center gap-3 border px-4 py-3.5 text-left text-sm font-medium text-ink transition sm:text-base ${cls}`}
+                  variants={staggerItemSoft}
                   whileTap={
                     reduce || selected !== null ? undefined : { scale: 0.99 }
                   }
@@ -162,7 +175,7 @@ export function Quiz() {
                 </motion.button>
               );
             })}
-          </div>
+          </motion.div>
 
           <AnimatePresence>
             {selected !== null ? (
@@ -171,7 +184,7 @@ export function Quiz() {
                 initial={reduce ? false : { opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={reduce ? undefined : { opacity: 0 }}
-                transition={{ duration: reduce ? 0 : 0.35 }}
+                transition={{ duration: reduce ? 0 : 0.35, ease: softEase }}
               >
                 {question.feedback}
               </motion.p>

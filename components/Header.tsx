@@ -2,7 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
+import {
+  enterTransition,
+  fadeUp,
+  pressTransition,
+  stagger,
+  staggerItemSoft,
+} from "@/components/motion";
 
 const links = [
   { href: "/#problema", label: "Problema" },
@@ -16,6 +24,7 @@ const links = [
 export function Header({ solid = false }: { solid?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const reduce = useReducedMotion();
   const isSolid = solid || scrolled || open;
 
   useEffect(() => {
@@ -59,7 +68,9 @@ export function Header({ solid = false }: { solid?: boolean }) {
               key={link.href}
               href={link.href}
               className={`text-sm font-medium tracking-wide ${
-                isSolid ? "text-ink/75 hover:text-forest" : "text-mist/85 hover:text-mist"
+                isSolid
+                  ? "text-ink/75 hover:text-forest"
+                  : "text-mist/85 hover:text-mist"
               }`}
             >
               {link.label}
@@ -83,32 +94,46 @@ export function Header({ solid = false }: { solid?: boolean }) {
         </button>
       </div>
 
-      {open ? (
-        <nav className="border-t border-[var(--line)] bg-mist px-5 py-5 xl:hidden">
-          <ul className="flex flex-col gap-3">
-            {links.map((link) => (
-              <li key={link.href}>
+      <AnimatePresence initial={false}>
+        {open ? (
+          <motion.nav
+            key="mobile-nav"
+            className="overflow-hidden border-t border-[var(--line)] bg-mist xl:hidden"
+            initial={reduce ? false : { height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={reduce ? undefined : { height: 0, opacity: 0 }}
+            transition={reduce ? { duration: 0 } : enterTransition}
+          >
+            <motion.ul
+              className="flex flex-col gap-3 px-5 py-5"
+              variants={stagger(0.05, 0.04)}
+              initial={reduce ? false : "hidden"}
+              animate="visible"
+            >
+              {links.map((link) => (
+                <motion.li key={link.href} variants={staggerItemSoft}>
+                  <Link
+                    href={link.href}
+                    className="block py-1 text-base font-medium text-ink"
+                    onClick={() => setOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                </motion.li>
+              ))}
+              <motion.li variants={fadeUp} transition={pressTransition}>
                 <Link
-                  href={link.href}
-                  className="block py-1 text-base font-medium text-ink"
+                  href="/#agir"
+                  className="btn btn-dark mt-2"
                   onClick={() => setOpen(false)}
                 >
-                  {link.label}
+                  Começar
                 </Link>
-              </li>
-            ))}
-            <li>
-              <Link
-                href="/#agir"
-                className="btn btn-dark mt-2"
-                onClick={() => setOpen(false)}
-              >
-                Começar
-              </Link>
-            </li>
-          </ul>
-        </nav>
-      ) : null}
+              </motion.li>
+            </motion.ul>
+          </motion.nav>
+        ) : null}
+      </AnimatePresence>
     </header>
   );
 }

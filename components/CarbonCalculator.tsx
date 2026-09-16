@@ -13,7 +13,7 @@ import {
   calculateFootprint,
   type TransportMode,
 } from "@/lib/carbon/calculate";
-import { pressTransition } from "./motion/variants";
+import { pressTransition, tapSoft } from "@/components/motion";
 
 const TRANSPORT_OPTIONS: {
   mode: TransportMode;
@@ -88,7 +88,7 @@ export function CarbonCalculator() {
                     ? "bg-sprout text-ink"
                     : "border border-mist/25 text-mist/90 hover:border-sprout/50"
                 }`}
-                whileTap={reduce ? undefined : { scale: 0.97 }}
+                whileTap={reduce ? undefined : tapSoft}
                 transition={pressTransition}
               >
                 {opt.label}

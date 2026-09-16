@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
 import { HIDE_BOTTOM_NAV } from "@/lib/pwa";
-import { pressTransition } from "@/components/motion/variants";
+import { pressTransition } from "@/components/motion";
 
 const NAV = [
   { href: "/", label: "Início" },

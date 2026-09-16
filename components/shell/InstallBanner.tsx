@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { enterTransition, softEase } from "@/components/motion";
 import {
   hidesBottomNav,
   isIosDevice,
@@ -22,6 +24,7 @@ function readDismissed() {
 export function InstallBanner() {
   const pathname = usePathname();
   const hideNav = hidesBottomNav(pathname);
+  const reduce = useReducedMotion();
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(
     null,
   );
@@ -61,57 +64,70 @@ export function InstallBanner() {
     sessionStorage.setItem("ecomind-install-dismissed", "1");
   }
 
-  if (installed || dismissed) return null;
-
   const showAndroid = Boolean(deferred);
   const showIos = !deferred && iosHint;
-  if (!showAndroid && !showIos) return null;
+  const visible = !installed && !dismissed && (showAndroid || showIos);
 
   const bottomClass = hideNav
     ? "bottom-[max(1rem,env(safe-area-inset-bottom))]"
     : "bottom-[calc(4.5rem+env(safe-area-inset-bottom))]";
 
   return (
-    <div
-      className={`fixed inset-x-0 z-40 mx-4 ${bottomClass} md:bottom-4 md:left-auto md:right-4 md:mx-0 md:max-w-sm`}
-    >
-      <div className="flex items-start gap-3 rounded-xl border border-forest/15 bg-white/95 p-4 shadow-lg backdrop-blur-md">
-        <div className="flex-1">
-          <p className="text-sm font-semibold text-forest">
-            {showAndroid ? "Instalar EcoMind" : "Adicionar à Tela de Início"}
-          </p>
-          <p className="mt-0.5 text-xs leading-relaxed text-ash">
-            {showAndroid
-              ? "Acesso rápido na tela inicial do aparelho."
-              : "No iPhone: Safari → Compartilhar → Adicionar à Tela de Início."}
-          </p>
-          {showIos ? (
-            <Link
-              href="/baixar"
-              className="mt-2 inline-block text-xs font-semibold text-forest underline-offset-2 hover:underline"
-            >
-              Ver passo a passo
-            </Link>
-          ) : null}
-        </div>
-        {showAndroid ? (
-          <button
-            type="button"
-            onClick={install}
-            className="shrink-0 rounded-md bg-forest px-3 py-2 text-xs font-semibold text-mist"
-          >
-            Instalar
-          </button>
-        ) : null}
-        <button
-          type="button"
-          onClick={dismiss}
-          aria-label="Fechar"
-          className="shrink-0 text-ash/60 hover:text-ash"
+    <AnimatePresence>
+      {visible ? (
+        <motion.div
+          key="install-banner"
+          className={`fixed inset-x-0 z-40 mx-4 ${bottomClass} md:bottom-4 md:left-auto md:right-4 md:mx-0 md:max-w-sm`}
+          initial={reduce ? false : { opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={reduce ? undefined : { opacity: 0, y: 12 }}
+          transition={
+            reduce
+              ? { duration: 0 }
+              : { ...enterTransition, ease: softEase }
+          }
         >
-          ✕
-        </button>
-      </div>
-    </div>
+          <div className="flex items-start gap-3 rounded-xl border border-forest/15 bg-white/95 p-4 shadow-lg backdrop-blur-md">
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-forest">
+                {showAndroid
+                  ? "Instalar EcoMind"
+                  : "Adicionar à Tela de Início"}
+              </p>
+              <p className="mt-0.5 text-xs leading-relaxed text-ash">
+                {showAndroid
+                  ? "Acesso rápido na tela inicial do aparelho."
+                  : "No iPhone: Safari → Compartilhar → Adicionar à Tela de Início."}
+              </p>
+              {showIos ? (
+                <Link
+                  href="/baixar"
+                  className="mt-2 inline-block text-xs font-semibold text-forest underline-offset-2 hover:underline"
+                >
+                  Ver passo a passo
+                </Link>
+              ) : null}
+            </div>
+            {showAndroid ? (
+              <button
+                type="button"
+                onClick={install}
+                className="shrink-0 rounded-md bg-forest px-3 py-2 text-xs font-semibold text-mist"
+              >
+                Instalar
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={dismiss}
+              aria-label="Fechar"
+              className="shrink-0 text-ash/60 hover:text-ash"
+            >
+              ✕
+            </button>
+          </div>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
   );
 }
