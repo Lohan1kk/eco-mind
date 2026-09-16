@@ -7,7 +7,7 @@ export function Idea() {
   return (
     <section id="ideia" className="section section-botanical relative overflow-hidden">
       <SectionAtmosphere variant="soft" />
-      <VerdantWash tone="light" speed={1.0} />
+      <VerdantWash tone="light" speed={0.36} />
       <div className="section-inner relative z-[1] grid items-center gap-12 md:grid-cols-[1.15fr_0.85fr] md:gap-16">
         <Reveal>
           <p className="eyebrow text-forest-mid">Nossa ideia</p>

@@ -9,7 +9,7 @@ export function ClimateReality() {
   return (
     <section id="realidade" className="section relative overflow-hidden bg-[#101c15] text-mist">
       <SectionAtmosphere variant="deep" />
-      <VerdantWash tone="dark" speed={1.1} />
+      <VerdantWash tone="dark" speed={0.42} />
       <div className="section-inner relative z-[1]">
         <Reveal>
           <p className="eyebrow text-sprout">A realidade</p>

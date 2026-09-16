@@ -77,33 +77,33 @@ void main() {
   vec2 p = (uv - 0.5) * vec2(aspect, 1.0);
 
   float e = max(u_energy, 1.0);
-  float t = u_time * u_speed * (0.85 + 0.25 * e);
+  float t = u_time * u_speed * (0.7 + 0.2 * e);
 
   // Silk swirl: rotate + dual domain warp (energy makes flow livelier)
-  float ang = t * (0.12 + 0.08 * (e - 1.0));
+  float ang = t * (0.08 + 0.04 * (e - 1.0));
   float ca = cos(ang);
   float sa = sin(ang);
   p = mat2(ca, -sa, sa, ca) * p;
 
-  float warp = 0.85 + 0.35 * (e - 1.0);
-  float n1 = fbm(p * 2.2 + vec2(t * 0.18, -t * 0.1));
-  vec2 q = p + vec2(n1 * warp, fbm(p * 2.0 - t * 0.12) * warp);
-  float n2 = fbm(q * 2.6 + vec2(-t * 0.14, t * 0.22));
-  vec2 r = q + vec2(n2 * (0.7 + 0.2 * (e - 1.0)), fbm(q * 3.1 + t * 0.11) * 0.7);
+  float warp = 0.7 + 0.25 * (e - 1.0);
+  float n1 = fbm(p * 2.0 + vec2(t * 0.1, -t * 0.06));
+  vec2 q = p + vec2(n1 * warp, fbm(p * 1.85 - t * 0.07) * warp);
+  float n2 = fbm(q * 2.35 + vec2(-t * 0.08, t * 0.12));
+  vec2 r = q + vec2(n2 * (0.55 + 0.15 * (e - 1.0)), fbm(q * 2.8 + t * 0.06) * 0.55);
 
-  float silk = fbm(r * 2.4 + t * 0.07);
-  silk = silk * 0.68 + n2 * 0.32;
+  float silk = fbm(r * 2.15 + t * 0.04);
+  silk = silk * 0.7 + n2 * 0.3;
 
   // Soft vignette keeps edges deep green
   float vig = smoothstep(1.35, 0.15, length(p * 1.05));
   silk = mix(silk * 0.35, silk, vig);
 
   vec3 col = palette(silk);
-  // Silk sheen — stronger when energy > 1
-  float sheen = (0.04 + 0.05 * (e - 1.0)) * sin(silk * 6.28318 + t * (1.0 + 0.4 * (e - 1.0)));
-  col += u_c4 * (sheen + 0.02 + 0.015 * (e - 1.0));
-  // Extra sprout flicker for living wash
-  col = mix(col, u_c3, 0.06 * (e - 1.0) * (0.5 + 0.5 * sin(t * 1.7 + silk * 4.0)));
+  // Silk sheen — gentle when energy is near 1
+  float sheen = (0.03 + 0.03 * (e - 1.0)) * sin(silk * 6.28318 + t * (0.7 + 0.2 * (e - 1.0)));
+  col += u_c4 * (sheen + 0.015 + 0.01 * (e - 1.0));
+  // Soft sprout drift for living wash
+  col = mix(col, u_c3, 0.04 * (e - 1.0) * (0.5 + 0.5 * sin(t * 0.9 + silk * 3.0)));
 
   gl_FragColor = vec4(col, 1.0);
 }

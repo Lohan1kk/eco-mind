@@ -24,7 +24,7 @@ export function Problem() {
   return (
     <section id="problema" className="section section-warm relative overflow-hidden">
       <SectionAtmosphere variant="mist" />
-      <VerdantWash tone="light" speed={1.05} />
+      <VerdantWash tone="light" speed={0.38} />
       <div className="section-inner relative z-[1]">
         <Reveal>
           <p className="eyebrow text-burn">O problema</p>

@@ -30,7 +30,7 @@ export function Team() {
   return (
     <section id="equipe" className="section section-soft relative overflow-hidden">
       <SectionAtmosphere variant="soft" />
-      <VerdantWash tone="light" speed={1.0} />
+      <VerdantWash tone="light" speed={0.35} />
       <div className="section-inner relative z-[1]">
         <Reveal>
           <p className="eyebrow text-forest-mid">Equipe</p>

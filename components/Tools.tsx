@@ -31,7 +31,7 @@ export function Tools() {
   return (
     <section id="ferramentas" className="section section-soft relative overflow-hidden">
       <SectionAtmosphere variant="soft" />
-      <VerdantWash tone="light" speed={1.02} />
+      <VerdantWash tone="light" speed={0.37} />
       <div className="section-inner relative z-[1]">
         <Reveal>
           <p className="eyebrow text-forest-mid">Ferramentas</p>

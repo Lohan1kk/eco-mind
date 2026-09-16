@@ -13,7 +13,7 @@ export function School() {
   return (
     <section id="escola" className="section relative overflow-hidden bg-forest text-mist">
       <SectionAtmosphere variant="deep" />
-      <VerdantWash tone="dark" speed={1.05} />
+      <VerdantWash tone="dark" speed={0.4} />
       <div className="section-inner relative z-[1]">
         <Reveal>
           <p className="eyebrow text-sprout">Na escola</p>

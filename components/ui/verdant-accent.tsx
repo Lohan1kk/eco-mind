@@ -6,7 +6,7 @@ import { VerdantSwirl } from "@/components/ui/verdant-swirl";
 type VerdantWashProps = {
   /** light = botanical/cream sections; dark = forest panels */
   tone?: "light" | "dark";
-  /** Animation speed (default 1.05 — slightly livelier than CTA) */
+  /** Animation speed (default 0.4 — slow and smooth) */
   speed?: number;
   className?: string;
 };
@@ -18,7 +18,7 @@ type VerdantWashProps = {
  */
 export function VerdantWash({
   tone = "light",
-  speed = 1.05,
+  speed = 0.4,
   className = "",
 }: VerdantWashProps) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -45,7 +45,7 @@ export function VerdantWash({
         <VerdantSwirl
           className="verdant-wash__shader"
           speed={speed}
-          energy={1.15}
+          energy={1.05}
           maxDpr={1.25}
           active={visible}
           opacity={1}

@@ -24,7 +24,7 @@ export function HowItWorks() {
   return (
     <section id="como-funciona" className="section section-botanical relative overflow-hidden">
       <SectionAtmosphere variant="soft" />
-      <VerdantWash tone="light" speed={1.08} />
+      <VerdantWash tone="light" speed={0.4} />
       <div className="section-inner relative z-[1]">
         <Reveal>
           <p className="eyebrow text-forest-mid">Como funciona</p>
