@@ -1,5 +1,6 @@
 import { Reveal } from "./Reveal";
 import { SectionAtmosphere } from "@/components/ui/section-atmosphere";
+import { VerdantAccent } from "@/components/ui/verdant-accent";
 
 const points = [
   "Aprendizado ativo: o aluno participa, não só assiste",
@@ -12,6 +13,7 @@ export function School() {
   return (
     <section id="escola" className="section relative overflow-hidden bg-forest text-mist">
       <SectionAtmosphere variant="deep" />
+      <VerdantAccent corner="br" tone="dark" speed={0.78} />
       <div className="section-inner relative z-[1]">
         <Reveal>
           <p className="eyebrow text-sprout">Na escola</p>

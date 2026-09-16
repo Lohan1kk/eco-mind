@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Reveal } from "./Reveal";
 import { SectionAtmosphere } from "@/components/ui/section-atmosphere";
+import { VerdantAccent } from "@/components/ui/verdant-accent";
 
 const tools = [
   {
@@ -30,6 +31,7 @@ export function Tools() {
   return (
     <section id="ferramentas" className="section section-soft relative overflow-hidden">
       <SectionAtmosphere variant="soft" />
+      <VerdantAccent corner="br" tone="light" speed={0.68} />
       <div className="section-inner relative z-[1]">
         <Reveal>
           <p className="eyebrow text-forest-mid">Ferramentas</p>
