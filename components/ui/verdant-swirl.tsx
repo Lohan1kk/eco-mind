@@ -234,7 +234,8 @@ export function VerdantSwirl({
   }, [active, docVisible]);
 
   const resolvedMaxDpr = maxDpr ?? perf.verdantMaxDpr;
-  const useWebgl = !cssFallback && !reduce && perf.verdantWebgl;
+  // Prefer WebGL whenever the browser allows it; CSS only for reduced-motion
+  const useWebgl = !cssFallback && !reduce;
 
   useEffect(() => {
     if (!useWebgl) return;
@@ -247,7 +248,7 @@ export function VerdantSwirl({
       antialias: false,
       depth: false,
       stencil: false,
-      powerPreference: "low-power",
+      powerPreference: "default",
     });
     if (!gl) return;
 
@@ -301,7 +302,7 @@ export function VerdantSwirl({
     gl.uniform1f(uSpeed, reduce ? 0 : speed);
     gl.uniform1f(uEnergy, energy);
     gl.uniform1f(uKey, palette === "mist" ? 0.55 : palette === "glow" ? 0.25 : 0);
-    gl.uniform1f(uOctaves, perf.tier === "high" ? 5 : 3);
+    gl.uniform1f(uOctaves, perf.tier === "low" ? 3 : 5);
 
     let raf = 0;
     const start = performance.now();

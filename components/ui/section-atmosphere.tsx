@@ -33,7 +33,7 @@ export function SectionAtmosphere({
     return () => io.disconnect();
   }, []);
 
-  const paused = reduce || !on || perf.tier === "low";
+  const paused = reduce || !on;
 
   return (
     <div
