@@ -15,7 +15,7 @@ export default function QuizPage() {
   return (
     <>
       <Header solid />
-      <PageAtmosphereShell variant="mist" className="bg-mist pt-24 pb-16">
+      <PageAtmosphereShell variant="mist" wash="light" className="bg-mist pt-24 pb-16">
         <div className="section-inner">
           <PageIntro
             eyebrow="Educar"
