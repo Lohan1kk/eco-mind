@@ -166,7 +166,7 @@ export function ForestAtmosphere({
     activeRef.current = active && docVisible;
   }, [intensity, active, docVisible]);
 
-  const useWebgl = !reduce && perf.forestWebgl;
+  const useWebgl = !reduce;
 
   useEffect(() => {
     if (!useWebgl) return;
@@ -180,7 +180,7 @@ export function ForestAtmosphere({
       antialias: false,
       depth: false,
       stencil: false,
-      powerPreference: "low-power",
+      powerPreference: "default",
     });
     if (!gl) return;
 
@@ -219,7 +219,7 @@ export function ForestAtmosphere({
     const uPointer = gl.getUniformLocation(program, "u_pointer");
     const uOctaves = gl.getUniformLocation(program, "u_octaves");
 
-    const octaves = perf.tier === "high" ? 5 : 3;
+    const octaves = perf.tier === "low" ? 3 : 5;
     gl.uniform1f(uOctaves, octaves);
 
     let raf = 0;

@@ -1,7 +1,7 @@
 /**
  * Adaptive visual quality for EcoMind.
- * Keeps the look on capable devices; dials GPU/CPU load down on weaker ones
- * without collapsing to a bare layout.
+ * Shaders (Verdant / Forest) stay on for every tier — only DPR/FPS dial down.
+ * CSS fallbacks are reserved for reduced-motion / missing WebGL only.
  */
 
 export type PerfTier = "high" | "medium" | "low";
@@ -13,11 +13,11 @@ export type PerfProfile = {
   smokeMaxParticles: number;
   smokeSpawnDesktop: number;
   smokeSpawnTouch: number;
-  /** Full-bleed WebGL washes (Verdant) — false → CSS silk fallback */
+  /** Full-bleed WebGL washes (Verdant) — always on unless reduced-motion */
   verdantWebgl: boolean;
   verdantMaxDpr: number;
   verdantTargetFps: number;
-  /** Hero forest mist shader */
+  /** Hero forest mist shader — always on unless reduced-motion */
   forestWebgl: boolean;
   forestMaxDpr: number;
   forestTargetFps: number;
@@ -57,34 +57,35 @@ const MEDIUM: PerfProfile = {
   smokeSpawnDesktop: 1,
   smokeSpawnTouch: 2,
   verdantWebgl: true,
+  verdantMaxDpr: 1.25,
+  verdantTargetFps: 45,
+  forestWebgl: true,
+  forestMaxDpr: 1.25,
+  forestTargetFps: 45,
+  heroSrc: "/brand/hero-ecomind-hq.jpg",
+  heroQuality: 88,
+  heroKenBurns: true,
+  mapMaxAlerts: 280,
+  atmosphereGrain: true,
+};
+
+const LOW: PerfProfile = {
+  tier: "low",
+  smokeCursor: true,
+  smokeMaxParticles: 48,
+  smokeSpawnDesktop: 1,
+  smokeSpawnTouch: 1,
+  // Keep shaders alive — lighter fill rate, not CSS substitute
+  verdantWebgl: true,
   verdantMaxDpr: 1,
   verdantTargetFps: 30,
   forestWebgl: true,
   forestMaxDpr: 1,
   forestTargetFps: 30,
   heroSrc: "/brand/hero-ecomind-hq.jpg",
-  heroQuality: 85,
+  heroQuality: 82,
   heroKenBurns: true,
-  mapMaxAlerts: 220,
-  atmosphereGrain: true,
-};
-
-const LOW: PerfProfile = {
-  tier: "low",
-  smokeCursor: false,
-  smokeMaxParticles: 0,
-  smokeSpawnDesktop: 0,
-  smokeSpawnTouch: 0,
-  verdantWebgl: false,
-  verdantMaxDpr: 1,
-  verdantTargetFps: 20,
-  forestWebgl: false,
-  forestMaxDpr: 1,
-  forestTargetFps: 20,
-  heroSrc: "/brand/hero-ecomind-hq.jpg",
-  heroQuality: 80,
-  heroKenBurns: false,
-  mapMaxAlerts: 120,
+  mapMaxAlerts: 160,
   atmosphereGrain: false,
 };
 
@@ -107,35 +108,24 @@ function prefersReducedData(): boolean {
 }
 
 /**
- * Heuristic device tier. Conservative on phones so mid-range Androids stay smooth.
+ * Device tier. Phones default to medium (shaders on).
+ * Low is only for clearly constrained hardware / save-data.
  */
 export function detectPerfTier(): PerfTier {
   if (typeof window === "undefined") return "medium";
 
-  try {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      return "low";
-    }
-  } catch {
-    /* ignore */
-  }
-
+  // Accessibility: still report low so callers can soften motion elsewhere,
+  // but WebGL flags stay true — components gate on prefers-reduced-motion.
   if (prefersReducedData()) return "low";
 
   const nav = navigator as NavigatorWithMemory;
   const cores = nav.hardwareConcurrency || 4;
-  const memory = nav.deviceMemory; // Chrome only; undefined elsewhere
+  const memory = nav.deviceMemory;
   const coarse = isCoarsePointer();
-  const dpr = Math.min(window.devicePixelRatio || 1, 3);
-  const smallScreen = Math.min(window.innerWidth, window.innerHeight) < 500;
 
-  // Explicit low signals
   if (memory !== undefined && memory <= 2) return "low";
   if (cores <= 2) return "low";
-  if (coarse && memory !== undefined && memory <= 4) return "low";
-  if (coarse && cores <= 4 && (smallScreen || dpr >= 2.5)) return "low";
 
-  // Mid phones / modest laptops
   if (coarse) return "medium";
   if (memory !== undefined && memory <= 4) return "medium";
   if (cores <= 4) return "medium";

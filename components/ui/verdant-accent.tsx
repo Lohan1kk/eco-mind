@@ -55,11 +55,10 @@ export function VerdantWash({
           className="verdant-wash__shader"
           speed={speed}
           energy={isLight ? 1.08 : 1.02}
-          maxDpr={Math.min(1.2, perf.verdantMaxDpr)}
+          maxDpr={perf.verdantMaxDpr}
           active={visible}
           opacity={1}
           palette={isLight ? "mist" : "glow"}
-          cssFallback={!perf.verdantWebgl}
         />
       ) : null}
       <div className="verdant-wash__veil" />
