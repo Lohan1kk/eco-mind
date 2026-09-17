@@ -1,37 +1,25 @@
 import type { Metadata } from "next";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
-import { PageIntro } from "@/components/PageIntro";
-import { Quiz } from "@/components/Quiz";
+import { QuizPageClient } from "@/components/QuizPageClient";
 import { PageAtmosphereShell } from "@/components/ui/page-atmosphere-shell";
 
 export const metadata: Metadata = {
-  title: "Quiz ambiental",
+  title: "Quiz ambiental e gincana do folclore",
   description:
-    "Quiz sobre o conteúdo da EcoMind: desmatamento, queimadas, ferramentas do app e dados do clima.",
+    "Quiz sobre a EcoMind e gincana do folclore brasileiro — Curupira, Caipora, Boitatá e mais, ligados à proteção da natureza.",
 };
 
 export default function QuizPage() {
   return (
     <>
       <Header solid />
-      <PageAtmosphereShell variant="mist" wash="light" className="bg-mist pt-24 pb-16">
-        <div className="section-inner">
-          <PageIntro
-            eyebrow="Educar"
-            title="Quanto você sabe sobre a EcoMind?"
-            eyebrowClassName="eyebrow text-forest-mid"
-            titleClassName="display mt-3 text-3xl text-forest md:text-5xl"
-          >
-            <p className="lede mt-4 max-w-xl">
-              Dez perguntas baseadas nos textos e dados do site — com feedback
-              imediato após cada resposta.
-            </p>
-          </PageIntro>
-          <div className="mt-12">
-            <Quiz />
-          </div>
-        </div>
+      <PageAtmosphereShell
+        variant="mist"
+        wash="light"
+        className="bg-mist pt-24 pb-16"
+      >
+        <QuizPageClient />
       </PageAtmosphereShell>
       <Footer />
     </>
