@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, type MutableRefObject } from "react";
 import { useReducedMotion } from "framer-motion";
+import { useLowPowerMode } from "@/hooks/useLowPowerMode";
 
 /**
  * Atmospheric forest mist + god-ray shader for EcoMind hero.
- * Transparent WebGL overlay — reads pointer from a ref (no React re-renders).
+ * Transparent WebGL overlay — skipped on phones / low-power devices.
  */
 const VERT = `
 attribute vec2 a_position;
@@ -15,7 +16,7 @@ void main() {
 `;
 
 const FRAG = `
-precision highp float;
+precision mediump float;
 
 uniform float u_time;
 uniform vec2 u_resolution;
@@ -43,7 +44,7 @@ float fbm(vec2 p) {
   float v = 0.0;
   float a = 0.5;
   mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 3; i++) {
     v += a * noise(p);
     p = m * p * 1.05;
     a *= 0.5;
@@ -123,16 +124,21 @@ export function ForestAtmosphere({
 }: ForestAtmosphereProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const reduce = useReducedMotion();
+  const lowPower = useLowPowerMode();
   const localPointer = useRef<Pointer>({ x: 0, y: 0 });
   const intensityRef = useRef(intensity);
   const activeRef = useRef(active);
+  const kickRef = useRef<(() => void) | null>(null);
   intensityRef.current = intensity;
   activeRef.current = active;
 
   useEffect(() => {
+    if (lowPower) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    let lost = false;
     const gl = canvas.getContext("webgl", {
       alpha: true,
       premultipliedAlpha: true,
@@ -140,23 +146,37 @@ export function ForestAtmosphere({
       depth: false,
       stencil: false,
       powerPreference: "low-power",
+      failIfMajorPerformanceCaveat: true,
     });
     if (!gl) return;
+
+    const onLost = (e: Event) => {
+      e.preventDefault();
+      lost = true;
+    };
+    canvas.addEventListener("webglcontextlost", onLost, false);
 
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     const vs = compile(gl, gl.VERTEX_SHADER, VERT);
     const fs = compile(gl, gl.FRAGMENT_SHADER, FRAG);
-    if (!vs || !fs) return;
+    if (!vs || !fs) {
+      canvas.removeEventListener("webglcontextlost", onLost);
+      return;
+    }
 
     const program = gl.createProgram();
-    if (!program) return;
+    if (!program) {
+      canvas.removeEventListener("webglcontextlost", onLost);
+      return;
+    }
     gl.attachShader(program, vs);
     gl.attachShader(program, fs);
     gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
       console.warn(gl.getProgramInfoLog(program));
+      canvas.removeEventListener("webglcontextlost", onLost);
       return;
     }
     gl.useProgram(program);
@@ -184,7 +204,7 @@ export function ForestAtmosphere({
     let lastH = 0;
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
       const pw = Math.max(1, Math.floor(w * dpr));
@@ -204,11 +224,8 @@ export function ForestAtmosphere({
       }
     };
 
-    const draw = (now: number) => {
-      if (!activeRef.current && !frozen) {
-        raf = requestAnimationFrame(draw);
-        return;
-      }
+    const paint = (now: number) => {
+      if (lost) return;
       resize();
       const ptr = pointerRef?.current ?? localPointer.current;
       const t = frozen ? 2.4 : (now - start) / 1000;
@@ -218,28 +235,56 @@ export function ForestAtmosphere({
       gl.uniform1f(uIntensity, intensityRef.current);
       gl.uniform2f(uPointer, ptr.x, ptr.y);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
+    };
+
+    const draw = (now: number) => {
+      if (lost) return;
+      if (!activeRef.current && !frozen) {
+        // Stop the loop while offscreen — do not spin empty RAFs
+        return;
+      }
+      paint(now);
       if (!frozen) raf = requestAnimationFrame(draw);
     };
 
-    resize();
-    if (frozen) draw(performance.now());
-    else raf = requestAnimationFrame(draw);
-
-    const onResize = () => {
-      resize();
-      if (frozen) draw(performance.now());
+    const kick = () => {
+      cancelAnimationFrame(raf);
+      if (lost) return;
+      if (frozen) {
+        paint(performance.now());
+        return;
+      }
+      if (!activeRef.current) {
+        paint(performance.now());
+        return;
+      }
+      raf = requestAnimationFrame(draw);
     };
+    kickRef.current = kick;
+
+    resize();
+    kick();
+
+    const onResize = () => kick();
     window.addEventListener("resize", onResize);
 
     return () => {
+      kickRef.current = null;
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);
+      canvas.removeEventListener("webglcontextlost", onLost);
       gl.deleteProgram(program);
       gl.deleteShader(vs);
       gl.deleteShader(fs);
       gl.deleteBuffer(buf);
     };
-  }, [reduce, pointerRef]);
+  }, [reduce, lowPower, pointerRef]);
+
+  useEffect(() => {
+    kickRef.current?.();
+  }, [active]);
+
+  if (lowPower) return null;
 
   return (
     <canvas

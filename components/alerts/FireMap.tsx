@@ -13,7 +13,21 @@ import { ReportFireModal } from "./ReportFireModal";
 
 type MapLayer = "map" | "satellite";
 
-const MAX_VISIBLE_ALERTS = 400;
+const MAX_VISIBLE_ALERTS_DESKTOP = 400;
+const MAX_VISIBLE_ALERTS_MOBILE = 120;
+
+function maxVisibleAlerts(): number {
+  if (typeof window === "undefined") return MAX_VISIBLE_ALERTS_DESKTOP;
+  try {
+    const narrow = window.matchMedia("(max-width: 768px)").matches;
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
+    return narrow || coarse
+      ? MAX_VISIBLE_ALERTS_MOBILE
+      : MAX_VISIBLE_ALERTS_DESKTOP;
+  } catch {
+    return MAX_VISIBLE_ALERTS_MOBILE;
+  }
+}
 
 interface FiresMeta {
   count: number;
@@ -211,7 +225,7 @@ export default function FireMap() {
         ? alerts
         : alerts.filter((a) => a.level === levelFilter);
 
-    return selectVisibleAlerts(byLevel, MAX_VISIBLE_ALERTS);
+    return selectVisibleAlerts(byLevel, maxVisibleAlerts());
   }, [alerts, levelFilter]);
 
   const levelCounts = ALERT_LEVELS.reduce(
