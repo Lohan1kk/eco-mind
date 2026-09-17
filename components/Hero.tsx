@@ -15,8 +15,8 @@ import {
   tapPress,
 } from "@/components/motion";
 
-/** True 4K forest photograph (not AI-upscaled). */
-const BG = "/brand/hero-ecomind-4k.jpg";
+/** HQ hero — lighter than 4K so phones can decode without OOM. */
+const BG = "/brand/hero-ecomind-hq.jpg";
 
 export function Hero() {
   const reduce = useReducedMotion();
@@ -70,8 +70,8 @@ export function Hero() {
           alt=""
           fill
           priority
-          quality={92}
-          sizes="100vw"
+          quality={78}
+          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 100vw, 1920px"
           className="object-cover object-[52%_38%]"
         />
       </motion.div>

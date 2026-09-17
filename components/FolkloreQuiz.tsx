@@ -161,7 +161,8 @@ export function FolkloreQuiz({ onChangeMode }: { onChangeMode: () => void }) {
               width={640}
               height={640}
               className="aspect-square h-auto w-full object-cover"
-              sizes="(max-width: 672px) 100vw, 640px"
+              sizes="(max-width: 672px) 92vw, 480px"
+              quality={75}
               priority={current === 0}
             />
           </div>

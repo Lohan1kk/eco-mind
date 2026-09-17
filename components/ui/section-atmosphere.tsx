@@ -2,12 +2,13 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useReducedMotion } from "framer-motion";
+import { useLowPowerMode } from "@/hooks/useLowPowerMode";
 
 type Variant = "mist" | "soft" | "deep";
 
 /**
  * Lightweight CSS atmosphere for content sections.
- * No WebGL — safe to mount on every home section without freezing the page.
+ * No WebGL — grain/animation skipped on phones to cut compositor cost.
  */
 export function SectionAtmosphere({
   variant = "soft",
@@ -17,6 +18,7 @@ export function SectionAtmosphere({
   className?: string;
 }) {
   const reduce = useReducedMotion();
+  const lowPower = useLowPowerMode();
   const rootRef = useRef<HTMLDivElement>(null);
   const [on, setOn] = useState(true);
 
@@ -31,7 +33,7 @@ export function SectionAtmosphere({
     return () => io.disconnect();
   }, []);
 
-  const paused = reduce || !on;
+  const paused = reduce || lowPower || !on;
 
   return (
     <div
@@ -44,7 +46,11 @@ export function SectionAtmosphere({
           paused ? "is-paused" : ""
         }`}
       />
-      <div className={`section-atmosphere-grain ${paused ? "is-paused" : ""}`} />
+      {!lowPower ? (
+        <div
+          className={`section-atmosphere-grain ${paused ? "is-paused" : ""}`}
+        />
+      ) : null}
     </div>
   );
 }

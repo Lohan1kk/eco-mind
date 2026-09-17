@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { VerdantSwirl } from "@/components/ui/verdant-swirl";
+import { useLowPowerMode } from "@/hooks/useLowPowerMode";
 
 type VerdantWashProps = {
   /** light = pale mist under ink; dark = muted sage on forest panels */
@@ -13,8 +14,7 @@ type VerdantWashProps = {
 
 /**
  * Full-bleed rectangular wash behind section content.
- * Light tone: soft celadon mist (more visible silk, gentle reading plate).
- * Dark tone: muted sage glow — leave as-is when refining light only.
+ * CSS veil/plate always render; WebGL swirl only on capable desktops.
  */
 export function VerdantWash({
   tone = "light",
@@ -23,17 +23,19 @@ export function VerdantWash({
 }: VerdantWashProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
+  const lowPower = useLowPowerMode();
 
   useEffect(() => {
+    if (lowPower) return;
     const node = rootRef.current;
     if (!node) return;
     const io = new IntersectionObserver(
       ([entry]) => setVisible(entry.isIntersecting),
-      { rootMargin: "160px", threshold: 0.01 },
+      { rootMargin: "40px", threshold: 0.01 },
     );
     io.observe(node);
     return () => io.disconnect();
-  }, []);
+  }, [lowPower]);
 
   const isLight = tone === "light";
 
@@ -43,12 +45,12 @@ export function VerdantWash({
       aria-hidden
       className={`verdant-wash verdant-wash--${tone} ${className}`}
     >
-      {visible ? (
+      {!lowPower && visible ? (
         <VerdantSwirl
           className="verdant-wash__shader"
           speed={speed}
           energy={isLight ? 1.08 : 1.02}
-          maxDpr={1.2}
+          maxDpr={1}
           active={visible}
           opacity={1}
           palette={isLight ? "mist" : "glow"}

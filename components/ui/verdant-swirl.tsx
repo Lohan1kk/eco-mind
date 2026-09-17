@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import { useReducedMotion } from "framer-motion";
+import { useLowPowerMode } from "@/hooks/useLowPowerMode";
 
 /** Verdant Swirl palette (21st.dev / Serafim Silk-style) */
 export const VERDANT_COLORS = {
@@ -50,7 +51,7 @@ void main() {
  * Recreated to match Verdant Swirl (#03120E → #0E7C5A → #7CE577 → #F4FFC7).
  */
 const FRAG = `
-precision highp float;
+precision mediump float;
 
 uniform float u_time;
 uniform vec2 u_resolution;
@@ -83,7 +84,7 @@ float fbm(vec2 p) {
   float v = 0.0;
   float a = 0.5;
   mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 3; i++) {
     v += a * noise(p);
     p = m * p;
     a *= 0.5;
@@ -194,31 +195,52 @@ export function VerdantSwirl({
 }: VerdantSwirlProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const reduce = useReducedMotion();
+  const lowPower = useLowPowerMode();
+  const activeRef = useRef(active);
+  activeRef.current = active;
+  const kickRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
+    if (lowPower) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    let lost = false;
     const gl = canvas.getContext("webgl", {
       alpha: false,
       antialias: false,
       depth: false,
       stencil: false,
       powerPreference: "low-power",
+      failIfMajorPerformanceCaveat: true,
     });
     if (!gl) return;
 
+    const onLost = (e: Event) => {
+      e.preventDefault();
+      lost = true;
+    };
+    canvas.addEventListener("webglcontextlost", onLost, false);
+
     const vs = compile(gl, gl.VERTEX_SHADER, VERT);
     const fs = compile(gl, gl.FRAGMENT_SHADER, FRAG);
-    if (!vs || !fs) return;
+    if (!vs || !fs) {
+      canvas.removeEventListener("webglcontextlost", onLost);
+      return;
+    }
 
     const program = gl.createProgram();
-    if (!program) return;
+    if (!program) {
+      canvas.removeEventListener("webglcontextlost", onLost);
+      return;
+    }
     gl.attachShader(program, vs);
     gl.attachShader(program, fs);
     gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
       console.warn(gl.getProgramInfoLog(program));
+      canvas.removeEventListener("webglcontextlost", onLost);
       return;
     }
     gl.useProgram(program);
@@ -260,11 +282,11 @@ export function VerdantSwirl({
 
     let raf = 0;
     let start = performance.now();
-    let frozen = reduce || !active;
     let elapsedAtPause = 1.8;
+    const softCap = Math.min(maxDpr, 1.25);
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+      const dpr = Math.min(window.devicePixelRatio || 1, softCap);
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
       const pw = Math.max(1, Math.floor(w * dpr));
@@ -278,35 +300,56 @@ export function VerdantSwirl({
     };
 
     const draw = (now: number) => {
+      if (lost) return;
+      const frozen = Boolean(reduce) || !activeRef.current;
       resize();
-      const t = frozen ? elapsedAtPause : (now - start) / 1000;
+      if (frozen) {
+        gl.uniform1f(uTime, elapsedAtPause);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        return;
+      }
+      const t = (now - start) / 1000;
+      elapsedAtPause = t;
       gl.uniform1f(uTime, t);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
-      if (!frozen) raf = requestAnimationFrame(draw);
+      raf = requestAnimationFrame(draw);
     };
+
+    const kick = () => {
+      cancelAnimationFrame(raf);
+      if (lost) return;
+      if (reduce || !activeRef.current) {
+        draw(performance.now());
+      } else {
+        start = performance.now() - elapsedAtPause * 1000;
+        raf = requestAnimationFrame(draw);
+      }
+    };
+    kickRef.current = kick;
 
     resize();
-    if (frozen) {
-      draw(performance.now());
-    } else {
-      raf = requestAnimationFrame(draw);
-    }
+    kick();
 
-    const onResize = () => {
-      resize();
-      if (frozen) draw(performance.now());
-    };
+    const onResize = () => kick();
     window.addEventListener("resize", onResize);
 
     return () => {
+      kickRef.current = null;
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);
+      canvas.removeEventListener("webglcontextlost", onLost);
       gl.deleteProgram(program);
       gl.deleteShader(vs);
       gl.deleteShader(fs);
       gl.deleteBuffer(buf);
     };
-  }, [reduce, speed, energy, maxDpr, active, palette]);
+  }, [reduce, lowPower, speed, energy, maxDpr, palette]);
+
+  useEffect(() => {
+    kickRef.current?.();
+  }, [active]);
+
+  if (lowPower) return null;
 
   return (
     <canvas

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "framer-motion";
+import { useLowPowerMode } from "@/hooks/useLowPowerMode";
 
 class Particle {
   x: number;
@@ -31,26 +32,28 @@ class Particle {
 }
 
 /**
- * Site-wide green smoke trail that follows pointer / touch.
- * Non-interactive overlay (does not block clicks).
+ * Desktop-only green smoke trail. Disabled on phones / low-power devices
+ * so touch scrolling and GPU stay free.
  */
 export function SmokeCursor() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<Particle[]>([]);
-  const pointerRef = useRef({ x: 0, y: 0, active: false });
   const rafRef = useRef<number | undefined>(undefined);
+  const idleRef = useRef(true);
   const reduce = useReducedMotion();
+  const lowPower = useLowPowerMode();
+  const disabled = Boolean(reduce || lowPower);
 
   useEffect(() => {
-    if (reduce) return;
+    if (disabled) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       const w = window.innerWidth;
       const h = window.innerHeight;
       canvas.width = Math.floor(w * dpr);
@@ -70,24 +73,23 @@ export function SmokeCursor() {
           ),
         );
       }
-      if (particlesRef.current.length > 220) {
-        particlesRef.current = particlesRef.current.slice(-160);
+      if (particlesRef.current.length > 120) {
+        particlesRef.current = particlesRef.current.slice(-90);
+      }
+      if (idleRef.current) {
+        idleRef.current = false;
+        rafRef.current = requestAnimationFrame(animate);
       }
     };
 
     const onPointerMove = (e: PointerEvent) => {
-      pointerRef.current = { x: e.clientX, y: e.clientY, active: true };
-      const isTouch = e.pointerType === "touch";
-      spawn(e.clientX, e.clientY, isTouch ? 3 : 2, isTouch ? 1.15 : 1);
+      if (e.pointerType === "touch") return;
+      spawn(e.clientX, e.clientY, 2, 1);
     };
 
     const onPointerDown = (e: PointerEvent) => {
-      pointerRef.current = { x: e.clientX, y: e.clientY, active: true };
-      spawn(e.clientX, e.clientY, 4, 1.2);
-    };
-
-    const onPointerLeave = () => {
-      pointerRef.current.active = false;
+      if (e.pointerType === "touch") return;
+      spawn(e.clientX, e.clientY, 3, 1.1);
     };
 
     const animate = () => {
@@ -113,6 +115,11 @@ export function SmokeCursor() {
           return p;
         });
 
+      if (particlesRef.current.length === 0) {
+        idleRef.current = true;
+        rafRef.current = undefined;
+        return;
+      }
       rafRef.current = requestAnimationFrame(animate);
     };
 
@@ -120,21 +127,19 @@ export function SmokeCursor() {
     window.addEventListener("resize", resize);
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     window.addEventListener("pointerdown", onPointerDown, { passive: true });
-    window.addEventListener("pointerleave", onPointerLeave);
     document.documentElement.classList.add("smoke-cursor-on");
-    rafRef.current = requestAnimationFrame(animate);
 
     return () => {
       window.removeEventListener("resize", resize);
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerdown", onPointerDown);
-      window.removeEventListener("pointerleave", onPointerLeave);
       document.documentElement.classList.remove("smoke-cursor-on");
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      particlesRef.current = [];
     };
-  }, [reduce]);
+  }, [disabled]);
 
-  if (reduce) return null;
+  if (disabled) return null;
 
   return (
     <canvas

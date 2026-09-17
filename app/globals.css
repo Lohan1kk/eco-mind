@@ -576,3 +576,22 @@ input[type="range"] {
     animation: none !important;
   }
 }
+
+/* Phones: drop expensive compositor layers */
+@media (max-width: 768px), (pointer: coarse) {
+  .section-atmosphere {
+    animation: none;
+    will-change: auto;
+    opacity: 0.55;
+    background-size: 100% 100%;
+  }
+
+  .section-atmosphere-grain {
+    display: none;
+  }
+
+  .panel-soft {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+}
