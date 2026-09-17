@@ -376,7 +376,7 @@ input[type="range"] {
 
 /* Light: soft celadon silk — visible motion, airy (dark tone untouched) */
 .verdant-wash--light .verdant-wash__shader {
-  opacity: 0.38;
+  opacity: 0.55;
   mix-blend-mode: soft-light;
 }
 
@@ -406,7 +406,7 @@ input[type="range"] {
 
 /* Dark: muted sage, soft and quiet under mist text */
 .verdant-wash--dark .verdant-wash__shader {
-  opacity: 0.14;
+  opacity: 0.28;
   mix-blend-mode: soft-light;
 }
 
@@ -436,11 +436,11 @@ input[type="range"] {
 
 @media (min-width: 768px) {
   .verdant-wash--light .verdant-wash__shader {
-    opacity: 0.42;
+    opacity: 0.6;
   }
 
   .verdant-wash--dark .verdant-wash__shader {
-    opacity: 0.16;
+    opacity: 0.32;
   }
 
   .verdant-wash--light .verdant-wash__plate {

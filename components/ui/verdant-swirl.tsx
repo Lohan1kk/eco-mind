@@ -6,7 +6,6 @@ import {
   useDocumentVisible,
   usePerfProfile,
 } from "@/components/hooks/usePerfProfile";
-import { createFrameGate } from "@/lib/performance";
 
 /** Verdant Swirl palette (21st.dev / Serafim Silk-style) */
 export const VERDANT_COLORS = {
@@ -228,12 +227,20 @@ export function VerdantSwirl({
   const perf = usePerfProfile();
   const docVisible = useDocumentVisible();
   const activeRef = useRef(active && docVisible);
+  const maxDprRef = useRef(maxDpr ?? perf.verdantMaxDpr);
+  const fpsRef = useRef(perf.verdantTargetFps);
+  const tierRef = useRef(perf.tier);
 
   useEffect(() => {
     activeRef.current = active && docVisible;
   }, [active, docVisible]);
 
-  const resolvedMaxDpr = maxDpr ?? perf.verdantMaxDpr;
+  useEffect(() => {
+    maxDprRef.current = maxDpr ?? perf.verdantMaxDpr;
+    fpsRef.current = perf.verdantTargetFps;
+    tierRef.current = perf.tier;
+  }, [maxDpr, perf.verdantMaxDpr, perf.verdantTargetFps, perf.tier]);
+
   // Prefer WebGL whenever the browser allows it; CSS only for reduced-motion
   const useWebgl = !cssFallback && !reduce;
 
@@ -302,17 +309,16 @@ export function VerdantSwirl({
     gl.uniform1f(uSpeed, reduce ? 0 : speed);
     gl.uniform1f(uEnergy, energy);
     gl.uniform1f(uKey, palette === "mist" ? 0.55 : palette === "glow" ? 0.25 : 0);
-    gl.uniform1f(uOctaves, perf.tier === "low" ? 3 : 5);
 
     let raf = 0;
     const start = performance.now();
     let elapsedAtPause = 1.8;
-    const shouldDraw = createFrameGate(perf.verdantTargetFps);
+    let lastFrame = 0;
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, resolvedMaxDpr);
-      const w = canvas.clientWidth;
-      const h = canvas.clientHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, maxDprRef.current);
+      const w = canvas.clientWidth || canvas.parentElement?.clientWidth || 1;
+      const h = canvas.clientHeight || canvas.parentElement?.clientHeight || 1;
       const pw = Math.max(1, Math.floor(w * dpr));
       const ph = Math.max(1, Math.floor(h * dpr));
       if (canvas.width !== pw || canvas.height !== ph) {
@@ -327,8 +333,12 @@ export function VerdantSwirl({
       raf = requestAnimationFrame(draw);
       const running = !reduce && activeRef.current;
       if (!running) return;
-      if (!shouldDraw(now)) return;
 
+      const minDelta = 1000 / Math.max(1, fpsRef.current);
+      if (now - lastFrame < minDelta) return;
+      lastFrame = now;
+
+      gl.uniform1f(uOctaves, tierRef.current === "low" ? 3 : 5);
       resize();
       const t = (now - start) / 1000;
       elapsedAtPause = t;
@@ -337,11 +347,9 @@ export function VerdantSwirl({
     };
 
     resize();
-    if (reduce || !activeRef.current) {
-      const t = elapsedAtPause;
-      gl.uniform1f(uTime, t);
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
-    }
+    gl.uniform1f(uOctaves, tierRef.current === "low" ? 3 : 5);
+    gl.uniform1f(uTime, elapsedAtPause);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
     raf = requestAnimationFrame(draw);
 
     const onResize = () => {
@@ -361,16 +369,7 @@ export function VerdantSwirl({
       gl.deleteShader(fs);
       gl.deleteBuffer(buf);
     };
-  }, [
-    reduce,
-    speed,
-    energy,
-    resolvedMaxDpr,
-    palette,
-    useWebgl,
-    perf.tier,
-    perf.verdantTargetFps,
-  ]);
+  }, [reduce, speed, energy, palette, useWebgl]);
 
   if (!useWebgl) {
     return (
