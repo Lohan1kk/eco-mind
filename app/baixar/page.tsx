@@ -14,7 +14,7 @@ export default function BaixarPage() {
   return (
     <>
       <Header solid />
-      <PageAtmosphereShell variant="soft" className="bg-mist pt-24 pb-16">
+      <PageAtmosphereShell variant="soft" wash="light" className="bg-mist pt-24 pb-16">
         <BaixarContent />
       </PageAtmosphereShell>
       <Footer />
