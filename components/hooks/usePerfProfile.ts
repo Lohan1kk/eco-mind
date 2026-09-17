@@ -9,23 +9,34 @@ import {
 
 const SERVER_PROFILE = profileForTier("medium");
 
+/** Detect once per page load — resize must not swap quality mid-session. */
+let cachedClientProfile: PerfProfile | null = null;
+
+function getClientProfile(): PerfProfile {
+  if (!cachedClientProfile) {
+    cachedClientProfile = detectPerfProfile();
+  }
+  return cachedClientProfile;
+}
+
 function subscribePerf(onStoreChange: () => void) {
   const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-  mq.addEventListener("change", onStoreChange);
-  window.addEventListener("resize", onStoreChange, { passive: true });
-  return () => {
-    mq.removeEventListener("change", onStoreChange);
-    window.removeEventListener("resize", onStoreChange);
+  const onMotion = () => {
+    cachedClientProfile = detectPerfProfile();
+    onStoreChange();
   };
+  mq.addEventListener("change", onMotion);
+  return () => mq.removeEventListener("change", onMotion);
 }
 
 /**
  * Client performance profile via useSyncExternalStore (SSR-safe medium default).
+ * Cached after first client read so hero/shaders do not flip on resize.
  */
 export function usePerfProfile(): PerfProfile {
   return useSyncExternalStore(
     subscribePerf,
-    detectPerfProfile,
+    getClientProfile,
     () => SERVER_PROFILE,
   );
 }

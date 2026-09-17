@@ -5,7 +5,6 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { ForestAtmosphere } from "@/components/ui/forest-atmosphere";
-import { usePerfProfile } from "@/components/hooks/usePerfProfile";
 import {
   hoverLift,
   pressTransition,
@@ -16,9 +15,11 @@ import {
   tapPress,
 } from "@/components/motion";
 
+/** Single hero photograph — never swap sources (avoids “different forest” on load). */
+const HERO_SRC = "/brand/hero-ecomind-4k.jpg";
+
 export function Hero() {
   const reduce = useReducedMotion();
-  const perf = usePerfProfile();
   const sectionRef = useRef<HTMLElement>(null);
   const [active, setActive] = useState(true);
 
@@ -33,7 +34,7 @@ export function Hero() {
     return () => io.disconnect();
   }, []);
 
-  const ambientOn = !reduce && active && perf.heroKenBurns;
+  const ambientOn = !reduce && active;
 
   return (
     <section
@@ -41,7 +42,6 @@ export function Hero() {
       id="topo"
       className="relative min-h-[100svh] overflow-hidden bg-[#0a1610]"
     >
-      {/* Adaptive source: 4K on high-tier desktops, HQ on phones / mid devices */}
       <motion.div
         className={`absolute inset-0 ${ambientOn ? "will-change-transform" : ""}`}
         initial={reduce ? false : { opacity: 0.8, scale: 1.04 }}
@@ -65,11 +65,11 @@ export function Hero() {
         }
       >
         <Image
-          src={perf.heroSrc}
+          src={HERO_SRC}
           alt=""
           fill
           priority
-          quality={perf.heroQuality}
+          quality={90}
           sizes="100vw"
           className="object-cover object-[52%_38%]"
         />

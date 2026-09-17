@@ -21,7 +21,7 @@ export type PerfProfile = {
   forestWebgl: boolean;
   forestMaxDpr: number;
   forestTargetFps: number;
-  /** Hero photograph */
+  /** Hero photograph (legacy — Hero uses a fixed asset now) */
   heroSrc: "/brand/hero-ecomind-4k.jpg" | "/brand/hero-ecomind-hq.jpg";
   heroQuality: number;
   heroKenBurns: boolean;
@@ -62,7 +62,7 @@ const MEDIUM: PerfProfile = {
   forestWebgl: true,
   forestMaxDpr: 1.25,
   forestTargetFps: 45,
-  heroSrc: "/brand/hero-ecomind-hq.jpg",
+  heroSrc: "/brand/hero-ecomind-4k.jpg",
   heroQuality: 88,
   heroKenBurns: true,
   mapMaxAlerts: 280,
@@ -82,7 +82,7 @@ const LOW: PerfProfile = {
   forestWebgl: true,
   forestMaxDpr: 1,
   forestTargetFps: 30,
-  heroSrc: "/brand/hero-ecomind-hq.jpg",
+  heroSrc: "/brand/hero-ecomind-4k.jpg",
   heroQuality: 82,
   heroKenBurns: true,
   mapMaxAlerts: 160,

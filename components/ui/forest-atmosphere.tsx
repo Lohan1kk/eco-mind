@@ -6,7 +6,6 @@ import {
   useDocumentVisible,
   usePerfProfile,
 } from "@/components/hooks/usePerfProfile";
-import { createFrameGate } from "@/lib/performance";
 
 /**
  * Atmospheric forest mist + god-ray shader for EcoMind hero.
@@ -160,11 +159,20 @@ export function ForestAtmosphere({
   const localPointer = useRef<Pointer>({ x: 0, y: 0 });
   const intensityRef = useRef(intensity);
   const activeRef = useRef(active && docVisible);
+  const maxDprRef = useRef(perf.forestMaxDpr);
+  const fpsRef = useRef(perf.forestTargetFps);
+  const tierRef = useRef(perf.tier);
 
   useEffect(() => {
     intensityRef.current = intensity;
     activeRef.current = active && docVisible;
   }, [intensity, active, docVisible]);
+
+  useEffect(() => {
+    maxDprRef.current = perf.forestMaxDpr;
+    fpsRef.current = perf.forestTargetFps;
+    tierRef.current = perf.tier;
+  }, [perf.forestMaxDpr, perf.forestTargetFps, perf.tier]);
 
   const useWebgl = !reduce;
 
@@ -219,20 +227,17 @@ export function ForestAtmosphere({
     const uPointer = gl.getUniformLocation(program, "u_pointer");
     const uOctaves = gl.getUniformLocation(program, "u_octaves");
 
-    const octaves = perf.tier === "low" ? 3 : 5;
-    gl.uniform1f(uOctaves, octaves);
-
     let raf = 0;
     const start = performance.now();
     const frozen = Boolean(reduce);
-    const shouldDraw = createFrameGate(perf.forestTargetFps);
+    let lastFrame = 0;
     let lastW = 0;
     let lastH = 0;
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, perf.forestMaxDpr);
-      const w = canvas.clientWidth;
-      const h = canvas.clientHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, maxDprRef.current);
+      const w = canvas.clientWidth || canvas.parentElement?.clientWidth || 1;
+      const h = canvas.clientHeight || canvas.parentElement?.clientHeight || 1;
       const pw = Math.max(1, Math.floor(w * dpr));
       const ph = Math.max(1, Math.floor(h * dpr));
       if (canvas.width !== pw || canvas.height !== ph) {
@@ -253,8 +258,12 @@ export function ForestAtmosphere({
     const draw = (now: number) => {
       if (!frozen) raf = requestAnimationFrame(draw);
       if (!activeRef.current && !frozen) return;
-      if (!frozen && !shouldDraw(now)) return;
 
+      const minDelta = 1000 / Math.max(1, fpsRef.current);
+      if (!frozen && now - lastFrame < minDelta) return;
+      lastFrame = now;
+
+      gl.uniform1f(uOctaves, tierRef.current === "low" ? 3 : 5);
       resize();
       const ptr = pointerRef?.current ?? localPointer.current;
       const t = frozen ? 2.4 : (now - start) / 1000;
@@ -284,7 +293,7 @@ export function ForestAtmosphere({
       gl.deleteShader(fs);
       gl.deleteBuffer(buf);
     };
-  }, [reduce, pointerRef, useWebgl, perf.forestMaxDpr, perf.forestTargetFps, perf.tier]);
+  }, [reduce, pointerRef, useWebgl]);
 
   if (!useWebgl) {
     return (
