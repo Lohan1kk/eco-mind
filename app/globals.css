@@ -576,3 +576,21 @@ input[type="range"] {
     animation: none !important;
   }
 }
+
+/* Soften expensive CSS filters on coarse pointers (phones/tablets) */
+@media (pointer: coarse) {
+  .panel-soft {
+    backdrop-filter: blur(6px);
+  }
+
+  .section-atmosphere {
+    will-change: auto;
+  }
+}
+
+@media (pointer: coarse) and (max-width: 900px) {
+  .section-atmosphere-grain {
+    opacity: 0.03;
+    animation: none;
+  }
+}

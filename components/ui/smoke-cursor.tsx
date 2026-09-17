@@ -2,6 +2,11 @@
 
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "framer-motion";
+import {
+  useDocumentVisible,
+  usePerfProfile,
+} from "@/components/hooks/usePerfProfile";
+import { createFrameGate } from "@/lib/performance";
 
 class Particle {
   x: number;
@@ -33,6 +38,7 @@ class Particle {
 /**
  * Site-wide green smoke trail that follows pointer / touch.
  * Non-interactive overlay (does not block clicks).
+ * Disabled or lightened on weaker devices via PerfProfile.
  */
 export function SmokeCursor() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -40,17 +46,29 @@ export function SmokeCursor() {
   const pointerRef = useRef({ x: 0, y: 0, active: false });
   const rafRef = useRef<number | undefined>(undefined);
   const reduce = useReducedMotion();
+  const perf = usePerfProfile();
+  const docVisible = useDocumentVisible();
+  const enabled = !reduce && perf.smokeCursor && docVisible;
 
   useEffect(() => {
-    if (reduce) return;
+    if (!enabled) {
+      particlesRef.current = [];
+      document.documentElement.classList.remove("smoke-cursor-on");
+      return;
+    }
 
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
+    const maxParticles = perf.smokeMaxParticles;
+    const softCap = Math.max(40, Math.floor(maxParticles * 0.72));
+    const dprCap = perf.tier === "high" ? 2 : 1;
+    const shouldDraw = createFrameGate(perf.tier === "high" ? 60 : 30);
+
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, dprCap);
       const w = window.innerWidth;
       const h = window.innerHeight;
       canvas.width = Math.floor(w * dpr);
@@ -70,50 +88,58 @@ export function SmokeCursor() {
           ),
         );
       }
-      if (particlesRef.current.length > 220) {
-        particlesRef.current = particlesRef.current.slice(-160);
+      if (particlesRef.current.length > maxParticles) {
+        particlesRef.current = particlesRef.current.slice(-softCap);
       }
     };
 
     const onPointerMove = (e: PointerEvent) => {
       pointerRef.current = { x: e.clientX, y: e.clientY, active: true };
       const isTouch = e.pointerType === "touch";
-      spawn(e.clientX, e.clientY, isTouch ? 3 : 2, isTouch ? 1.15 : 1);
+      spawn(
+        e.clientX,
+        e.clientY,
+        isTouch ? perf.smokeSpawnTouch : perf.smokeSpawnDesktop,
+        isTouch ? 1.15 : 1,
+      );
     };
 
     const onPointerDown = (e: PointerEvent) => {
       pointerRef.current = { x: e.clientX, y: e.clientY, active: true };
-      spawn(e.clientX, e.clientY, 4, 1.2);
+      spawn(e.clientX, e.clientY, Math.min(3, perf.smokeSpawnTouch + 1), 1.2);
     };
 
     const onPointerLeave = () => {
       pointerRef.current.active = false;
     };
 
-    const animate = () => {
+    const animate = (now: number) => {
+      rafRef.current = requestAnimationFrame(animate);
+      if (!shouldDraw(now)) return;
+
       const w = window.innerWidth;
       const h = window.innerHeight;
       ctx.clearRect(0, 0, w, h);
 
-      particlesRef.current = particlesRef.current
-        .filter((p) => p.life > 0 && p.size > 0)
-        .map((p) => {
-          p.update();
-          if (p.size > 0) {
-            const opacity = (p.life / 100) * 0.5;
-            ctx.fillStyle = `rgba(47, 122, 79, ${opacity})`;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = `rgba(200, 239, 212, ${opacity * 0.4})`;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y - p.size * 0.2, p.size * 0.5, 0, Math.PI * 2);
-            ctx.fill();
-          }
-          return p;
-        });
-
-      rafRef.current = requestAnimationFrame(animate);
+      const next: Particle[] = [];
+      for (const p of particlesRef.current) {
+        p.update();
+        if (p.life <= 0 || p.size <= 0) continue;
+        next.push(p);
+        const opacity = (p.life / 100) * 0.5;
+        ctx.fillStyle = `rgba(47, 122, 79, ${opacity})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        // Second highlight pass only on high tier — halves path cost on phones
+        if (perf.tier === "high") {
+          ctx.fillStyle = `rgba(200, 239, 212, ${opacity * 0.4})`;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y - p.size * 0.2, p.size * 0.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      particlesRef.current = next;
     };
 
     resize();
@@ -132,9 +158,9 @@ export function SmokeCursor() {
       document.documentElement.classList.remove("smoke-cursor-on");
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [reduce]);
+  }, [enabled, perf]);
 
-  if (reduce) return null;
+  if (!enabled) return null;
 
   return (
     <canvas

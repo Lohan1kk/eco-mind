@@ -93,6 +93,7 @@ export function MapView({
       className="z-0 h-full w-full"
       style={{ height: "100%", width: "100%" }}
       scrollWheelZoom
+      preferCanvas
     >
       <TileLayer
         key={layer}
