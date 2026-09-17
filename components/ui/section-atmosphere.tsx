@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useReducedMotion } from "framer-motion";
+import { usePerfProfile } from "@/components/hooks/usePerfProfile";
 
 type Variant = "mist" | "soft" | "deep";
 
@@ -17,6 +18,7 @@ export function SectionAtmosphere({
   className?: string;
 }) {
   const reduce = useReducedMotion();
+  const perf = usePerfProfile();
   const rootRef = useRef<HTMLDivElement>(null);
   const [on, setOn] = useState(true);
 
@@ -31,7 +33,7 @@ export function SectionAtmosphere({
     return () => io.disconnect();
   }, []);
 
-  const paused = reduce || !on;
+  const paused = reduce || !on || perf.tier === "low";
 
   return (
     <div
@@ -44,7 +46,11 @@ export function SectionAtmosphere({
           paused ? "is-paused" : ""
         }`}
       />
-      <div className={`section-atmosphere-grain ${paused ? "is-paused" : ""}`} />
+      {perf.atmosphereGrain ? (
+        <div
+          className={`section-atmosphere-grain ${paused ? "is-paused" : ""}`}
+        />
+      ) : null}
     </div>
   );
 }

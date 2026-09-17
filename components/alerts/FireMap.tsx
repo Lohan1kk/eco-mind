@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { usePerfProfile } from "@/components/hooks/usePerfProfile";
 import { readFiresCache, writeFiresCache } from "@/lib/alerts/firesCache";
 import { isInBrazil } from "@/lib/alerts/geo";
 import { ALERT_LEVELS, LEVEL_META } from "@/lib/alerts/levels";
@@ -12,8 +13,6 @@ import { MapView } from "./MapView";
 import { ReportFireModal } from "./ReportFireModal";
 
 type MapLayer = "map" | "satellite";
-
-const MAX_VISIBLE_ALERTS = 400;
 
 interface FiresMeta {
   count: number;
@@ -29,6 +28,7 @@ interface FiresMeta {
 }
 
 export default function FireMap() {
+  const perf = usePerfProfile();
   const [alerts, setAlerts] = useState<FireAlert[]>([]);
   const [meta, setMeta] = useState<FiresMeta | null>(null);
   const [loading, setLoading] = useState(true);
@@ -211,8 +211,8 @@ export default function FireMap() {
         ? alerts
         : alerts.filter((a) => a.level === levelFilter);
 
-    return selectVisibleAlerts(byLevel, MAX_VISIBLE_ALERTS);
-  }, [alerts, levelFilter]);
+    return selectVisibleAlerts(byLevel, perf.mapMaxAlerts);
+  }, [alerts, levelFilter, perf.mapMaxAlerts]);
 
   const levelCounts = ALERT_LEVELS.reduce(
     (acc, level) => {

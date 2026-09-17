@@ -1,7 +1,12 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useReducedMotion } from "framer-motion";
+import {
+  useDocumentVisible,
+  usePerfProfile,
+} from "@/components/hooks/usePerfProfile";
+import { createFrameGate } from "@/lib/performance";
 
 /** Verdant Swirl palette (21st.dev / Serafim Silk-style) */
 export const VERDANT_COLORS = {
@@ -47,10 +52,10 @@ void main() {
 
 /**
  * Silk-style verdant swirl — domain-warped FBM through a 4-stop green palette.
- * Recreated to match Verdant Swirl (#03120E → #0E7C5A → #7CE577 → #F4FFC7).
+ * Octaves scale with device tier so mid/low phones keep the look with less fill cost.
  */
 const FRAG = `
-precision highp float;
+precision mediump float;
 
 uniform float u_time;
 uniform vec2 u_resolution;
@@ -61,6 +66,7 @@ uniform vec3 u_c4;
 uniform float u_speed;
 uniform float u_energy;
 uniform float u_key;
+uniform float u_octaves;
 
 float hash(vec2 p) {
   p = fract(p * vec2(123.34, 456.21));
@@ -84,6 +90,7 @@ float fbm(vec2 p) {
   float a = 0.5;
   mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
   for (int i = 0; i < 5; i++) {
+    if (float(i) >= u_octaves) break;
     v += a * noise(p);
     p = m * p;
     a *= 0.5;
@@ -107,7 +114,6 @@ void main() {
   float e = max(u_energy, 1.0);
   float t = u_time * u_speed * (0.7 + 0.2 * e);
 
-  // Silk swirl: rotate + dual domain warp (energy makes flow livelier)
   float ang = t * (0.08 + 0.04 * (e - 1.0));
   float ca = cos(ang);
   float sa = sin(ang);
@@ -122,18 +128,14 @@ void main() {
   float silk = fbm(r * 2.15 + t * 0.04);
   silk = silk * 0.7 + n2 * 0.3;
 
-  // Vignette: classic goes deep at edges; high-key (mist) stays airy
   float vig = smoothstep(1.35, 0.15, length(p * 1.05));
   float edgeMul = mix(0.35, 0.82, clamp(u_key, 0.0, 1.0));
   silk = mix(silk * edgeMul, silk, vig);
 
   vec3 col = palette(silk);
-  // Silk sheen — gentle when energy is near 1
   float sheen = (0.025 + 0.02 * (e - 1.0)) * sin(silk * 6.28318 + t * (0.7 + 0.2 * (e - 1.0)));
   col += u_c4 * (sheen + 0.012 + 0.008 * (e - 1.0));
-  // Soft sprout drift for living wash
   col = mix(col, u_c3, 0.03 * (e - 1.0) * (0.5 + 0.5 * sin(t * 0.9 + silk * 3.0)));
-  // Lift mist washes toward paper so ink stays crisp
   col = mix(col, u_c1, 0.22 * clamp(u_key, 0.0, 1.0));
 
   gl_FragColor = vec4(col, 1.0);
@@ -175,27 +177,68 @@ type VerdantSwirlProps = {
   opacity?: number;
   /** Motion / sheen intensity (1 = classic CTA, >1 = livelier wash) */
   energy?: number;
-  /** Cap device pixel ratio for lighter washes (default 1.75) */
+  /** Cap device pixel ratio for lighter washes (default from PerfProfile) */
   maxDpr?: number;
-  /** Pause RAF when false (offscreen) */
+  /** Pause RAF when false (offscreen) — uses ref, does not remount GL */
   active?: boolean;
   /** Color story: classic CTA, mist (light sections), glow (dark sections) */
   palette?: VerdantPalette;
+  /** Force CSS fallback (low-tier / no WebGL) */
+  cssFallback?: boolean;
 };
+
+function VerdantCssFallback({
+  className,
+  opacity,
+  palette,
+}: {
+  className: string;
+  opacity: number;
+  palette: VerdantPalette;
+}) {
+  const swatch = PALETTES[palette];
+  return (
+    <div
+      aria-hidden
+      className={`pointer-events-none absolute inset-0 h-full w-full ${className}`}
+      style={{
+        opacity,
+        background: `
+          radial-gradient(ellipse 80% 70% at 20% 30%, ${swatch.sprout}55, transparent 60%),
+          radial-gradient(ellipse 70% 60% at 80% 70%, ${swatch.forest}66, transparent 55%),
+          linear-gradient(135deg, ${swatch.deep} 0%, ${swatch.forest} 48%, ${swatch.highlight}33 100%)
+        `,
+      }}
+    />
+  );
+}
 
 export function VerdantSwirl({
   className = "",
   speed = 1,
   opacity = 1,
   energy = 1,
-  maxDpr = 1.75,
+  maxDpr,
   active = true,
   palette = "classic",
+  cssFallback = false,
 }: VerdantSwirlProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const reduce = useReducedMotion();
+  const perf = usePerfProfile();
+  const docVisible = useDocumentVisible();
+  const activeRef = useRef(active && docVisible);
 
   useEffect(() => {
+    activeRef.current = active && docVisible;
+  }, [active, docVisible]);
+
+  const resolvedMaxDpr = maxDpr ?? perf.verdantMaxDpr;
+  const useWebgl = !cssFallback && !reduce && perf.verdantWebgl;
+
+  useEffect(() => {
+    if (!useWebgl) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -239,6 +282,7 @@ export function VerdantSwirl({
     const uSpeed = gl.getUniformLocation(program, "u_speed");
     const uEnergy = gl.getUniformLocation(program, "u_energy");
     const uKey = gl.getUniformLocation(program, "u_key");
+    const uOctaves = gl.getUniformLocation(program, "u_octaves");
     const uC1 = gl.getUniformLocation(program, "u_c1");
     const uC2 = gl.getUniformLocation(program, "u_c2");
     const uC3 = gl.getUniformLocation(program, "u_c3");
@@ -257,14 +301,15 @@ export function VerdantSwirl({
     gl.uniform1f(uSpeed, reduce ? 0 : speed);
     gl.uniform1f(uEnergy, energy);
     gl.uniform1f(uKey, palette === "mist" ? 0.55 : palette === "glow" ? 0.25 : 0);
+    gl.uniform1f(uOctaves, perf.tier === "high" ? 5 : 3);
 
     let raf = 0;
-    let start = performance.now();
-    let frozen = reduce || !active;
+    const start = performance.now();
     let elapsedAtPause = 1.8;
+    const shouldDraw = createFrameGate(perf.verdantTargetFps);
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+      const dpr = Math.min(window.devicePixelRatio || 1, resolvedMaxDpr);
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
       const pw = Math.max(1, Math.floor(w * dpr));
@@ -278,23 +323,32 @@ export function VerdantSwirl({
     };
 
     const draw = (now: number) => {
+      raf = requestAnimationFrame(draw);
+      const running = !reduce && activeRef.current;
+      if (!running) return;
+      if (!shouldDraw(now)) return;
+
       resize();
-      const t = frozen ? elapsedAtPause : (now - start) / 1000;
+      const t = (now - start) / 1000;
+      elapsedAtPause = t;
       gl.uniform1f(uTime, t);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
-      if (!frozen) raf = requestAnimationFrame(draw);
     };
 
     resize();
-    if (frozen) {
-      draw(performance.now());
-    } else {
-      raf = requestAnimationFrame(draw);
+    if (reduce || !activeRef.current) {
+      const t = elapsedAtPause;
+      gl.uniform1f(uTime, t);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
     }
+    raf = requestAnimationFrame(draw);
 
     const onResize = () => {
       resize();
-      if (frozen) draw(performance.now());
+      if (reduce || !activeRef.current) {
+        gl.uniform1f(uTime, elapsedAtPause);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+      }
     };
     window.addEventListener("resize", onResize);
 
@@ -306,7 +360,26 @@ export function VerdantSwirl({
       gl.deleteShader(fs);
       gl.deleteBuffer(buf);
     };
-  }, [reduce, speed, energy, maxDpr, active, palette]);
+  }, [
+    reduce,
+    speed,
+    energy,
+    resolvedMaxDpr,
+    palette,
+    useWebgl,
+    perf.tier,
+    perf.verdantTargetFps,
+  ]);
+
+  if (!useWebgl) {
+    return (
+      <VerdantCssFallback
+        className={className}
+        opacity={opacity}
+        palette={palette}
+      />
+    );
+  }
 
   return (
     <canvas
@@ -332,12 +405,27 @@ export function VerdantSwirlSection({
   speed?: number;
   id?: string;
 }) {
+  const rootRef = useRef<HTMLElement>(null);
+  const [active, setActive] = useState(true);
+
+  useEffect(() => {
+    const node = rootRef.current;
+    if (!node) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setActive(entry.isIntersecting),
+      { rootMargin: "80px", threshold: 0.02 },
+    );
+    io.observe(node);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <section
+      ref={rootRef}
       id={id}
       className={`relative overflow-hidden bg-[#03120E] ${className}`}
     >
-      <VerdantSwirl speed={speed} />
+      <VerdantSwirl speed={speed} active={active} />
       <div className={`relative z-10 ${innerClassName}`}>{children}</div>
     </section>
   );

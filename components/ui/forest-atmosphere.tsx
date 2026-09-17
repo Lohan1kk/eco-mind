@@ -2,10 +2,16 @@
 
 import { useEffect, useRef, type MutableRefObject } from "react";
 import { useReducedMotion } from "framer-motion";
+import {
+  useDocumentVisible,
+  usePerfProfile,
+} from "@/components/hooks/usePerfProfile";
+import { createFrameGate } from "@/lib/performance";
 
 /**
  * Atmospheric forest mist + god-ray shader for EcoMind hero.
  * Transparent WebGL overlay — reads pointer from a ref (no React re-renders).
+ * Quality scales with PerfProfile (DPR + FPS); skipped on low-tier devices.
  */
 const VERT = `
 attribute vec2 a_position;
@@ -15,12 +21,13 @@ void main() {
 `;
 
 const FRAG = `
-precision highp float;
+precision mediump float;
 
 uniform float u_time;
 uniform vec2 u_resolution;
 uniform float u_intensity;
 uniform vec2 u_pointer;
+uniform float u_octaves;
 
 float hash(vec2 p) {
   p = fract(p * vec2(123.34, 456.21));
@@ -44,6 +51,7 @@ float fbm(vec2 p) {
   float a = 0.5;
   mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
   for (int i = 0; i < 5; i++) {
+    if (float(i) >= u_octaves) break;
     v += a * noise(p);
     p = m * p * 1.05;
     a *= 0.5;
@@ -115,6 +123,30 @@ type ForestAtmosphereProps = {
   active?: boolean;
 };
 
+/** Soft CSS mist when WebGL is skipped — same palette, no GPU loop. */
+function ForestCssFallback({
+  className,
+  intensity,
+}: {
+  className: string;
+  intensity: number;
+}) {
+  return (
+    <div
+      aria-hidden
+      className={`pointer-events-none absolute inset-0 ${className}`}
+      style={{
+        opacity: Math.min(0.85, 0.45 + intensity * 0.4),
+        background: `
+          radial-gradient(ellipse 70% 55% at 18% 40%, rgba(14, 124, 90, 0.35), transparent 60%),
+          radial-gradient(ellipse 50% 45% at 72% 18%, rgba(124, 229, 119, 0.18), transparent 55%),
+          linear-gradient(105deg, rgba(10, 22, 16, 0.35) 0%, transparent 55%)
+        `,
+      }}
+    />
+  );
+}
+
 export function ForestAtmosphere({
   className = "",
   intensity = 1,
@@ -123,13 +155,22 @@ export function ForestAtmosphere({
 }: ForestAtmosphereProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const reduce = useReducedMotion();
+  const perf = usePerfProfile();
+  const docVisible = useDocumentVisible();
   const localPointer = useRef<Pointer>({ x: 0, y: 0 });
   const intensityRef = useRef(intensity);
-  const activeRef = useRef(active);
-  intensityRef.current = intensity;
-  activeRef.current = active;
+  const activeRef = useRef(active && docVisible);
 
   useEffect(() => {
+    intensityRef.current = intensity;
+    activeRef.current = active && docVisible;
+  }, [intensity, active, docVisible]);
+
+  const useWebgl = !reduce && perf.forestWebgl;
+
+  useEffect(() => {
+    if (!useWebgl) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -176,15 +217,20 @@ export function ForestAtmosphere({
     const uRes = gl.getUniformLocation(program, "u_resolution");
     const uIntensity = gl.getUniformLocation(program, "u_intensity");
     const uPointer = gl.getUniformLocation(program, "u_pointer");
+    const uOctaves = gl.getUniformLocation(program, "u_octaves");
+
+    const octaves = perf.tier === "high" ? 5 : 3;
+    gl.uniform1f(uOctaves, octaves);
 
     let raf = 0;
     const start = performance.now();
     const frozen = Boolean(reduce);
+    const shouldDraw = createFrameGate(perf.forestTargetFps);
     let lastW = 0;
     let lastH = 0;
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const dpr = Math.min(window.devicePixelRatio || 1, perf.forestMaxDpr);
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
       const pw = Math.max(1, Math.floor(w * dpr));
@@ -205,10 +251,10 @@ export function ForestAtmosphere({
     };
 
     const draw = (now: number) => {
-      if (!activeRef.current && !frozen) {
-        raf = requestAnimationFrame(draw);
-        return;
-      }
+      if (!frozen) raf = requestAnimationFrame(draw);
+      if (!activeRef.current && !frozen) return;
+      if (!frozen && !shouldDraw(now)) return;
+
       resize();
       const ptr = pointerRef?.current ?? localPointer.current;
       const t = frozen ? 2.4 : (now - start) / 1000;
@@ -218,7 +264,6 @@ export function ForestAtmosphere({
       gl.uniform1f(uIntensity, intensityRef.current);
       gl.uniform2f(uPointer, ptr.x, ptr.y);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
-      if (!frozen) raf = requestAnimationFrame(draw);
     };
 
     resize();
@@ -239,7 +284,13 @@ export function ForestAtmosphere({
       gl.deleteShader(fs);
       gl.deleteBuffer(buf);
     };
-  }, [reduce, pointerRef]);
+  }, [reduce, pointerRef, useWebgl, perf.forestMaxDpr, perf.forestTargetFps, perf.tier]);
+
+  if (!useWebgl) {
+    return (
+      <ForestCssFallback className={className} intensity={intensity} />
+    );
+  }
 
   return (
     <canvas

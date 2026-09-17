@@ -84,7 +84,8 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${display.variable} ${body.variable} h-full`}>
       <head>
-        <link rel="preload" as="image" href="/brand/hero-ecomind-4k.jpg" />
+        {/* Hero image is loaded via next/image on the home page only —
+            avoid forcing a 3MB 4K download on every route (phones / mid devices). */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
