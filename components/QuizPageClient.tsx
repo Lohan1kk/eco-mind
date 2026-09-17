@@ -36,7 +36,7 @@ export function QuizPageClient() {
       >
         <p className="lede mt-4 max-w-xl">
           {mode === "folklore"
-            ? "Seis personagens do folclore brasileiro — e o que eles ensinam sobre cuidar da floresta, dos rios e do fogo."
+            ? "Desafio com timer, combo e imagem velada: descubra Curupira, Caipora, Boitatá e mais — e o que ensinam sobre floresta, rios e fogo."
             : mode === "eco"
               ? "Dez perguntas baseadas nos textos e dados do site — com feedback imediato após cada resposta."
               : "Teste o que você sabe sobre o site ou explore a mata encantada do folclore brasileiro."}
@@ -88,8 +88,8 @@ export function QuizPageClient() {
                 Gincana do Folclore
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-ash">
-                Curupira, Caipora, Boitatá e mais — com imagens e laço com a
-                natureza.
+                Imagem velada, timer e combo — lore do folclore com laço
+                ambiental.
               </p>
             </motion.button>
           </motion.div>
