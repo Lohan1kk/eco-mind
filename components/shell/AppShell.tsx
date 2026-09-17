@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 import { SmokeCursor } from "@/components/ui/smoke-cursor";
+import { FolklorePeeks } from "@/components/ui/folklore-peeks";
 import { hidesBottomNav } from "@/lib/pwa";
 import { BottomNav } from "./BottomNav";
 import { InstallBanner } from "./InstallBanner";
@@ -21,6 +22,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <>
       <SmokeCursor />
+      <FolklorePeeks />
       <OfflineIndicator />
       <a
         href="#conteudo-principal"
