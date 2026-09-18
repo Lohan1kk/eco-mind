@@ -3,9 +3,9 @@
 Apresentação objetiva · ~4–5 minutos · 8 slides  
 
 **Baixar PDF:**  
-https://github.com/Lohan1kk/eco-mind/raw/main/docs/EcoMind-apresentacao.pdf
+https://github.com/Lohan1kk/eco-mind/raw/main/apresentacao/EcoMind-apresentacao.pdf
 
-Arquivo no repositório: [`docs/EcoMind-apresentacao.pdf`](docs/EcoMind-apresentacao.pdf)  
+Arquivo no repositório: [`apresentacao/EcoMind-apresentacao.pdf`](apresentacao/EcoMind-apresentacao.pdf)  
 *(Não fica publicado como página do site.)*
 
 Site do app: https://eco-mind-ashy.vercel.app
