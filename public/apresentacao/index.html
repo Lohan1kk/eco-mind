@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoMind — Apresentação (3 falas)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,650&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --forest: #163d2a;
+      --forest-mid: #2f7a4f;
+      --sprout: #c8efd4;
+      --mist: #fbfdfb;
+      --ink: #122018;
+      --ash: #5f675f;
+      --burn: #9a6242;
+      --paper: #ffffff;
+      --line: rgba(22, 61, 42, 0.12);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Source Sans 3", system-ui, sans-serif;
+      background: #0c1813;
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: 1fr auto;
+    }
+
+    .deck {
+      position: relative;
+      width: min(100vw, calc(100vh * 16 / 9));
+      height: min(100vh - 7.5rem, calc(100vw * 9 / 16));
+      margin: 1rem auto 0;
+      background: var(--mist);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: clamp(1.5rem, 4vw, 3.5rem);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      background:
+        radial-gradient(ellipse 55% 45% at 8% 0%, rgba(200,239,212,0.55), transparent 55%),
+        radial-gradient(ellipse 50% 40% at 100% 100%, rgba(47,122,79,0.08), transparent 50%),
+        var(--mist);
+    }
+
+    .slide.active { display: flex; }
+
+    .slide.dark {
+      background:
+        radial-gradient(ellipse 60% 50% at 15% 20%, rgba(47,122,79,0.35), transparent 55%),
+        linear-gradient(160deg, #0f2218 0%, #163d2a 55%, #0c1813 100%);
+      color: var(--mist);
+    }
+
+    .eyebrow {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--forest-mid);
+      margin-bottom: 0.75rem;
+    }
+
+    .slide.dark .eyebrow { color: var(--sprout); }
+
+    h1, h2 {
+      font-family: Fraunces, Georgia, serif;
+      font-weight: 560;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+
+    h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); }
+    h2 { font-size: clamp(1.8rem, 4vw, 3rem); margin-bottom: 1rem; color: var(--forest); }
+    .slide.dark h2 { color: var(--mist); }
+
+    .lede {
+      font-size: clamp(1.05rem, 2vw, 1.35rem);
+      line-height: 1.55;
+      color: var(--ash);
+      max-width: 36rem;
+    }
+
+    .slide.dark .lede { color: rgba(251,253,251,0.82); }
+
+    ul {
+      list-style: none;
+      display: grid;
+      gap: 0.7rem;
+      margin-top: 1.25rem;
+      max-width: 40rem;
+    }
+
+    li {
+      font-size: clamp(1rem, 1.8vw, 1.25rem);
+      line-height: 1.4;
+      padding-left: 1.1rem;
+      position: relative;
+      color: var(--ink);
+    }
+
+    li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.55em;
+      width: 0.45rem;
+      height: 0.45rem;
+      border-radius: 50%;
+      background: var(--forest-mid);
+    }
+
+    .slide.dark li { color: rgba(251,253,251,0.92); }
+    .slide.dark li::before { background: var(--sprout); }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .brand-row img {
+      width: clamp(3.5rem, 8vw, 5rem);
+      height: clamp(3.5rem, 8vw, 5rem);
+      object-fit: contain;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 1.5rem;
+      width: 100%;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.85rem;
+      margin-top: 1.5rem;
+      width: 100%;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.72);
+      border: 1px solid var(--line);
+      border-radius: 1rem;
+      padding: 1.1rem 1rem;
+      text-align: left;
+    }
+
+    .slide.dark .card {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.12);
+    }
+
+    .card strong {
+      display: block;
+      font-family: Fraunces, Georgia, serif;
+      font-size: 1.15rem;
+      color: var(--forest);
+      margin-bottom: 0.35rem;
+    }
+
+    .slide.dark .card strong { color: var(--sprout); }
+
+    .card span {
+      font-size: 0.95rem;
+      color: var(--ash);
+      line-height: 1.4;
+    }
+
+    .slide.dark .card span { color: rgba(251,253,251,0.75); }
+
+    .person {
+      text-align: center;
+    }
+
+    .person img {
+      width: 4.5rem;
+      height: 4.5rem;
+      border-radius: 999px;
+      object-fit: cover;
+      border: 2px solid rgba(47,122,79,0.35);
+      margin-bottom: 0.55rem;
+    }
+
+    .person b {
+      display: block;
+      font-size: 0.95rem;
+      color: var(--forest);
+    }
+
+    .person small {
+      color: var(--ash);
+      font-size: 0.8rem;
+    }
+
+    .speaker-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: auto;
+      padding-top: 1.5rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--forest-mid);
+    }
+
+    .slide.dark .speaker-tag { color: var(--sprout); }
+
+    .speaker-tag::before {
+      content: "";
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .notes {
+      width: min(100vw, calc(100vh * 16 / 9));
+      margin: 0.75rem auto 1rem;
+      background: #13241c;
+      color: var(--mist);
+      border-radius: 12px;
+      padding: 0.9rem 1.1rem;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .notes .who {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--sprout);
+      white-space: nowrap;
+    }
+
+    .notes .line {
+      font-size: clamp(0.92rem, 1.5vw, 1.05rem);
+      line-height: 1.4;
+    }
+
+    .nav {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .nav button {
+      border: 1px solid rgba(200,239,212,0.25);
+      background: transparent;
+      color: var(--mist);
+      border-radius: 999px;
+      padding: 0.45rem 0.85rem;
+      font: inherit;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .nav button:hover { background: rgba(200,239,212,0.12); }
+
+    .nav .count {
+      font-size: 0.8rem;
+      color: rgba(251,253,251,0.65);
+      min-width: 3.2rem;
+      text-align: center;
+    }
+
+    .hint {
+      position: fixed;
+      right: 1rem;
+      bottom: 1rem;
+      font-size: 0.75rem;
+      color: rgba(251,253,251,0.45);
+    }
+
+    @media (max-width: 800px) {
+      .deck {
+        width: calc(100vw - 1rem);
+        height: auto;
+        min-height: 70vh;
+        margin: 0.5rem;
+      }
+      .slide { position: relative; display: none; min-height: 70vh; }
+      .slide.active { display: flex; }
+      .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; }
+      .notes {
+        width: calc(100vw - 1rem);
+        grid-template-columns: 1fr;
+        margin: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="deck" id="deck">
+
+      <!-- 1 -->
+      <section class="slide dark active" data-who="Ana Flávia" data-fala="Bom dia. Somos a EcoMind. Unimos consciência ambiental e tecnologia para educar sobre desmatamento e queimadas — e mostrar o que cada um pode fazer.">
+        <div class="brand-row">
+          <img src="/brand/icon-ecomind.png" alt="EcoMind" />
+          <div>
+            <p class="eyebrow">Apresentação do projeto</p>
+            <h1>EcoMind</h1>
+          </div>
+        </div>
+        <p class="lede">Consciência ambiental + tecnologia</p>
+        <p class="speaker-tag">Fala: Ana Flávia</p>
+      </section>
+
+      <!-- 2 -->
+      <section class="slide" data-who="Ana Flávia" data-fala="O problema: desmatamento e queimadas. A gente vê a notícia, se preocupa… e não sabe por onde começar. Falta uma ponte entre preocupação e ação.">
+        <p class="eyebrow">Contexto</p>
+        <h2>O problema</h2>
+        <ul>
+          <li>Desmatamento e queimadas destroem floresta e biodiversidade</li>
+          <li>Notícia gera preocupação, mas também impotência</li>
+          <li>Falta ponte clara entre preocupação e ação concreta</li>
+        </ul>
+        <p class="speaker-tag">Fala: Ana Flávia</p>
+      </section>
+
+      <!-- 3 -->
+      <section class="slide" data-who="Ana Flávia" data-fala="A EcoMind é essa ponte: um app que educa, calcula impacto e acompanha queimadas. A metáfora da marca é a semente que vira broto.">
+        <p class="eyebrow">Nossa ideia</p>
+        <h2>A EcoMind</h2>
+        <ul>
+          <li>App web de educação ambiental</li>
+          <li>Calculadora, quiz e mapa de queimadas</li>
+          <li>Metáfora: semente que vira broto</li>
+          <li>Para escola, casa e comunidade</li>
+        </ul>
+        <p class="speaker-tag">Fala: Ana Flávia</p>
+      </section>
+
+      <!-- 4 -->
+      <section class="slide" data-who="Lucas Lohan" data-fala="No app tem três ferramentas principais: calculadora de pegada de carbono, quiz com modo folclore, e mapa de queimadas com dados do INPE.">
+        <p class="eyebrow">Produto</p>
+        <h2>O que já existe</h2>
+        <div class="grid-3">
+          <div class="card">
+            <strong>Calculadora</strong>
+            <span>Estima a pegada de carbono e mostra onde reduzir.</span>
+          </div>
+          <div class="card">
+            <strong>Quiz</strong>
+            <span>Perguntas do site + Gincana do Folclore.</span>
+          </div>
+          <div class="card">
+            <strong>Mapa</strong>
+            <span>Focos de queimada com dados do INPE.</span>
+          </div>
+        </div>
+        <p class="speaker-tag">Fala: Lucas Lohan</p>
+      </section>
+
+      <!-- 5 -->
+      <section class="slide" data-who="Lucas Lohan" data-fala="O fluxo é simples: educar com informação clara, praticar no quiz e na calculadora, e agir — na escola, em casa e na comunidade. O mapa mostra o problema em tempo quase real.">
+        <p class="eyebrow">Como funciona</p>
+        <h2>Três passos</h2>
+        <div class="grid-3">
+          <div class="card">
+            <strong>1. Educar</strong>
+            <span>Causas e efeitos do desmatamento e das queimadas.</span>
+          </div>
+          <div class="card">
+            <strong>2. Praticar</strong>
+            <span>Quiz, calculadora e exploração do mapa.</span>
+          </div>
+          <div class="card">
+            <strong>3. Agir</strong>
+            <span>Hábitos e engajamento no dia a dia.</span>
+          </div>
+        </div>
+        <p class="speaker-tag">Fala: Lucas Lohan</p>
+      </section>
+
+      <!-- 6 -->
+      <section class="slide" data-who="André Soares" data-fala="Na escola, a EcoMind vira aprendizagem ativa. Liga Geografia, Biologia e atualidades. O aluno participa — não só assiste.">
+        <p class="eyebrow">Escola</p>
+        <h2>Por que importa</h2>
+        <ul>
+          <li>Aprendizado ativo: o aluno participa</li>
+          <li>Cidadania e responsabilidade ambiental</li>
+          <li>Liga Geografia, Biologia e notícias</li>
+          <li>Projeto real, feito por alunos</li>
+        </ul>
+        <p class="speaker-tag">Fala: André Soares</p>
+      </section>
+
+      <!-- 7 -->
+      <section class="slide" data-who="André Soares" data-fala="Somos quatro: Ana no design e liderança; Lucas na programação e UX; eu na tecnologia; Gabriel no marketing e conteúdo.">
+        <p class="eyebrow">Time</p>
+        <h2>Nossa equipe</h2>
+        <div class="grid-4">
+          <div class="person">
+            <img src="/team/foto-ana.png" alt="" />
+            <b>Ana Flávia</b>
+            <small>CEO / Design</small>
+          </div>
+          <div class="person">
+            <img src="/team/foto-lucas.png" alt="" />
+            <b>Lucas Lohan</b>
+            <small>CTO / Programação</small>
+          </div>
+          <div class="person">
+            <img src="/team/foto-andre.png" alt="" />
+            <b>André Soares</b>
+            <small>Tecnologia</small>
+          </div>
+          <div class="person">
+            <img src="/team/foto-gabriel.png" alt="" />
+            <b>Gabriel Rosa</b>
+            <small>Marketing</small>
+          </div>
+        </div>
+        <p class="speaker-tag">Fala: André Soares</p>
+      </section>
+
+      <!-- 8 -->
+      <section class="slide dark" data-who="André Soares" data-fala="Pedimos feedback e apoio para testar na escola. Obrigado.">
+        <p class="eyebrow">Fechamento</p>
+        <h2>Próximo passo</h2>
+        <ul>
+          <li>Validar o uso com a turma</li>
+          <li>Ajustar conteúdo com orientação da professora</li>
+          <li>Pedido: feedback e apoio para testar na escola</li>
+        </ul>
+        <p class="lede" style="margin-top:1.25rem">eco-mind-ashy.vercel.app</p>
+        <p class="speaker-tag">Fala: André Soares</p>
+      </section>
+    </div>
+
+    <div class="notes" id="notes">
+      <div class="who" id="who">Ana Flávia</div>
+      <div class="line" id="fala">Bom dia. Somos a EcoMind. Unimos consciência ambiental e tecnologia para educar sobre desmatamento e queimadas — e mostrar o que cada um pode fazer.</div>
+      <div class="nav">
+        <button type="button" id="prev" aria-label="Anterior">←</button>
+        <span class="count" id="count">1 / 8</span>
+        <button type="button" id="next" aria-label="Próximo">→</button>
+      </div>
+    </div>
+  </div>
+
+  <p class="hint">← → ou clique · F tela cheia</p>
+
+  <script>
+    const slides = [...document.querySelectorAll(".slide")];
+    const who = document.getElementById("who");
+    const fala = document.getElementById("fala");
+    const count = document.getElementById("count");
+    let i = 0;
+
+    function show(n) {
+      i = (n + slides.length) % slides.length;
+      slides.forEach((s, idx) => s.classList.toggle("active", idx === i));
+      const s = slides[i];
+      who.textContent = s.dataset.who;
+      fala.textContent = s.dataset.fala;
+      count.textContent = `${i + 1} / ${slides.length}`;
+    }
+
+    document.getElementById("prev").onclick = () => show(i - 1);
+    document.getElementById("next").onclick = () => show(i + 1);
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); show(i + 1); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); show(i - 1); }
+      if (e.key === "f" || e.key === "F") {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+        else document.exitFullscreen?.();
+      }
+    });
+
+    show(0);
+  </script>
+</body>
+</html>
