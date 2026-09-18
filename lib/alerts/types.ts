@@ -16,10 +16,3 @@ export interface FireAlert {
   bioma?: string;
   frp?: number;
 }
-
-export interface CreateFireAlertInput {
-  lat: number;
-  lng: number;
-  level: AlertLevel;
-  description?: string;
-}

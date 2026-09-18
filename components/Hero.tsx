@@ -99,7 +99,7 @@ export function Hero() {
         >
           <motion.div className="mb-7" variants={scaleSoft}>
             <Image
-              src="/brand/logo-ecomind.png"
+              src="/brand/icon-ecomind.png"
               alt="EcoMind"
               width={120}
               height={120}

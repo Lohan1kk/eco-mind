@@ -1,9 +1,5 @@
 /**
  * EcoMind motion system — shared Framer Motion presets.
- *
- * Use variants/transitions from here instead of repeating motion config
- * in feature components. Design tokens (duration, ease, offsets) live in
- * `variants.ts` only.
  */
 export {
   softEase,
@@ -13,12 +9,7 @@ export {
   brandEnterTransition,
   fadeIn,
   fadeUp,
-  fadeDown,
   slideUp,
-  slideDown,
-  slideLeft,
-  slideRight,
-  slideSwap,
   scaleIn,
   scaleSoft,
   stagger,
@@ -26,8 +17,6 @@ export {
   staggerHero,
   staggerItem,
   staggerItemSoft,
-  heroStagger,
-  heroItem,
   hoverLift,
   tapPress,
   tapSoft,

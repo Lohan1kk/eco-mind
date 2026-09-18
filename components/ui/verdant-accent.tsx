@@ -5,18 +5,14 @@ import { VerdantSwirl } from "@/components/ui/verdant-swirl";
 import { usePerfProfile } from "@/components/hooks/usePerfProfile";
 
 type VerdantWashProps = {
-  /** light = pale mist under ink; dark = muted sage on forest panels */
   tone?: "light" | "dark";
-  /** Animation speed (default 0.38 — slow and smooth) */
   speed?: number;
   className?: string;
 };
 
 /**
  * Full-bleed rectangular wash behind section content.
- * Light tone: soft celadon mist (more visible silk, gentle reading plate).
- * Dark tone: muted sage glow — leave as-is when refining light only.
- * Mounts once when near viewport and pauses via `active` (no WebGL remount).
+ * Mounts once when near viewport; pauses via `active` (no WebGL remount).
  */
 export function VerdantWash({
   tone = "light",
@@ -66,6 +62,3 @@ export function VerdantWash({
     </div>
   );
 }
-
-/** @deprecated Use VerdantWash — kept as alias during migration */
-export const VerdantAccent = VerdantWash;

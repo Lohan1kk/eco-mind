@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type MutableRefObject } from "react";
+import { useEffect, useRef } from "react";
 import { useReducedMotion } from "framer-motion";
 import {
   useDocumentVisible,
@@ -9,8 +9,7 @@ import {
 
 /**
  * Atmospheric forest mist + god-ray shader for EcoMind hero.
- * Transparent WebGL overlay — reads pointer from a ref (no React re-renders).
- * Quality scales with PerfProfile (DPR + FPS); skipped on low-tier devices.
+ * Transparent WebGL overlay. Quality scales with PerfProfile (DPR + FPS).
  */
 const VERT = `
 attribute vec2 a_position;
@@ -112,13 +111,9 @@ function compile(
   return shader;
 }
 
-type Pointer = { x: number; y: number };
-
 type ForestAtmosphereProps = {
   className?: string;
   intensity?: number;
-  /** Shared ref updated by Hero without React setState */
-  pointerRef?: MutableRefObject<Pointer>;
   active?: boolean;
 };
 
@@ -149,14 +144,12 @@ function ForestCssFallback({
 export function ForestAtmosphere({
   className = "",
   intensity = 1,
-  pointerRef,
   active = true,
 }: ForestAtmosphereProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const reduce = useReducedMotion();
   const perf = usePerfProfile();
   const docVisible = useDocumentVisible();
-  const localPointer = useRef<Pointer>({ x: 0, y: 0 });
   const intensityRef = useRef(intensity);
   const activeRef = useRef(active && docVisible);
   const maxDprRef = useRef(perf.forestMaxDpr);
@@ -265,13 +258,12 @@ export function ForestAtmosphere({
 
       gl.uniform1f(uOctaves, tierRef.current === "low" ? 3 : 5);
       resize();
-      const ptr = pointerRef?.current ?? localPointer.current;
       const t = frozen ? 2.4 : (now - start) / 1000;
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.uniform1f(uTime, t);
       gl.uniform1f(uIntensity, intensityRef.current);
-      gl.uniform2f(uPointer, ptr.x, ptr.y);
+      gl.uniform2f(uPointer, 0, 0);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
     };
 
@@ -293,7 +285,7 @@ export function ForestAtmosphere({
       gl.deleteShader(fs);
       gl.deleteBuffer(buf);
     };
-  }, [reduce, pointerRef, useWebgl]);
+  }, [reduce, useWebgl]);
 
   if (!useWebgl) {
     return (

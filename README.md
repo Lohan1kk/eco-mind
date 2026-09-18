@@ -33,4 +33,4 @@ Modelo: [`.env.example`](.env.example)
 
 - Identidade e história: [`MARCA.md`](MARCA.md)
 - Pitch: [`PITCH.md`](PITCH.md)
-- Assets: [`assets/`](assets/) e `public/brand/`
+- Assets: `public/brand/`

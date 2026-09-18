@@ -1,4 +1,4 @@
-import { Reveal } from "./Reveal";
+import { Reveal } from "@/components/motion";
 import { SectionAtmosphere } from "@/components/ui/section-atmosphere";
 import { VerdantWash } from "@/components/ui/verdant-accent";
 
