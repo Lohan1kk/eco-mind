@@ -1,19 +1,23 @@
 # EcoMind — Roteiro de falas (3 pessoas)
 
 Apresentação objetiva · ~4–5 minutos · 8 slides  
-Abrir: [/apresentacao](https://eco-mind-ashy.vercel.app/apresentacao)  
-Site: https://eco-mind-ashy.vercel.app
+
+**Baixar PDF:**  
+https://github.com/Lohan1kk/eco-mind/raw/main/apresentacao/EcoMind-apresentacao.pdf
+
+Arquivo no repositório: [`apresentacao/EcoMind-apresentacao.pdf`](apresentacao/EcoMind-apresentacao.pdf)  
+*(Não fica publicado como página do site.)*
+
+Site do app: https://eco-mind-ashy.vercel.app
 
 **Quem fala**
 1. **Ana Flávia** — abertura, problema, ideia  
 2. **Lucas Lohan** — produto e como funciona  
 3. **André Soares** — escola, equipe, fechamento  
 
-*(Gabriel Rosa aparece no slide da equipe; se precisar trocar, André ↔ Gabriel no fechamento.)*
-
 ---
 
-## Ordem e falas (ler quase literal)
+## Falas
 
 ### 1. Capa — Ana Flávia
 > Bom dia. Somos a EcoMind. Unimos consciência ambiental e tecnologia para educar sobre desmatamento e queimadas — e mostrar o que cada um pode fazer.
@@ -37,21 +41,4 @@ Site: https://eco-mind-ashy.vercel.app
 > Somos quatro: Ana no design e liderança; Lucas na programação e UX; eu na tecnologia; Gabriel no marketing e conteúdo.
 
 ### 8. Fechamento — André Soares
-> Pedimos feedback e apoio para testar na escola. Obrigado.  
-> *(opcional:)* O site está em eco-mind-ashy.vercel.app.
-
----
-
-## Tempo sugerido
-
-| Pessoa        | Slides | Tempo   |
-|---------------|--------|---------|
-| Ana Flávia    | 1–3    | ~1 min  |
-| Lucas Lohan   | 4–5    | ~1,5 min|
-| André Soares  | 6–8    | ~1,5 min|
-| **Total**     | 8      | **~4 min** + perguntas |
-
-## Dicas rápidas
-- Uma ideia por frase. Não improvisar parágrafo longo.
-- No slide 4, se der, abrir o site e mostrar 1 tela (mapa ou calculadora).
-- Ensaiar uma vez em voz alta cronometrado.
+> Pedimos feedback e apoio para testar na escola. Obrigado.
