@@ -2,7 +2,7 @@
 
 Roteiro de **7 slides** (~3–5 min). Cole o texto de cada slide no Canva. Use o **roteiro falado** só como guia — não leia palavra por palavra.
 
-**Arquivos da marca:** [`assets/logo-ecomind.png`](assets/logo-ecomind.png) · [`assets/logo-ecomind.svg`](assets/logo-ecomind.svg)
+**Arquivos da marca:** [`public/brand/icon-ecomind.png`](public/brand/icon-ecomind.png) · [`public/brand/icon-ecomind-maskable.png`](public/brand/icon-ecomind-maskable.png)
 
 **Paleta sugerida (alinhada à logo):** verde floresta, verde claro (broto), terra/cinza de queimada, branco. Evite roxo e fundos “genéricos de startup”.
 

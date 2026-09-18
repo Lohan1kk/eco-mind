@@ -1,4 +1,4 @@
-const CACHE_NAME = "ecomind-v4";
+const CACHE_NAME = "ecomind-v5";
 const PRECACHE = [
   "/",
   "/calculadora",
@@ -8,7 +8,6 @@ const PRECACHE = [
   "/manifest.webmanifest",
   "/brand/icon-ecomind.png",
   "/brand/icon-ecomind-maskable.png",
-  "/brand/logo-ecomind.png",
 ];
 
 self.addEventListener("install", (event) => {

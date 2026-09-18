@@ -39,7 +39,7 @@ export function Idea() {
           className="flex flex-col items-center justify-center text-center md:items-end md:text-right"
         >
           <Image
-            src="/brand/logo-ecomind.png"
+            src="/brand/icon-ecomind.png"
             alt="Logo EcoMind"
             width={240}
             height={240}

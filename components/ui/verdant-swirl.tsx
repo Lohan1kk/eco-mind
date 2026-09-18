@@ -182,8 +182,6 @@ type VerdantSwirlProps = {
   active?: boolean;
   /** Color story: classic CTA, mist (light sections), glow (dark sections) */
   palette?: VerdantPalette;
-  /** Force CSS fallback (low-tier / no WebGL) */
-  cssFallback?: boolean;
 };
 
 function VerdantCssFallback({
@@ -220,7 +218,6 @@ export function VerdantSwirl({
   maxDpr,
   active = true,
   palette = "classic",
-  cssFallback = false,
 }: VerdantSwirlProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const reduce = useReducedMotion();
@@ -241,8 +238,7 @@ export function VerdantSwirl({
     tierRef.current = perf.tier;
   }, [maxDpr, perf.verdantMaxDpr, perf.verdantTargetFps, perf.tier]);
 
-  // Prefer WebGL whenever the browser allows it; CSS only for reduced-motion
-  const useWebgl = !cssFallback && !reduce;
+  const useWebgl = !reduce;
 
   useEffect(() => {
     if (!useWebgl) return;

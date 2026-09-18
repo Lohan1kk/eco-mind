@@ -33,7 +33,7 @@ A metáfora da marca é a **semente que vira broto**: pequenas ações e conheci
 
 ## Logo
 
-- PNG: [`assets/logo-ecomind.png`](assets/logo-ecomind.png)
-- Ícone: [`assets/icon-ecomind.png`](assets/icon-ecomind.png)
+- PNG: [`public/brand/icon-ecomind.png`](public/brand/icon-ecomind.png)
+- Ícone maskable: [`public/brand/icon-ecomind-maskable.png`](public/brand/icon-ecomind-maskable.png)
 
 Conceito: **natureza + mente** — metade folha, metade cérebro em circuito, unindo meio ambiente e consciência tecnológica. Gradiente verde-água a lima, em círculo.

@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 import { usePerfProfile } from "@/components/hooks/usePerfProfile";
 
 type Variant = "mist" | "soft" | "deep";
 
 /**
- * Lightweight CSS atmosphere for content sections.
- * No WebGL — safe to mount on every home section without freezing the page.
+ * Lightweight CSS atmosphere for content sections (no WebGL).
  */
 export function SectionAtmosphere({
   variant = "soft",
@@ -51,24 +50,6 @@ export function SectionAtmosphere({
           className={`section-atmosphere-grain ${paused ? "is-paused" : ""}`}
         />
       ) : null}
-    </div>
-  );
-}
-
-/** Convenience wrapper: relative section shell with atmosphere behind children */
-export function WithAtmosphere({
-  variant = "soft",
-  className = "",
-  children,
-}: {
-  variant?: Variant;
-  className?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className={`relative overflow-hidden ${className}`}>
-      <SectionAtmosphere variant={variant} />
-      <div className="relative z-[1]">{children}</div>
     </div>
   );
 }
