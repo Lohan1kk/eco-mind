@@ -8,7 +8,7 @@ import {
 } from "@/components/hooks/usePerfProfile";
 
 /** Verdant Swirl palette (21st.dev / Serafim Silk-style) */
-export const VERDANT_COLORS = {
+const VERDANT_COLORS = {
   deep: "#03120E",
   forest: "#0E7C5A",
   sprout: "#7CE577",
@@ -16,7 +16,7 @@ export const VERDANT_COLORS = {
 } as const;
 
 /** High-key mist for light content sections — soft celadon silk, still ink-safe */
-export const VERDANT_MIST = {
+const VERDANT_MIST = {
   deep: "#EEF6F1",
   forest: "#C4DFD1",
   sprout: "#8FCBAA",
@@ -24,14 +24,14 @@ export const VERDANT_MIST = {
 } as const;
 
 /** Muted glow for dark panels — soft sage, not neon CTA */
-export const VERDANT_GLOW = {
+const VERDANT_GLOW = {
   deep: "#0c1813",
   forest: "#1a4032",
   sprout: "#3d7358",
   highlight: "#9bb89a",
 } as const;
 
-export type VerdantPalette = "classic" | "mist" | "glow";
+type VerdantPalette = "classic" | "mist" | "glow";
 
 const PALETTES: Record<
   VerdantPalette,
