@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
-import { HIDE_BOTTOM_NAV } from "@/lib/pwa";
+import { hidesBottomNav } from "@/lib/pwa";
 import { pressTransition } from "@/components/motion";
 
 const NAV = [
@@ -18,7 +18,7 @@ export function BottomNav() {
   const pathname = usePathname();
   const reduce = useReducedMotion();
 
-  if (HIDE_BOTTOM_NAV.some((p) => pathname.startsWith(p))) return null;
+  if (hidesBottomNav(pathname)) return null;
 
   return (
     <nav

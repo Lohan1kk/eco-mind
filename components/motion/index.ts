@@ -5,9 +5,6 @@ export {
   softEase,
   enterTransition,
   pressTransition,
-  slowEnterTransition,
-  brandEnterTransition,
-  fadeIn,
   fadeUp,
   slideUp,
   scaleIn,
@@ -20,12 +17,6 @@ export {
   hoverLift,
   tapPress,
   tapSoft,
-  hoverPresets,
-  revealVariants,
-  revealViewport,
-  revealTransition,
-  type RevealVariantName,
-  type StaggerOptions,
 } from "./variants";
 
 export { Reveal, StaggerReveal, StaggerItem, MotionPress } from "./Reveal";
