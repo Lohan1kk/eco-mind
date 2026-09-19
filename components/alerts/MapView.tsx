@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import {
+  CircleMarker,
   MapContainer,
   Marker,
   Popup,
@@ -9,6 +10,7 @@ import {
   useMap,
   useMapEvents,
 } from "react-leaflet";
+import { usePerfProfile } from "@/components/hooks/usePerfProfile";
 import { WORLD_CENTER, WORLD_DEFAULT_ZOOM } from "@/lib/alerts/geo";
 import { LEVEL_META } from "@/lib/alerts/levels";
 import type { FireAlert } from "@/lib/alerts/types";
@@ -53,11 +55,16 @@ function MapClickHandler({
 function FixMapSize({ layer }: { layer: MapLayer }) {
   const map = useMap();
   useEffect(() => {
-    const t1 = window.setTimeout(() => map.invalidateSize(), 50);
-    const t2 = window.setTimeout(() => map.invalidateSize(), 300);
+    const bump = () => map.invalidateSize({ animate: false });
+    const t1 = window.setTimeout(bump, 40);
+    const t2 = window.setTimeout(bump, 280);
+    window.addEventListener("orientationchange", bump);
+    window.addEventListener("resize", bump);
     return () => {
       window.clearTimeout(t1);
       window.clearTimeout(t2);
+      window.removeEventListener("orientationchange", bump);
+      window.removeEventListener("resize", bump);
     };
   }, [map, layer]);
   return null;
@@ -67,6 +74,51 @@ function formatReportedAt(value: string) {
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return value;
   return d.toLocaleString("pt-BR");
+}
+
+function AlertPopup({ alert }: { alert: FireAlert }) {
+  return (
+    <div className="min-w-[160px] max-w-[220px] text-sm">
+      <p
+        className="font-semibold"
+        style={{ color: LEVEL_META[alert.level].color }}
+      >
+        {LEVEL_META[alert.level].label}
+      </p>
+      {alert.frp != null ? (
+        <p className="mt-1 text-xs font-medium text-ink">
+          FRP {alert.frp.toFixed(1)} MW
+        </p>
+      ) : null}
+      {alert.municipio ? (
+        <p className="mt-1 text-ash">
+          {[alert.municipio, alert.estado].filter(Boolean).join(" · ")}
+        </p>
+      ) : alert.description ? (
+        <p className="mt-1 text-ash">{alert.description}</p>
+      ) : null}
+      {alert.bioma ? (
+        <p className="mt-1 text-xs text-ash/80">Bioma: {alert.bioma}</p>
+      ) : null}
+      {alert.satelite ? (
+        <p className="mt-1 text-xs text-ash/80">Satélite: {alert.satelite}</p>
+      ) : null}
+      <p className="mt-2 text-xs text-ash/80">
+        {formatReportedAt(alert.reportedAt)}
+      </p>
+      <p className="mt-1 text-[10px] uppercase tracking-wide text-ash/60">
+        {alert.source === "inpe"
+          ? "INPE Brasil"
+          : alert.source === "nasa"
+            ? "NASA FIRMS · mundo"
+            : alert.source === "user"
+              ? "Reporte neste aparelho"
+              : alert.source === "seed"
+                ? "Demonstração EcoMind"
+                : "EcoMind"}
+      </p>
+    </div>
+  );
 }
 
 interface MapViewProps {
@@ -84,83 +136,88 @@ export function MapView({
   onMapClick,
   selectedCoords,
 }: MapViewProps) {
+  const perf = usePerfProfile();
   const tile = TILES[layer];
+  const isTouch = perf.tier !== "high";
+  const pinRadius = isTouch ? 6 : 5;
+
+  const pathByLevel = useMemo(() => {
+    const out = {} as Record<
+      FireAlert["level"],
+      { color: string; weight: number; fillColor: string; fillOpacity: number }
+    >;
+    for (const level of Object.keys(LEVEL_META) as FireAlert["level"][]) {
+      out[level] = {
+        color: "#ffffff",
+        weight: isTouch ? 2 : 1.5,
+        fillColor: LEVEL_META[level].color,
+        fillOpacity: 0.92,
+      };
+    }
+    return out;
+  }, [isTouch]);
 
   return (
     <MapContainer
       center={WORLD_CENTER}
-      zoom={WORLD_DEFAULT_ZOOM}
-      className="z-0 h-full w-full"
+      zoom={isTouch ? 3 : WORLD_DEFAULT_ZOOM}
+      className="z-0 h-full w-full touch-manipulation"
       style={{ height: "100%", width: "100%" }}
-      scrollWheelZoom
+      scrollWheelZoom={!isTouch}
       preferCanvas
+      zoomControl={!isTouch}
+      attributionControl={!isTouch}
+      tapTolerance={18}
+      maxZoom={isTouch ? 12 : 19}
+      minZoom={2}
     >
       <TileLayer
         key={layer}
         attribution={tile.attribution}
         url={tile.url}
-        maxZoom={tile.maxZoom}
+        maxZoom={isTouch ? 12 : tile.maxZoom}
+        updateWhenZooming={!isTouch}
+        updateWhenIdle
+        keepBuffer={isTouch ? 1 : 2}
       />
       <FixMapSize layer={layer} />
       <MapClickHandler enabled={pickMode} onClick={onMapClick} />
 
-      {alerts.map((alert) => (
-        <Marker
-          key={alert.id}
-          position={[alert.lat, alert.lng]}
-          icon={createPinIcon(alert.level)}
-        >
-          <Popup>
-            <div className="min-w-[180px] text-sm">
-              <p
-                className="font-semibold"
-                style={{ color: LEVEL_META[alert.level].color }}
-              >
-                {LEVEL_META[alert.level].label}
-              </p>
-              {alert.frp != null ? (
-                <p className="mt-1 text-xs font-medium text-ink">
-                  FRP {alert.frp.toFixed(1)} MW
-                </p>
-              ) : null}
-              {alert.municipio ? (
-                <p className="mt-1 text-ash">
-                  {[alert.municipio, alert.estado].filter(Boolean).join(" · ")}
-                </p>
-              ) : alert.description ? (
-                <p className="mt-1 text-ash">{alert.description}</p>
-              ) : null}
-              {alert.bioma ? (
-                <p className="mt-1 text-xs text-ash/80">Bioma: {alert.bioma}</p>
-              ) : null}
-              {alert.satelite ? (
-                <p className="mt-1 text-xs text-ash/80">
-                  Satélite: {alert.satelite}
-                </p>
-              ) : null}
-              <p className="mt-2 text-xs text-ash/80">
-                {formatReportedAt(alert.reportedAt)}
-              </p>
-              <p className="mt-1 text-[10px] uppercase tracking-wide text-ash/60">
-                {alert.source === "inpe"
-                  ? "INPE Brasil"
-                  : alert.source === "nasa"
-                    ? "NASA FIRMS · mundo"
-                    : alert.source === "user"
-                      ? "Reporte neste aparelho"
-                      : alert.source === "seed"
-                        ? "Demonstração EcoMind"
-                        : "EcoMind"}
-              </p>
-            </div>
-          </Popup>
-        </Marker>
-      ))}
+      {alerts.map((alert) =>
+        alert.source === "user" ? (
+          <Marker
+            key={alert.id}
+            position={[alert.lat, alert.lng]}
+            icon={createPinIcon(alert.level)}
+          >
+            <Popup autoPanPadding={[48, 48]}>
+              <AlertPopup alert={alert} />
+            </Popup>
+          </Marker>
+        ) : (
+          <CircleMarker
+            key={alert.id}
+            center={[alert.lat, alert.lng]}
+            radius={pinRadius}
+            pathOptions={pathByLevel[alert.level]}
+          >
+            <Popup autoPanPadding={[48, 48]}>
+              <AlertPopup alert={alert} />
+            </Popup>
+          </CircleMarker>
+        ),
+      )}
 
       {selectedCoords ? (
-        <Marker
-          position={[selectedCoords.lat, selectedCoords.lng]}
-          icon={createPinIcon("critico")}
+        <CircleMarker
+          center={[selectedCoords.lat, selectedCoords.lng]}
+          radius={9}
+          pathOptions={{
+            color: "#fff",
+            weight: 2,
+            fillColor: LEVEL_META.critico.color,
+            fillOpacity: 1,
+          }}
         />
       ) : null}
     </MapContainer>
