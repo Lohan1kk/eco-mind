@@ -6,22 +6,22 @@ import { VerdantWash } from "@/components/ui/verdant-accent";
 const team = [
   {
     name: "Ana Flávia",
-    role: "CEO / Design",
+    role: "Designer e Marketing",
     image: "/team/foto-ana.png",
   },
   {
     name: "André Zauli",
-    role: "Tecnologia / Programação",
+    role: "Programador",
     image: "/team/foto-andre.png",
   },
   {
     name: "Lucas Lohan",
-    role: "CTO / UX-UI",
+    role: "Programador e Conteúdo",
     image: "/team/foto-lucas.png",
   },
   {
     name: "Gabriel Rosa",
-    role: "Marketing / Conteúdo",
+    role: "Conteúdo e Designer",
     image: "/team/foto-gabriel.png",
   },
 ];
