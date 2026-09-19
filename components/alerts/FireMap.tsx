@@ -244,11 +244,11 @@ export default function FireMap() {
 
   const tenMinNote =
     meta?.inpeSource === "inpe-10min" && !showLevelFilters
-      ? "Fonte INPE 10 min sem FRP — níveis médios. Atualize para o consolidado diário."
+      ? "Fonte INPE 10 min sem FRP — intensidade estimada baixa. Atualize para o consolidado diário."
       : null;
 
   return (
-    <div className="relative h-[calc(100svh-8.5rem-env(safe-area-inset-bottom))] w-full md:h-[calc(100svh-4rem)]">
+    <div className="relative h-full w-full">
       {loading ? (
         <div className="flex h-full flex-col items-center justify-center gap-4 bg-mist-soft text-ash">
           <div className="h-12 w-12 animate-pulse-soft rounded-full border-2 border-forest/30 border-t-forest" />
@@ -265,9 +265,9 @@ export default function FireMap() {
       )}
 
       {/* z-[1100]: above Leaflet controls */}
-      <div className="pointer-events-none absolute inset-x-0 top-3 z-[1100] flex justify-center px-3">
+      <div className="pointer-events-none absolute inset-x-0 top-2 z-[1100] flex justify-center px-2 sm:top-3 sm:px-3">
         <div
-          className="pointer-events-auto inline-flex rounded-lg border border-forest/15 bg-white/95 p-1 shadow-md backdrop-blur-sm"
+          className="pointer-events-auto inline-flex rounded-lg border border-forest/15 bg-white/95 p-1 shadow-md"
           role="tablist"
           aria-label="Tipo de mapa"
         >
@@ -278,10 +278,10 @@ export default function FireMap() {
               role="tab"
               aria-selected={layer === mode}
               onClick={() => setLayer(mode)}
-              className={`rounded-md px-4 py-1.5 text-sm font-semibold transition ${
+              className={`min-h-9 rounded-md px-3.5 py-1.5 text-sm font-semibold transition touch-manipulation ${
                 layer === mode
                   ? "bg-forest text-mist"
-                  : "text-forest hover:bg-forest/10"
+                  : "text-forest active:bg-forest/10"
               }`}
             >
               {mode === "map" ? "Mapa" : "Satélite"}
@@ -290,12 +290,12 @@ export default function FireMap() {
         </div>
       </div>
 
-      <div className="pointer-events-none absolute left-3 right-3 top-14 z-[1100] flex flex-col gap-2 sm:top-16">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="pointer-events-none absolute left-2 right-2 top-12 z-[1100] flex flex-col gap-1.5 sm:left-3 sm:right-3 sm:top-14 sm:gap-2">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
           {sourceLabel ? (
-            <div className="pointer-events-auto rounded-lg border border-forest/15 bg-white/95 px-3 py-1.5 text-xs font-medium text-forest shadow-md backdrop-blur-sm">
+            <div className="pointer-events-auto max-w-[calc(100%-2.75rem)] truncate rounded-lg border border-forest/15 bg-white/95 px-2.5 py-1.5 text-[11px] font-medium text-forest shadow-md sm:max-w-none sm:px-3 sm:text-xs">
               {sourceLabel}
-              {freshnessLabel}
+              <span className="hidden sm:inline">{freshnessLabel}</span>
               <span className="ml-1 text-ash/70">
                 · {filteredAlerts.length} visíveis
               </span>
@@ -312,7 +312,7 @@ export default function FireMap() {
               onClick={refreshData}
               disabled={refreshing}
               aria-label="Atualizar dados"
-              className="pointer-events-auto flex h-8 w-8 items-center justify-center rounded-lg border border-forest/15 bg-white/95 text-forest shadow-md backdrop-blur-sm transition hover:bg-mist-soft disabled:opacity-50"
+              className="pointer-events-auto flex h-9 w-9 items-center justify-center rounded-lg border border-forest/15 bg-white/95 text-forest shadow-md transition active:bg-mist-soft disabled:opacity-50 touch-manipulation"
             >
               <span className={refreshing ? "animate-spin" : ""}>↻</span>
             </button>
@@ -320,14 +320,14 @@ export default function FireMap() {
         </div>
 
         {showLevelFilters ? (
-          <div className="pointer-events-auto flex max-w-full flex-wrap gap-1 rounded-lg border border-forest/15 bg-white/95 p-1 shadow-md backdrop-blur-sm">
+          <div className="pointer-events-auto flex max-w-full gap-1 overflow-x-auto rounded-lg border border-forest/15 bg-white/95 p-1 shadow-md [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <button
               type="button"
               onClick={() => setLevelFilter("all")}
-              className={`rounded-md px-2 py-1 text-[10px] font-semibold uppercase ${
+              className={`shrink-0 rounded-md px-2.5 py-1.5 text-[10px] font-semibold uppercase touch-manipulation ${
                 levelFilter === "all"
                   ? "bg-forest text-mist"
-                  : "text-ash hover:bg-forest/10"
+                  : "text-ash active:bg-forest/10"
               }`}
             >
               Todos ({alerts.length})
@@ -337,10 +337,10 @@ export default function FireMap() {
                 key={level}
                 type="button"
                 onClick={() => setLevelFilter(level)}
-                className={`rounded-md px-2 py-1 text-[10px] font-semibold uppercase ${
+                className={`shrink-0 rounded-md px-2.5 py-1.5 text-[10px] font-semibold uppercase touch-manipulation ${
                   levelFilter === level
                     ? "text-mist"
-                    : "text-ash hover:bg-forest/10"
+                    : "text-ash active:bg-forest/10"
                 }`}
                 style={
                   levelFilter === level
@@ -374,7 +374,7 @@ export default function FireMap() {
         ) : null}
       </div>
 
-      <div className="pointer-events-none absolute bottom-6 left-3 z-[1100]">
+      <div className="pointer-events-none absolute bottom-[max(1.25rem,env(safe-area-inset-bottom))] left-2 z-[1100] sm:bottom-6 sm:left-3">
         <div className="pointer-events-auto">
           <FireLegend />
         </div>
@@ -384,19 +384,19 @@ export default function FireMap() {
         type="button"
         onClick={openReport}
         aria-label="Reportar queimada"
-        className="absolute bottom-6 right-4 z-[1100] flex h-14 w-14 items-center justify-center rounded-full bg-red-600 text-3xl font-light text-white shadow-lg transition hover:bg-red-700"
+        className="absolute bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-3 z-[1100] flex h-14 w-14 items-center justify-center rounded-full bg-red-600 text-3xl font-light text-white shadow-lg transition active:bg-red-700 touch-manipulation sm:bottom-6 sm:right-4"
       >
         +
       </button>
 
       {error && !modalOpen ? (
-        <div className="absolute bottom-24 right-4 z-[1100] flex max-w-xs flex-col gap-2 rounded-lg bg-burn px-3 py-2 text-sm text-white shadow-md">
+        <div className="absolute bottom-24 right-3 z-[1100] flex max-w-[min(20rem,calc(100vw-5rem))] flex-col gap-2 rounded-lg bg-burn px-3 py-2 text-sm text-white shadow-md sm:right-4">
           <p>{error}</p>
           <button
             type="button"
             onClick={refreshData}
             disabled={refreshing}
-            className="self-start rounded-md bg-white/20 px-2 py-1 text-xs font-semibold uppercase tracking-wide hover:bg-white/30 disabled:opacity-50"
+            className="self-start rounded-md bg-white/20 px-2 py-1 text-xs font-semibold uppercase tracking-wide active:bg-white/30 disabled:opacity-50 touch-manipulation"
           >
             Tentar de novo
           </button>

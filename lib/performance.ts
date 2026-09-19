@@ -29,7 +29,7 @@ const HIGH: PerfProfile = {
   verdantTargetFps: 60,
   forestMaxDpr: 1.5,
   forestTargetFps: 60,
-  mapMaxAlerts: 400,
+  mapMaxAlerts: 320,
   atmosphereGrain: true,
 };
 
@@ -43,7 +43,8 @@ const MEDIUM: PerfProfile = {
   verdantTargetFps: 45,
   forestMaxDpr: 1.25,
   forestTargetFps: 45,
-  mapMaxAlerts: 280,
+  // Phones land here — keep pins low for smooth pan/zoom
+  mapMaxAlerts: 96,
   atmosphereGrain: true,
 };
 
@@ -57,7 +58,7 @@ const LOW: PerfProfile = {
   verdantTargetFps: 30,
   forestMaxDpr: 1,
   forestTargetFps: 30,
-  mapMaxAlerts: 160,
+  mapMaxAlerts: 64,
   atmosphereGrain: false,
 };
 
@@ -90,6 +91,8 @@ function detectPerfTier(): PerfTier {
 
   if (memory !== undefined && memory <= 2) return "low";
   if (cores <= 2) return "low";
+  // Touch phones: prefer low map budget over medium
+  if (coarse && (memory === undefined || memory <= 4 || cores <= 6)) return "low";
   if (coarse) return "medium";
   if (memory !== undefined && memory <= 4) return "medium";
   if (cores <= 4) return "medium";

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { AlertaIntro } from "@/components/alerts/AlertaIntro";
 import { AlertaQueimadasClient } from "@/components/alerts/AlertaQueimadasClient";
 import { Header } from "@/components/Header";
-import { SectionAtmosphere } from "@/components/ui/section-atmosphere";
 
 export const metadata: Metadata = {
   title: "Alerta de queimadas",
@@ -14,12 +13,13 @@ export default function AlertaQueimadasPage() {
   return (
     <>
       <Header solid />
-      <main className="pt-16">
-        <div className="relative overflow-hidden border-b border-forest/10 bg-mist px-5 py-4 md:px-8">
-          <SectionAtmosphere variant="mist" />
+      <main className="flex h-[100dvh] flex-col overflow-hidden pt-[calc(4rem+env(safe-area-inset-top))]">
+        <div className="shrink-0 border-b border-forest/10 bg-mist px-4 py-2.5 md:px-8 md:py-4">
           <AlertaIntro />
         </div>
-        <AlertaQueimadasClient />
+        <div className="min-h-0 flex-1">
+          <AlertaQueimadasClient />
+        </div>
       </main>
     </>
   );
