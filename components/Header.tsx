@@ -19,6 +19,7 @@ const links = [
   { href: "/quiz", label: "Quiz" },
   { href: "/alerta-queimadas", label: "Mapa" },
   { href: "/#equipe", label: "Equipe" },
+  { href: "/#avaliacao", label: "Avaliar" },
 ];
 
 export function Header({ solid = false }: { solid?: boolean }) {
