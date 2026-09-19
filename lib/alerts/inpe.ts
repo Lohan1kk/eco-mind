@@ -19,18 +19,15 @@ function safeIso(raw: string): string | null {
   return parsed.toISOString();
 }
 
-function latestDailyFilename(): string {
-  const now = new Date();
-  const y = now.getUTCFullYear();
-  const m = String(now.getUTCMonth() + 1).padStart(2, "0");
-  const d = String(now.getUTCDate()).padStart(2, "0");
+function dailyFilename(date: Date): string {
+  const y = date.getUTCFullYear();
+  const m = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(date.getUTCDate()).padStart(2, "0");
   return `focos_diario_br_${y}${m}${d}.csv`;
 }
 
 function fetchOpts(fresh: boolean, revalidate: number): RequestInit {
-  return fresh
-    ? { cache: "no-store" }
-    : { next: { revalidate } };
+  return fresh ? { cache: "no-store" } : { next: { revalidate } };
 }
 
 async function findLatest10MinFile(fresh: boolean): Promise<string | null> {
@@ -68,7 +65,8 @@ function parse10MinCsv(text: string): FireAlert[] {
           id: `inpe-10m-${index}-${lat.toFixed(4)}-${lng.toFixed(4)}`,
           lat,
           lng,
-          level: "medio" as const,
+          // 10-min CSV has no FRP — do not imply "médio"
+          level: "baixo" as const,
           description: satelite ? `Satélite ${satelite}` : undefined,
           reportedAt,
           source: "inpe" as const,
@@ -155,6 +153,33 @@ function diversifyInpeLevels(alerts: FireAlert[], limit: number): FireAlert[] {
   return picked.slice(0, limit);
 }
 
+async function fetchDailyCsvText(
+  date: Date,
+  fresh: boolean,
+): Promise<string | null> {
+  const res = await fetch(
+    `${INPE_DAILY_BR}${dailyFilename(date)}`,
+    fetchOpts(fresh, 3600),
+  );
+  if (!res.ok) return null;
+  return res.text();
+}
+
+/**
+ * Prefer a complete daily file. Mid-day "today" CSVs are often partial —
+ * if today has far fewer rows than yesterday, use yesterday.
+ */
+function pickBestDaily(
+  today: FireAlert[],
+  yesterday: FireAlert[],
+): FireAlert[] {
+  if (today.length === 0) return yesterday;
+  if (yesterday.length === 0) return today;
+  // Incomplete today (e.g. morning file vs full previous day)
+  if (today.length < yesterday.length * 0.4) return yesterday;
+  return today;
+}
+
 export async function fetchInpeFires(options?: {
   fresh?: boolean;
 }): Promise<{
@@ -163,30 +188,57 @@ export async function fetchInpeFires(options?: {
 }> {
   const fresh = Boolean(options?.fresh);
 
-  // Prefer daily CSV: includes FRP → proper crítico/alto/médio/baixo levels.
-  const dailyUrl = `${INPE_DAILY_BR}${latestDailyFilename()}`;
-  let res = await fetch(dailyUrl, fetchOpts(fresh, 3600));
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setUTCDate(yesterday.getUTCDate() - 1);
 
-  if (!res.ok) {
-    const yesterday = new Date();
-    yesterday.setUTCDate(yesterday.getUTCDate() - 1);
-    const y = yesterday.getUTCFullYear();
-    const m = String(yesterday.getUTCMonth() + 1).padStart(2, "0");
-    const d = String(yesterday.getUTCDate()).padStart(2, "0");
-    res = await fetch(
-      `${INPE_DAILY_BR}focos_diario_br_${y}${m}${d}.csv`,
-      fetchOpts(fresh, 3600),
-    );
-  }
+  const [todayText, yesterdayText] = await Promise.all([
+    fetchDailyCsvText(today, fresh),
+    fetchDailyCsvText(yesterday, fresh),
+  ]);
 
-  if (res.ok) {
-    const alerts = diversifyInpeLevels(parseDailyCsv(await res.text()), 320);
-    if (alerts.length > 0) {
-      return { alerts, source: "inpe-daily" };
+  const todayAlerts = todayText ? parseDailyCsv(todayText) : [];
+  const yesterdayAlerts = yesterdayText ? parseDailyCsv(yesterdayText) : [];
+  const daily = pickBestDaily(todayAlerts, yesterdayAlerts);
+
+  if (daily.length > 0) {
+    // Overlay latest 10-min foci for fresher pins (no FRP → baixo)
+    let merged = daily;
+    try {
+      const latest10 = await findLatest10MinFile(fresh);
+      if (latest10) {
+        const tenRes = await fetch(
+          `${INPE_10MIN_DIR}${latest10}`,
+          fetchOpts(fresh, 600),
+        );
+        if (tenRes.ok) {
+          const recent = parse10MinCsv(await tenRes.text());
+          if (recent.length > 0) {
+            const byId = new Map(daily.map((a) => [a.id, a]));
+            const cells = new Set(
+              daily.map((a) => `${a.lat.toFixed(2)}:${a.lng.toFixed(2)}`),
+            );
+            for (const r of recent) {
+              const cell = `${r.lat.toFixed(2)}:${r.lng.toFixed(2)}`;
+              if (cells.has(cell)) continue;
+              cells.add(cell);
+              byId.set(r.id, r);
+            }
+            merged = [...byId.values()];
+          }
+        }
+      }
+    } catch {
+      // keep daily only
     }
+
+    return {
+      alerts: diversifyInpeLevels(merged, 320),
+      source: "inpe-daily",
+    };
   }
 
-  // Fallback: 10-min (no FRP column — levels stay médio unless we infer later)
+  // Fallback: 10-min only
   const latest10 = await findLatest10MinFile(fresh);
   if (latest10) {
     const tenRes = await fetch(

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { dedupeFireAlerts } from "@/lib/alerts/dedupe";
 import {
   fetchNasaFirmsFires,
   fetchNasaFirmsGlobal,
@@ -18,20 +19,26 @@ export async function GET(request: Request) {
   let inpeAlerts: FireAlert[] = [];
   let inpeSource: string | null = null;
   let nasaAlerts: FireAlert[] = [];
+  let nasaOk = false;
   let seedAlerts: FireAlert[] = [];
   const errors: string[] = [];
 
-  try {
-    const inpe = await fetchInpeFires({ fresh });
-    inpeAlerts = inpe.alerts;
-    inpeSource = inpe.source;
-  } catch {
+  const [inpeResult, nasaResult] = await Promise.allSettled([
+    fetchInpeFires({ fresh }),
+    fetchNasaFirmsGlobal({ fresh, limit: 450 }),
+  ]);
+
+  if (inpeResult.status === "fulfilled") {
+    inpeAlerts = inpeResult.value.alerts;
+    inpeSource = inpeResult.value.source;
+  } else {
     errors.push("INPE indisponível no momento.");
   }
 
-  try {
-    nasaAlerts = await fetchNasaFirmsGlobal({ fresh, limit: 450 });
-  } catch {
+  if (nasaResult.status === "fulfilled") {
+    nasaAlerts = nasaResult.value;
+    nasaOk = nasaAlerts.length > 0;
+  } else {
     errors.push("NASA FIRMS global indisponível.");
   }
 
@@ -48,6 +55,7 @@ export async function GET(request: Request) {
         seen.add(key);
         nasaAlerts.push(alert);
       }
+      if (brazilFirms.length > 0) nasaOk = true;
     } catch {
       errors.push("NASA FIRMS (chave) indisponível.");
     }
@@ -60,7 +68,11 @@ export async function GET(request: Request) {
     );
   }
 
-  const alerts = [...inpeAlerts, ...nasaAlerts, ...seedAlerts];
+  const alerts = dedupeFireAlerts([
+    ...inpeAlerts,
+    ...nasaAlerts,
+    ...seedAlerts,
+  ]);
 
   return NextResponse.json({
     alerts,
@@ -70,9 +82,9 @@ export async function GET(request: Request) {
       nasa: nasaAlerts.length,
       seed: seedAlerts.length,
       inpeSource,
-      nasaEnabled: true,
+      nasaEnabled: nasaOk,
       firmsKeyConfigured: Boolean(firmsKey),
-      worldwide: nasaAlerts.length > 0 || seedAlerts.length > 0,
+      worldwide: nasaOk || seedAlerts.length > 0,
       updatedAt: new Date().toISOString(),
       errors: errors.length ? errors : undefined,
     },
