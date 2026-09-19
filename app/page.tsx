@@ -1,5 +1,6 @@
 import { ClimateReality } from "@/components/ClimateSections";
 import { Encourage } from "@/components/Encourage";
+import { EvaluationSection } from "@/components/Evaluation";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
@@ -25,6 +26,7 @@ export default function Home() {
         <ClimateReality />
         <School />
         <Team />
+        <EvaluationSection />
         <Encourage />
       </main>
       <Footer />
