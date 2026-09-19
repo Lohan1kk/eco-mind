@@ -24,9 +24,12 @@ export function FireLegend() {
           </li>
         ))}
       </ul>
-      <p className="mt-1.5 hidden max-w-[11rem] text-[10px] leading-snug text-ash/75 sm:mt-2 sm:block">
-        Crítico ≥100 MW · Alto ≥40 · Médio ≥15 · Baixo &lt;15 (ou FRP ausente).
-        Toque no pin para ver FRP e satélite.
+      <p className="mt-1.5 hidden max-w-[12rem] text-[10px] leading-snug text-ash/75 sm:mt-2 sm:block">
+        FRP = potência do fogo (MW). Crítico ≥100 · Alto ≥40 · Médio ≥15 · Baixo
+        &lt;15.{" "}
+        <a href="/#glossario" className="underline underline-offset-2">
+          Glossário
+        </a>
       </p>
     </div>
   );

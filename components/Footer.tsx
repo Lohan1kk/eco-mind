@@ -7,6 +7,7 @@ const links = [
   { href: "/calculadora", label: "Calculadora" },
   { href: "/quiz", label: "Quiz" },
   { href: "/alerta-queimadas", label: "Mapa de queimadas" },
+  { href: "/#glossario", label: "Termos" },
   { href: "/#avaliacao", label: "Avaliar" },
   { href: "/baixar", label: "Baixar app" },
   { href: "/#agir", label: "Começar" },
