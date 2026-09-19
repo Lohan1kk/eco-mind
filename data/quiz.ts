@@ -74,7 +74,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     ],
     correct: 1,
     feedback:
-      "O mapa usa focos reais de satélite — no Brasil, com dados do INPE (Programa Queimadas), quase em tempo real.",
+      "O mapa usa focos reais de satélite — no Brasil com o INPE (Programa Queimadas, arquivo diário) e no mundo com a NASA FIRMS (últimas 24h).",
   },
   {
     id: 6,

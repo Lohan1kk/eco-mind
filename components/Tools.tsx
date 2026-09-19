@@ -22,7 +22,7 @@ const tools = [
     href: "/alerta-queimadas",
     step: "03",
     title: "Mapa de queimadas",
-    desc: "Focos reais de satélite (INPE) no Brasil, quase em tempo real.",
+    desc: "Focos reais de satélite: INPE no Brasil e NASA FIRMS no mundo.",
     cta: "Abrir o mapa",
   },
 ];

@@ -21,8 +21,9 @@ export function AlertaIntro() {
       </StaggerItem>
       <StaggerItem soft>
         <p className="mt-1 max-w-2xl text-sm text-ash">
-          Focos no mundo (NASA FIRMS) e detalhe do Brasil (INPE), coloridos por
-          intensidade (FRP): crítico, alto, médio e baixo. Toque no pin para
+          Focos no mundo (NASA FIRMS, 24h) e no Brasil (INPE diário + 10 min),
+          coloridos por intensidade (FRP): crítico, alto, médio e baixo. Amostra
+          diversificada — não é inventário completo. Toque no pin para
           identificar. O + marca um foco no Brasil neste aparelho.
         </p>
       </StaggerItem>
