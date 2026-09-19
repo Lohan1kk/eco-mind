@@ -27,7 +27,11 @@ export function ClimateReality() {
           <StaggerItem soft>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-mist/70">
               Antes de qualquer app, existe um planeta reagindo às nossas
-              escolhas.
+              escolhas. Os números usam unidades como{" "}
+              <a href="/#glossario" className="text-sprout underline-offset-2 hover:underline">
+                ppm
+              </a>{" "}
+              e °C — veja o glossário se o termo for novo.
             </p>
           </StaggerItem>
         </StaggerReveal>

@@ -2,6 +2,7 @@ import { ClimateReality } from "@/components/ClimateSections";
 import { Encourage } from "@/components/Encourage";
 import { EvaluationSection } from "@/components/Evaluation";
 import { Footer } from "@/components/Footer";
+import { Glossary } from "@/components/Glossary";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { HowItWorks } from "@/components/HowItWorks";
@@ -24,6 +25,7 @@ export default function Home() {
         <HowItWorks />
         <Tools />
         <ClimateReality />
+        <Glossary />
         <School />
         <Team />
         <EvaluationSection />

@@ -18,6 +18,7 @@ const links = [
   { href: "/calculadora", label: "Calculadora" },
   { href: "/quiz", label: "Quiz" },
   { href: "/alerta-queimadas", label: "Mapa" },
+  { href: "/#glossario", label: "Termos" },
   { href: "/#equipe", label: "Equipe" },
   { href: "/#avaliacao", label: "Avaliar" },
 ];

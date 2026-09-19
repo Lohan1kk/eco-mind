@@ -150,6 +150,9 @@ export function CarbonCalculator() {
           {totalDisplay}
         </motion.p>
         <p className="text-lg text-mist/80">kg de CO₂ equivalente por ano</p>
+        <p className="mt-1 text-xs text-mist/50">
+          CO₂e = impacto de vários gases numa só unidade (como se fosse só CO₂).
+        </p>
 
         <div className="mt-6 h-2 overflow-hidden rounded-full bg-mist/10">
           <motion.div

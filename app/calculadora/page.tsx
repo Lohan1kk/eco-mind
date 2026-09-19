@@ -24,8 +24,15 @@ export default function CalculadoraPage() {
             titleClassName="display mt-3 text-3xl text-mist md:text-5xl"
           >
             <p className="mt-4 max-w-xl text-lg text-mist/70">
-              Ajuste os controles. O resultado recalcula na hora — e mostra por
-              onde começar a reduzir.
+              Ajuste os controles. O resultado recalcula na hora — em{" "}
+              <strong className="font-semibold text-mist/90">kg de CO₂e</strong>{" "}
+              (CO₂ equivalente) por ano.{" "}
+              <a
+                href="/#glossario"
+                className="text-sprout underline-offset-2 hover:underline"
+              >
+                O que é pegada e CO₂e?
+              </a>
             </p>
           </PageIntro>
           <div className="mt-12">

@@ -22,13 +22,19 @@ export function AlertaIntro() {
       <StaggerItem soft>
         <p className="mt-1 max-w-2xl text-xs leading-snug text-ash md:text-sm md:leading-normal">
           <span className="md:hidden">
-            INPE + NASA · toque no pin · + para reportar no Brasil.
+            INPE + NASA · cores = FRP (potência do fogo) · + para reportar.
           </span>
           <span className="hidden md:inline">
-            Focos no mundo (NASA FIRMS, 24h) e no Brasil (INPE diário + 10 min),
-            coloridos por intensidade (FRP): crítico, alto, médio e baixo.
-            Amostra diversificada — não é inventário completo. Toque no pin para
-            identificar. O + marca um foco no Brasil neste aparelho.
+            Focos no mundo (NASA FIRMS, 24h) e no Brasil (INPE). As cores seguem
+            o FRP — potência do fogo em megawatts.{" "}
+            <a
+              href="/#glossario"
+              className="font-medium text-forest underline-offset-2 hover:underline"
+            >
+              O que é FRP, foco e INPE?
+            </a>{" "}
+            Amostra diversificada — não é inventário completo. O + marca um foco
+            no Brasil neste aparelho.
           </span>
         </p>
       </StaggerItem>
