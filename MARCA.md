@@ -18,7 +18,7 @@ A EcoMind cria essa ponte com um app que educa sobre causas e efeitos do desmata
 
 A EcoMind nasceu na escola. Em conversas e aulas, o grupo se deparou com a realidade dos **desmatamentos** e das **queimadas** — florestas destruídas, animais sem habitat e um futuro mais inseguro para a biodiversidade.
 
-Em vez de só se indignar com as notícias, Ana Flávia (CEO e Design), Lucas Lohan (CTO / Programação), André Soares (Tecnologia / Programação) e Gabriel Rosa (Marketing) decidiram transformar essa preocupação em um projeto: um app que educa e conscientiza sobre o impacto do desmatamento e das queimadas, e mostra o que cada pessoa pode fazer.
+Em vez de só se indignar com as notícias, Ana Flávia (Designer e Marketing), Lucas Lohan (Programador e Conteúdo), André Soares (Programador) e Gabriel Rosa (Conteúdo e Designer) decidiram transformar essa preocupação em um projeto: um app que educa e conscientiza sobre o impacto do desmatamento e das queimadas, e mostra o que cada pessoa pode fazer.
 
 A metáfora da marca é a **semente que vira broto**: pequenas ações e conhecimento plantados hoje podem crescer em mudança real. A EcoMind existe para cultivar essa consciência — na escola, em casa e na comunidade.
 

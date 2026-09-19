@@ -103,13 +103,13 @@ Roteiro de **7 slides** (~3–5 min). Cole o texto de cada slide no Canva. Use o
 
 ### Texto para o Canva
 - **Nossa equipe**
-- **Ana Flávia** — CEO / Design
-- **Lucas Lohan** — CTO / Programação (UX-UI)
-- **André Soares** — Tecnologia / Programação
-- **Gabriel Rosa** — Marketing / Conteúdo
+- **Ana Flávia** — Designer e Marketing
+- **Lucas Lohan** — Programador e Conteúdo
+- **André Soares** — Programador
+- **Gabriel Rosa** — Conteúdo e Designer
 
 ### Roteiro falado
-“Somos quatro. Ana Flávia lidera e cuida do design; Lucas Lohan é CTO, com programação e UX-UI; André Soares também na tecnologia e programação; e Gabriel Rosa no marketing e conteúdo. Cada um cobre uma parte para o projeto andar junto.”
+“Somos quatro. Ana Flávia no design e marketing; Lucas Lohan na programação e conteúdo; André Soares na programação; e Gabriel Rosa no conteúdo e design. Cada um cobre uma parte para o projeto andar junto.”
 
 ### Visual
 - Quatro colunas ou quatro “spots” com nome + função
